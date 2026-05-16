@@ -1,0 +1,146 @@
+#ajuda {
+  background-color: #f8fafc;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.ajuda-topo h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+  color: #0f172a;
+}
+
+.ajuda-topo p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto 50px auto;
+  color: #475569;
+}
+
+.ajuda-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.ajuda-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 30px 20px;
+  width: 300px;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
+  max-width: 400px;
+}
+
+.ajuda-card h2 {
+  font-size: 1.4rem;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.ajuda-card p {
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.ajuda-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.fale-conosco {
+  margin-top: 60px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  margin: 60px auto 0 auto;
+}
+
+.fale-conosco h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+.fale-conosco form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fale-conosco input,
+.fale-conosco textarea {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.fale-conosco button {
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #0f172a;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.fale-conosco button:hover {
+  background-color: #334155;
+}
+
+.mensagem-sucesso {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.mensagem-erro {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .ajuda-topo h1 {
+    font-size: 2.2rem;
+  }
+
+  .ajuda-topo p {
+    font-size: 1.1rem;
+  }
+
+  .ajuda-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ajuda-card {
+    width: 90%;
+  }
+
+  .fale-conosco {
+    padding: 0 20px;
+  }
+}

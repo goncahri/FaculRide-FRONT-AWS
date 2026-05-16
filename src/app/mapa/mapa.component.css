@@ -1,0 +1,616 @@
+.mapa-section {
+  padding: 30px;
+  background-color: #f1f5f9;
+  font-family: 'Poppins', sans-serif;
+}
+
+.titulo-centralizado {
+  text-align: center;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.mapa-form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.linha-horizontal {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 180px;
+}
+
+.input-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #0f172a;
+}
+
+.input-group input,
+.input-group select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.flex2 {
+  flex: 2;
+}
+
+.botao-centro {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn-mapa {
+  padding: 12px 24px;
+  background-color: #0f172a;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.btn-mapa:hover {
+  background-color: #1e293b;
+}
+
+.mapa-wrapper {
+  position: relative;
+}
+
+.mapa-container {
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.caronas-disponiveis-faixa {
+  background-color: #0f172a;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 40px 0;
+}
+
+.caronas-disponiveis-lista {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.carona-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 15px;
+  width: 300px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.carona-foto {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.carona-info {
+  flex: 1;
+}
+
+.carona-info strong {
+  color: #0f172a;
+  display: block;
+  font-weight: 600;
+}
+
+.ver-rota {
+  background: none;
+  color: #0f172a;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 5px 0;
+}
+
+.whatsapp-icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.carona-info a {
+  display: inline-block;
+  font-size: 0.95rem;
+  color: #2563eb;
+  text-decoration: none;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.carona-info a:hover {
+  text-decoration: underline;
+}
+
+.carona-info .link-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #2563eb;
+  text-decoration: none;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.carona-info .link-whatsapp:hover {
+  text-decoration: underline;
+}
+
+.minhas-caronas-faixa {
+  background-color: #0f172a;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 40px;
+}
+
+.minhas-caronas-faixa h3 {
+  text-align: center;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.caronas-bloco {
+  margin-bottom: 20px;
+}
+
+.caronas-bloco h4 {
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.caronas-bloco ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.caronas-bloco li {
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.vazio {
+  font-style: italic;
+  color: #cbd5e1;
+}
+
+.tipo-carona {
+  margin-bottom: 20px;
+}
+
+.tipo-carona select {
+  padding: 10px;
+  font-size: 1rem;
+  min-width: 200px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.avaliacao-box {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 30px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.avaliacao-box h3 {
+  color: #0f172a;
+  margin-bottom: 5px;
+  font-size: 1.3rem;
+}
+
+.subtexto-avaliacao {
+  margin-bottom: 15px;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.estrelas {
+  display: flex;
+  justify-content: center;
+  flex-direction: row-reverse;
+  gap: 8px;
+}
+
+.estrelas label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.estrelas input {
+  display: none;
+}
+
+.estrela {
+  font-size: 2rem;
+  color: #cbd5e1;
+  transition: color 0.2s;
+}
+
+.estrelas input:checked ~ .estrela,
+.estrelas .estrela:hover,
+.estrelas .estrela:hover ~ .estrela {
+  color: gold;
+}
+
+.numero-estrela {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.btn-enviar {
+  margin-top: 10px;
+  background-color: #0f172a;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-enviar:hover {
+  background-color: #1e293b;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.excluir-carona {
+  text-align: right;
+  margin-bottom: 5px;
+}
+
+.excluir-carona button {
+  background-color: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.excluir-carona button:hover {
+  text-decoration: underline;
+}
+
+.avaliacoes-faixa {
+  background-color: #0f172a;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.avaliacoes-bloco {
+  background-color: white;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.avaliacoes-bloco h4 {
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+
+.avaliacao-box textarea {
+  width: 60%;
+  min-height: 80px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 1rem;
+  resize: none;
+  margin-top: 15px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.avaliacao-box .btn-enviar {
+  display: block;
+  margin: 15px auto 0 auto;
+}
+
+/* ===== Overlay de carregamento no mapa ===== */
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.loading-box {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Calendário simples das datas da rota ===== */
+
+.calendario-container {
+  margin-top: 10px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.calendario-container > label {
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* chips com dias selecionados */
+.datas-selecionadas {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-data {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background-color: #1d4ed8;
+  color: #fff;
+  font-size: 0.8rem;
+  gap: 4px;
+}
+
+.tag-remover {
+  border: none;
+  background: transparent;
+  color: #e5e7eb;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.tag-remover:hover {
+  color: #fecaca;
+}
+
+/* ===== Responsividade geral ===== */
+
+@media (max-width: 768px) {
+  .linha-horizontal {
+    flex-direction: column;
+  }
+
+  .input-group {
+    flex: 1 1 100%;
+  }
+
+  .carona-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .carona-foto {
+    margin-bottom: 10px;
+  }
+
+  .mapa-container {
+    height: 350px;
+  }
+
+  .tipo-carona select {
+    width: 100%;
+  }
+
+  .input-comentario {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 1rem;
+    resize: none;
+    margin-top: 10px;
+  }
+
+  .botao-centro {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-mapa {
+    width: 100%;
+    border-radius: 12px;
+  }
+}
+
+/* trigger que abre/fecha o calendário */
+.calendario-trigger {
+  margin-top: 8px;
+  margin-bottom: 10px;
+  background: #0f172a;
+  border-radius: 999px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #e5e7eb;
+  cursor: pointer;
+  border: 1px solid #1f2937;
+}
+
+.calendario-trigger:hover {
+  border-color: #3b82f6;
+}
+
+.seta-calendario {
+  font-size: 0.8rem;
+  margin-left: 8px;
+}
+
+/* caixa do calendário aberto */
+.calendario-popup {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #e5e7eb;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== NOVO GRID DO CALENDÁRIO ===== */
+
+.calendario-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.calendario-mes {
+  font-weight: 600;
+}
+
+.calendario-legenda {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+/* cabeçalho D S T Q Q S S */
+.calendario-weekday {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  padding-bottom: 4px;
+}
+
+/* botão de cada dia */
+.calendario-dia {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #e5e7eb;
+  padding: 6px 0;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.calendario-dia:hover:not(:disabled) {
+  border-color: #3b82f6;
+}
+
+.calendario-dia.vazio {
+  visibility: hidden;
+  cursor: default;
+}
+
+.calendario-dia.selecionado {
+  background: #2563eb;
+  border-color: #93c5fd;
+  color: #fff;
+}
+
+.calendario-dia:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Variação “primária” azul (se usar) */
+.btn-mapa.primary {
+  background-color: #2563eb;
+  border: 1px solid #2563eb;
+  color: #fff;
+}
+
+/* Estado desabilitado (enquanto carrega/sem dados) */
+.btn-mapa:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ícones nos botões (se colocar) */
+.btn-mapa .icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  vertical-align: -3px;
+}

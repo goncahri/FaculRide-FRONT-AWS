@@ -1,0 +1,92 @@
+<section class="login-section">
+  <div class="login-container">
+    <h1>Faça seu login</h1>
+
+    <!-- Mensagem de erro geral -->
+    <div *ngIf="errorMsg" class="error-message">
+      {{ errorMsg }}
+    </div>
+
+    <!-- Formulário de Login -->
+    <form #formLogin="ngForm" (ngSubmit)="login()">
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        placeholder="Digite seu email"
+        required
+        email
+      />
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        placeholder="Digite sua senha"
+        required
+      />
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="carregando || formLogin.invalid"
+      >
+        <!-- Quando NÃO está carregando -->
+        <ng-container *ngIf="!carregando; else loadingTpl">
+          <img src="assets/logo1.png" alt="FaculRide" class="btn-icon" />
+          Entrar
+        </ng-container>
+
+        <!-- Quando ESTÁ carregando -->
+        <ng-template #loadingTpl>
+          <div class="loading-wrapper">
+            <span class="spinner"></span>
+            Carregando...
+          </div>
+        </ng-template>
+      </button>
+    </form>
+
+    <!-- Link para recuperar senha -->
+    <button class="recover-password" (click)="toggleRecoverPassword()">
+      Esqueceu sua senha?
+    </button>
+
+    <!-- Seção de Recuperação de Senha -->
+    <div *ngIf="showRecoverPasswordSection" class="recover-container">
+      <form (ngSubmit)="sendRecoverEmail()" #formRecover="ngForm">
+        <input
+          id="recover-email"
+          name="recoverEmail"
+          type="email"
+          [(ngModel)]="recoverEmail"
+          placeholder="Informe seu e-mail"
+          required
+        />
+        <button type="submit" class="btn-primary">Enviar</button>
+      </form>
+
+      <div *ngIf="recoverMsg" class="success-message">
+        {{ recoverMsg }}
+      </div>
+    </div>
+
+    <!-- Separador -->
+    <p class="ou">ou</p>
+
+    <!-- Login Social -->
+    <button type="button" class="btn-google">
+      <img src="assets/google.png" alt="Google" class="btn-icon" />
+      Continuar com Google
+    </button>
+
+    <button type="button" class="btn-facebook">
+      <img src="assets/facebook.png" alt="Facebook" class="btn-icon" />
+      Continuar com Facebook
+    </button>
+
+    <!-- Link Cadastro -->
+    <p class="cadastro">
+      Ainda não tem cadastro? <a routerLink="/cadastro">Cadastrar</a>
+    </p>
+  </div>
+</section>

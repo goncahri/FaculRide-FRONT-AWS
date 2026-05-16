@@ -1,0 +1,135 @@
+<header class="header-container">
+  <div class="logo-menu">
+    <a routerLink="/" class="logo-link" aria-label="Ir para a página inicial">
+      <img src="/assets/logo.png" alt="Logo FaculRide" />
+    </a>
+
+    <nav class="menu-left" aria-label="Menu principal">
+      <ul class="menu-list-left">
+        <li class="dropdown">
+          <!-- usar button ao invés de href="#" -->
+          <button type="button" class="link-like" aria-haspopup="true" aria-expanded="false">
+            Sobre
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li role="none"><a role="menuitem" href="#quem-somos">Quem Somos</a></li>
+            <li role="none"><a role="menuitem" href="#sustentabilidade">Sustentabilidade</a></li>
+            <li role="none"><a role="menuitem" href="#como-funciona">Como Funciona</a></li>
+            <li role="none"><a role="menuitem" routerLink="/devs">Desenvolvedores</a></li>
+            <li role="none"><a role="menuitem" routerLink="/ajuda">Ajuda</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="menu-right">
+    <!-- Não logado -->
+    <ng-container *ngIf="!isLoggedIn; else usuarioLogado">
+      <ul class="menu-list">
+        <li><a routerLink="/login">Fazer login</a></li>
+        <li><a routerLink="/cadastro" class="btn-cadastro">Cadastre-se</a></li>
+      </ul>
+    </ng-container>
+
+    <!-- Logado -->
+    <ng-template #usuarioLogado>
+      <div class="menu-right-inner">
+        <!-- Sino de notificações -->
+        <div class="notification-wrapper">
+          <button
+            type="button"
+            class="bell-btn"
+            (click)="toggleNotifications($event)"
+            [attr.aria-expanded]="isNotificationsOpen"
+            aria-haspopup="true"
+            aria-label="Notificações"
+          >
+            <span class="bell" aria-hidden="true">🔔</span>
+            <span *ngIf="unreadCount > 0" class="badge" aria-hidden="true">{{ unreadCount }}</span>
+          </button>
+          <!-- região para leitores de tela anunciar novas notificações -->
+          <span class="sr-only" aria-live="polite">
+            {{ unreadCount }} nova(s) notificação(ões)
+          </span>
+
+          <div
+            class="notif-dropdown"
+            *ngIf="isNotificationsOpen"
+            role="dialog"
+            aria-modal="true"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="notif-header">
+              <span>Notificações</span>
+              <button type="button" (click)="markAllAsRead($event)">Marcar todas como lidas</button>
+            </div>
+
+            <div class="notif-list">
+              <button
+                type="button"
+                class="notif-item"
+                *ngFor="let n of notifications"
+                [class.unread]="!n.isRead"
+                (click)="markAsRead(n.id, $event)"
+              >
+                <strong>{{ n.title }}</strong>
+                <p>{{ n.message }}</p>
+              </button>
+
+              <p class="notif-empty" *ngIf="notifications.length === 0">
+                Sem notificações por enquanto 🙂
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dropdown do usuário -->
+        <div class="user-dropdown">
+          <button
+            type="button"
+            class="user-trigger"
+            (click)="toggleUserDropdown($event)"
+            [attr.aria-expanded]="isUserDropdownOpen"
+            aria-haspopup="true"
+          >
+            <img
+              [src]="fotoUsuario"
+              alt="Foto do usuário"
+              class="user-photo"
+              (error)="onImgError()"
+            />
+            <span class="user-name">{{ nomeUsuario }}</span>
+            <span class="arrow-down" aria-hidden="true">▼</span>
+          </button>
+
+          <ul
+            *ngIf="isUserDropdownOpen"
+            class="dropdown-menu-user"
+            role="menu"
+            (click)="$event.stopPropagation()"
+          >
+            <li role="none">
+              <a role="menuitem" routerLink="/gerenciar">
+                <img src="/assets/usuario.png" alt="" class="menu-icon" />
+                Gerenciar Conta
+              </a>
+            </li>
+            <li role="none">
+              <a role="menuitem" routerLink="/usuario">
+                <img src="/assets/viajar.png" alt="" class="menu-icon" />
+                Viajar
+              </a>
+            </li>
+            <li role="none">
+              <button role="menuitem" type="button" (click)="logout($event)">
+                <img src="/assets/sair.png" alt="" class="menu-icon" />
+                Sair
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</header>

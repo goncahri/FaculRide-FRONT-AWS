@@ -1,0 +1,68 @@
+<!-- Seção de Ajuda com Formulário -->
+<section class="section section-white" id="ajuda">
+  <div class="ajuda-topo">
+    <h1>FaculRide te ajuda!</h1>
+    <p>Precisa de suporte? Veja abaixo as principais informações e tire suas dúvidas rapidamente. Se ainda precisar, mande sua mensagem para nós!</p>
+  </div>
+
+  <div class="ajuda-cards">
+    <div class="ajuda-card">
+      <h2>Como Funciona o FaculRide?</h2>
+      <p>O FaculRide conecta estudantes que precisam de carona com colegas que oferecem vagas no carro, promovendo mobilidade sustentável e segura.</p>
+    </div>
+
+    <div class="ajuda-card">
+      <h2>Cadastro e Login</h2>
+      <p>Você pode criar uma conta gratuitamente usando seu e-mail acadêmico. Depois, basta fazer login para começar a usar.</p>
+    </div>
+
+    <div class="ajuda-card">
+      <h2>Segurança nas Caronas</h2>
+      <p>Todos os usuários passam por uma verificação de cadastro para garantir a confiança nas caronas.</p>
+    </div>
+
+    <div class="ajuda-card">
+      <h2>Problemas com uma Carona</h2>
+      <p>Entre em contato diretamente com o suporte para reportar qualquer incidente.</p>
+    </div>
+
+    <div class="ajuda-card">
+      <h2>Contato com o Suporte</h2>
+      <p>Envie uma mensagem usando o formulário abaixo ou acesse nosso WhatsApp oficial para atendimento rápido.</p>
+    </div>
+  </div>
+
+  <!-- Formulário Fale Conosco -->
+  <div class="fale-conosco">
+    <h2>Fale Conosco</h2>
+
+  <!-- Mensagem de sucesso -->
+  <div *ngIf="mensagemSucesso" class="mensagem-sucesso">
+    ✅ Sua mensagem foi enviada com sucesso! ✅
+  </div>
+
+  <form #formContato="ngForm" (ngSubmit)="enviarFormulario(formContato)">
+  
+  <!-- Nome -->
+  <input type="text" name="nome" ngModel placeholder="Seu nome" required #nome="ngModel">
+  <div *ngIf="nome.invalid && nome.touched" class="mensagem-erro">
+    ⚠️ Nome é obrigatório.
+  </div>
+
+  <!-- E-mail -->
+  <input type="email" name="email" ngModel placeholder="Seu e-mail" required email #email="ngModel">
+  <div *ngIf="email.invalid && email.touched" class="mensagem-erro">
+    ⚠️ Informe um e-mail válido.
+  </div>
+
+  <!-- Mensagem -->
+  <textarea name="mensagem" ngModel placeholder="Sua dúvida ou reclamação" rows="5" required #mensagem="ngModel"></textarea>
+  <div *ngIf="mensagem.invalid && mensagem.touched" class="mensagem-erro">
+    ⚠️ A mensagem é obrigatória.
+  </div>
+
+  <!-- Botão -->
+  <button type="submit" [disabled]="formContato.invalid">Enviar</button>
+</form>
+</div>
+</section>

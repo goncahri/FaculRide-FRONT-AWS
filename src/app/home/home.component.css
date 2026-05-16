@@ -1,0 +1,268 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  min-height: 70vh;
+  transition: all 0.3s ease-in-out;
+}
+
+.section-white {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+.section-blue {
+  background-color: #1e293b;
+  color: #f1f5f9;
+}
+
+.section-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  max-width: 1300px;
+  gap: 40px;
+}
+
+.section-text {
+  flex: 1;
+  text-align: center;
+}
+
+.section-text h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+
+.section-text p {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 20px auto 0; 
+  line-height: 1.5;
+}
+
+.section-image {
+  flex: 1;
+  text-align: center;
+}
+
+.section-image img {
+  width: 500px;
+  max-width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+}
+
+.procurar-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 28px;
+  border: 2px solid #0f172a;
+  background-color: #ffffff;
+  color: #0f172a;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.procurar-btn:hover {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+.section-blue .procurar-btn {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+.section-blue .procurar-btn:hover {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+.quem-somos-boxes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 100px;
+  padding: 40px 60px;
+}
+
+.quem-somos-logo {
+  flex: 2;
+  text-align: center;
+}
+
+.quem-somos-logo img {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+}
+
+.quem-somos-texto {
+  flex: 2;
+  text-align: left;
+  color: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 800px;
+}
+
+.quem-somos-texto h1 {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 3.2rem;
+}
+
+.quem-somos-texto p {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  max-width: 100%;
+  margin-top: 20px;
+}
+
+#como-funciona .section-content {
+  width: 100%;
+  max-width: 1400px;
+  padding: 0 20px;
+}
+
+#como-funciona .section-image img {
+  width: 100% !important;
+  max-width: 1400px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Responsividade geral */
+@media (max-width: 768px) {
+  .section-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .section-text h1 {
+    font-size: 2.2rem;
+  }
+
+  .section-text p {
+    font-size: 1rem;
+  }
+
+  /* Responsivo para seção Quem Somos */
+  .quem-somos-boxes {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .quem-somos-texto {
+    text-align: center;
+  }
+
+  .quem-somos-texto h1 {
+    font-size: 2.4rem;
+  }
+
+  .quem-somos-texto p {
+    font-size: 1.1rem;
+  }
+
+  .quem-somos-logo img {
+    max-width: 300px;
+  }
+
+  /* Responsivo para seção Como Funciona */
+  #como-funciona .section-content {
+    padding: 0 10px;
+  }
+
+  #como-funciona .section-image img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+.sustentabilidade-boxes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 40px;
+  padding: 40px 20px;
+}
+
+.sustentabilidade-texto h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+
+.sustentabilidade-texto p {
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.sustentabilidade-imagens {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.sustentabilidade-imagens img {
+  width: 500px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 16px;
+}
+
+.section img:hover,
+.quem-somos-logo img:hover,
+.sustentabilidade-imagens img:hover {
+  transform: scale(1.05); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Responsividade para Sustentabilidade */
+@media (max-width: 768px) {
+  .sustentabilidade-imagens {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .sustentabilidade-imagens img {
+    width: 90%;
+  }
+
+  .sustentabilidade-texto h1 {
+    font-size: 2.2rem;
+  }
+
+  .sustentabilidade-texto p {
+    font-size: 1.1rem;
+  }
+}
+
+

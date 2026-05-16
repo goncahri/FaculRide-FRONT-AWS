@@ -1,0 +1,125 @@
+<section class="apoio-container">
+  <h2 class="titulo-apoio">Seja um apoiador da ideia 💙</h2>
+
+  <p class="texto-apoio">
+    Sua doação ajuda a manter o FaculRide vivo e em evolução.
+    Aqui não é compra de produto, é apoio espontâneo ao projeto.
+  </p>
+
+  <form (ngSubmit)="iniciarDoacao()">
+    <!-- Dados básicos do apoiador -->
+    <div class="row mb-3">
+      <div class="col-md-6 mb-2">
+        <label class="form-label">Nome</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="nome"
+          name="nome"
+          required
+        />
+      </div>
+      <div class="col-md-6 mb-2">
+        <label class="form-label">E-mail</label>
+        <input
+          type="email"
+          class="form-control"
+          [(ngModel)]="email"
+          name="email"
+          required
+        />
+      </div>
+    </div>
+
+    <!-- Planos rápidos -->
+    <div class="planos-apoio mb-3">
+      <button
+        *ngFor="let plano of planos"
+        type="button"
+        class="btn-plano"
+        [class.selecionado]="valorSelecionado === plano.valor"
+        (click)="selecionarPlano(plano)"
+      >
+        <div class="plano-label">{{ plano.label }}</div>
+        <div class="plano-valor">
+          R$ {{ plano.valor | number:'1.2-2' }}
+        </div>
+      </button>
+    </div>
+
+    <!-- Valor personalizado -->
+    <div class="doacao-valor-custom mb-4">
+      <label class="form-label">Ou escolha outro valor:</label>
+      <div class="input-group">
+        <span class="input-group-text">R$</span>
+        <input
+          type="number"
+          min="1"
+          class="form-control"
+          [value]="valorSelecionado || ''"
+          (input)="
+            valorSelecionado = $any($event.target).valueAsNumber;
+            tipoApoioSelecionado = 'Apoio Personalizado'
+          "
+        />
+      </div>
+    </div>
+
+    <button
+      class="btn btn-primary btn-apoio"
+      type="submit"
+      [disabled]="carregando"
+    >
+      <span *ngIf="!carregando">Apoiar com Mercado Pago</span>
+      <span *ngIf="carregando">Gerando link de apoio...</span>
+    </button>
+
+    <small class="texto-termos">
+      Você será redirecionado ao ambiente seguro do Mercado Pago para concluir sua doação.
+    </small>
+  </form>
+</section>
+
+<!-- ================= MODAL PIX ================= -->
+<div class="modal-pix-backdrop" *ngIf="exibirModalPix">
+  <div class="modal-pix-card">
+    <button class="modal-fechar" type="button" (click)="fecharModalPix()">×</button>
+
+    <h3 class="modal-titulo">PIX gerado com sucesso 🎉</h3>
+
+    <p class="modal-subtitulo" *ngIf="statusPagamento">
+      Status do pagamento: <strong>{{ statusPagamento }}</strong>
+    </p>
+
+    <!-- QR CODE -->
+    <div class="modal-qr-wrapper" *ngIf="qrCodeBase64">
+      <img
+        [src]="'data:image/png;base64,' + qrCodeBase64"
+        alt="QR Code PIX"
+        class="qr-image"
+      />
+    </div>
+
+    <!-- Copia e cola -->
+    <div class="modal-copia-cola" *ngIf="qrCode">
+      <label>Código PIX (copia e cola):</label>
+      <textarea
+        readonly
+        class="pix-textarea"
+      >{{ qrCode }}</textarea>
+
+      <button
+        type="button"
+        class="btn btn-secondary btn-copiar"
+        (click)="copiarCodigoPix()"
+      >
+        {{ copiado ? 'Copiado! ✅' : 'Copiar código PIX' }}
+      </button>
+    </div>
+
+    <p class="modal-info-extra">
+      Abra o app do seu banco, escolha pagar via PIX e use o QR Code
+      ou o código de copia e cola acima.
+    </p>
+  </div>
+</div>

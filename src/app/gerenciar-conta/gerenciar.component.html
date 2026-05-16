@@ -1,0 +1,139 @@
+<section class="gerenciar-section">
+  <h2>Gerenciar Conta</h2>
+  <p class="subtexto">
+    Faça as alterações necessárias nos seus dados e, em seguida, clique em <strong>"Salvar Alterações"</strong> para atualizar sua conta.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Dados pessoais -->
+    <div class="form-group">
+      <label for="nome">Nome</label>
+      <input id="nome" formControlName="nome" placeholder="Nome completo" />
+    </div>
+
+    <div class="form-group">
+      <label for="cpf">CPF</label>
+      <input id="cpf" formControlName="cpf" placeholder="CPF (somente números)" />
+    </div>
+
+    <div class="form-group">
+      <label for="email">E-mail</label>
+      <input id="email" formControlName="email" placeholder="E-mail" />
+    </div>
+
+    <div class="form-group">
+      <label for="telefone">Telefone</label>
+      <input id="telefone" formControlName="telefone" placeholder="Telefone (somente números)" />
+    </div>
+
+    <div class="form-group">
+      <label for="cep">CEP</label>
+      <input id="cep" formControlName="cep" placeholder="CEP (somente números)" (blur)="buscarEnderecoPorCep()" />
+    </div>
+
+    <div class="form-group">
+      <label for="endereco">Endereço</label>
+      <input id="endereco" formControlName="endereco" placeholder="Endereço" />
+    </div>
+
+    <div class="form-group">
+      <label for="numero">Número</label>
+      <input id="numero" formControlName="numero" placeholder="Número" />
+    </div>
+
+    <div class="form-group">
+      <label for="cidade">Cidade</label>
+      <input id="cidade" formControlName="cidade" placeholder="Cidade" />
+    </div>
+
+    <div class="form-group">
+      <label for="estado">Estado</label>
+      <input id="estado" formControlName="estado" placeholder="Estado" />
+    </div>
+
+    <div class="form-group">
+      <label for="fatec">Fatec</label>
+      <input id="fatec" formControlName="fatec" placeholder="Sua Fatec" />
+    </div>
+
+    <div class="form-group">
+      <label for="ra">RA</label>
+      <input id="ra" formControlName="ra" placeholder="RA (somente números)" />
+    </div>
+
+    <div class="form-group">
+      <label for="genero">Gênero</label>
+      <input id="genero" formControlName="genero" placeholder="Masculino ou Feminino" />
+    </div>
+
+    <div class="form-group">
+      <label for="dataNascimento">Data de Nascimento</label>
+      <input id="dataNascimento" type="date" formControlName="dataNascimento" [attr.max]="hoje" />
+      <div *ngIf="form.get('dataNascimento')?.errors?.['dataFutura'] && form.get('dataNascimento')?.touched">
+        <small>A data não pode ser no futuro.</small>
+      </div>
+      <div *ngIf="form.get('dataNascimento')?.errors?.['required'] && form.get('dataNascimento')?.touched">
+        <small>Preencha a data de nascimento.</small>
+      </div>
+    </div>
+
+    <!-- Dados do veículo -->
+    <div class="card-veiculo">
+      <div *ngIf="temVeiculo; else templateAdicionarVeiculo">
+        <h3>Dados do Veículo</h3>
+
+        <div class="form-group">
+          <label for="modeloCarro">Modelo</label>
+          <input id="modeloCarro" formControlName="modeloCarro" placeholder="Ex: Fox" />
+        </div>
+
+        <div class="form-group">
+          <label for="anoCarro">Ano</label>
+          <input id="anoCarro" formControlName="anoCarro" placeholder="Ex: 2020" />
+        </div>
+
+        <div class="form-group">
+          <label for="corCarro">Cor</label>
+          <input id="corCarro" formControlName="corCarro" placeholder="Ex: Prata" />
+        </div>
+
+        <div class="form-group">
+          <label for="placa">Placa</label>
+          <input id="placa" formControlName="placa" placeholder="Placa do veículo" />
+        </div>
+
+        <button type="button" (click)="removerVeiculo()" class="btn-remover">
+          Não tenho mais veículo (Remover Veículo)
+        </button>
+      </div>
+
+      <!-- Caso não tenha veículo -->
+      <ng-template #templateAdicionarVeiculo>
+        <button type="button" (click)="adicionarVeiculo()" class="btn-adicionar">
+          + Adicionar Veículo
+        </button>
+      </ng-template>
+    </div>
+
+        <!-- Foto do perfil (opcional) -->
+    <div class="form-group">
+      <label for="foto">Foto do perfil (opcional)</label>
+
+      <!-- Preview (mostra se houver imagem selecionada) -->
+      <div class="foto-preview" *ngIf="previewUrl as src">
+        <img [src]="src" alt="Pré-visualização da foto" style="width:96px;height:96px;object-fit:cover;border-radius:50%;border:2px solid #ddd" />
+        <button type="button" (click)="removerFoto()">Remover</button>
+      </div>
+
+      <input
+        id="foto"
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        (change)="onFotoChange($event)" />
+
+      <small>Formatos: JPG/PNG/WEBP — até 5MB</small>
+    </div>
+
+    <button type="submit">Salvar Alterações</button>
+  </form>
+</section>
