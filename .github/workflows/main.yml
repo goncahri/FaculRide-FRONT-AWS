@@ -1,0 +1,108 @@
+name: CI / CD - Frontend - Production
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Semver
+        run: npm install -g semver
+
+      - name: Calculate Production Version
+        id: version
+        shell: bash
+        run: |
+          git fetch --tags --force --prune
+
+          LAST_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+
+          if [ -z "$LAST_TAG" ]; then
+            BASE_VERSION="0.0.0"
+            RANGE="HEAD"
+          else
+            BASE_VERSION="${LAST_TAG#v}"
+            BASE_VERSION=$(echo $BASE_VERSION | cut -d'-' -f1)
+            RANGE="${LAST_TAG}..HEAD"
+          fi
+
+          INC_TYPE="patch"
+
+          if git log $RANGE --pretty=%s | grep -qE "^feat"; then
+            INC_TYPE="minor"
+          fi
+
+          NEW_BASE=$(npx semver -i $INC_TYPE "$BASE_VERSION")
+
+          FINAL_VERSION="v${NEW_BASE}"
+
+          echo "new_version=$FINAL_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update package.json
+        run: |
+          VERSION="${{ steps.version.outputs.new_version }}"
+          VERSION="${VERSION#v}"
+
+          node -e "
+            const fs = require('fs');
+            const pkg = require('./package.json');
+            pkg.version = '$VERSION';
+            fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2));
+          "
+
+      - name: Create Production Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          name: Frontend Release ${{ steps.version.outputs.new_version }}
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit Version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add package.json
+
+          git commit -m "chore(version): production to ${{ steps.version.outputs.new_version }} [skip ci]" || echo "No changes"
+
+          git push origin main
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            goncahri/faculride-frontend:production-${{ steps.version.outputs.new_version }}
+            goncahri/faculride-frontend:production-latest
