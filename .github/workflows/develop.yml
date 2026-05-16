@@ -7,7 +7,8 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
+  issues: write
+  pull-requests: write
 
 jobs:
   pipeline:
@@ -26,85 +27,60 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Install Semver
-        run: npm install -g semver
-
-      - name: Calculate Preview Version
-        id: version
-        shell: bash
-        run: |
-          git fetch --tags --force --prune
-
-          LAST_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n1)
-
-          if [ -z "$LAST_TAG" ]; then
-            BASE_VERSION="0.0.0"
-            RANGE="HEAD"
-          else
-            BASE_VERSION="${LAST_TAG#v}"
-            BASE_VERSION=$(echo $BASE_VERSION | cut -d'-' -f1)
-            RANGE="${LAST_TAG}..HEAD"
-          fi
-
-          INC_TYPE="patch"
-
-          if git log $RANGE --pretty=%s | grep -qE "^feat"; then
-            INC_TYPE="minor"
-          fi
-
-          NEW_BASE=$(npx semver -i $INC_TYPE "$BASE_VERSION")
-
-          COUNT=$(git tag --list "v${NEW_BASE}-preview.*" | wc -l | xargs)
-
-          PREVIEW_VERSION="v${NEW_BASE}-preview.$((COUNT+1))"
-
-          echo "new_version=$PREVIEW_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Update package.json
-        run: |
-          VERSION="${{ steps.version.outputs.new_version }}"
-          VERSION="${VERSION#v}"
-
-          node -e "
-            const fs = require('fs');
-            const pkg = require('./package.json');
-            pkg.version = '$VERSION';
-            fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2));
-          "
-
-      - name: Create Preview Release
-        uses: softprops/action-gh-release@v2
+      - name: Semantic Release Preview
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4
         with:
-          tag_name: ${{ steps.version.outputs.new_version }}
-          name: Frontend Preview ${{ steps.version.outputs.new_version }}
-          prerelease: true
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit Version
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add package.json
-
-          git commit -m "chore(version): bump to ${{ steps.version.outputs.new_version }} [skip ci]" || echo "No changes"
-
-          git push origin develop
-
       - name: Login Docker Hub
+        if: steps.semantic.outputs.new_release_published == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push Docker
+        if: steps.semantic.outputs.new_release_published == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            goncahri/faculride-frontend:development-${{ steps.version.outputs.new_version }}
+            goncahri/faculride-frontend:development-v${{ steps.semantic.outputs.new_release_version }}
             goncahri/faculride-frontend:development-latest
+
+  notify_failure:
+    name: Notify Failure
+    needs: pipeline
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Send error email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_HOST }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USER }}
+          password: ${{ secrets.MAIL_PASS }}
+          subject: "🚨 FALHA NO CI/CD: ${{ github.repository }}"
+          to: "${{ secrets.TEAM_EMAILS }}"
+          from: "GitHub Actions <no-reply@faculride.com>"
+          body: |
+            O pipeline de desenvolvimento do Frontend ${{ github.repository }} falhou.
+
+            Detalhes:
+            - Branch: ${{ github.ref_name }}
+            - Autor do commit: ${{ github.actor }}
+            - Workflow: ${{ github.workflow }}
+            - Log do erro: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Verifique o link acima para entender a causa da falha.
