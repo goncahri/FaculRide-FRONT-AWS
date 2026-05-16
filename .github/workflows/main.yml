@@ -57,6 +57,28 @@ jobs:
             goncahri/faculride-frontend:production-v${{ steps.semantic.outputs.new_release_version }}
             goncahri/faculride-frontend:production-latest
 
+      - name: Deploy to EC2
+        if: steps.semantic.outputs.new_release_published == 'true'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            mkdir -p ${{ secrets.EC2_PATH }}
+            cd ${{ secrets.EC2_PATH }}
+
+            docker pull goncahri/faculride-frontend:production-latest
+
+            docker stop faculride-frontend || true
+            docker rm faculride-frontend || true
+
+            docker run -d \
+              --name faculride-frontend \
+              --restart always \
+              -p 8080:80 \
+              goncahri/faculride-frontend:production-latest
+
   notify_failure:
     name: Notify Failure
     needs: pipeline
