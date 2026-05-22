@@ -25,7 +25,7 @@ export class SocketService implements OnDestroy {
   notification$ = this.notificationSubject.asObservable();
 
   // ajuste de URL pro backend:
-  private readonly SOCKET_URL = 'https://projeto-faculride.onrender.com';
+  private readonly SOCKET_URL = 'http://faculride-api.duckdns.org';
 
   connect(token: string) {
     if (this.socket && this.socket.connected) {
