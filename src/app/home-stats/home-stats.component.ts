@@ -29,7 +29,7 @@ export class HomeStatsComponent implements OnInit, AfterViewInit, OnDestroy {
   baseURL =
     typeof window !== 'undefined' && window.location.hostname.includes('localhost')
       ? 'http://localhost:3000/api'
-      : 'https://projeto-faculride.onrender.com/api';
+      : 'http://faculride-api.duckdns.org/api';
 
   usuariosChart?: Chart;
   mediaChart?: Chart;
