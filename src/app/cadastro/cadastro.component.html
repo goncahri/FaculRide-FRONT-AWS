@@ -190,6 +190,33 @@
         </div>
       </div>
 
+      <!-- Arquivo da CNH (opcional) -->
+      <div class="form-group">
+        <label for="arquivoCnh">Foto ou PDF da CNH (opcional)</label>
+
+        <div class="foto-preview" *ngIf="previewCnhUrl as cnhSrc">
+          <img
+            *ngIf="cnhFileType !== 'application/pdf'"
+            [src]="cnhSrc"
+            alt="Pré-visualização da CNH"
+            style="width:96px;height:96px;object-fit:cover;border-radius:8px;border:2px solid #ddd" />
+
+          <span *ngIf="cnhFileType === 'application/pdf'">
+            PDF selecionado: {{ selectedCnhFile?.name }}
+          </span>
+
+          <button type="button" (click)="removerCnh()">Remover</button>
+        </div>
+
+        <input
+          id="arquivoCnh"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,application/pdf"
+          (change)="onCnhChange($event)" />
+
+        <small>Formatos: JPG/PNG/WEBP/PDF — até 5MB</small>
+      </div>
+
       <div class="form-group">
         <label for="modeloCarro">Modelo do Carro</label>
         <input id="modeloCarro" type="text" formControlName="modeloCarro"
@@ -234,7 +261,7 @@
       </div>
     </div>
 
-        <!-- Foto do perfil (opcional) -->
+    <!-- Foto do perfil (opcional) -->
     <div class="form-group">
       <label for="foto">Foto do perfil (opcional)</label>
 
