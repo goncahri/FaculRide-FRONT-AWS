@@ -19,7 +19,7 @@ export interface Notification {
   providedIn: 'root'
 })
 export class NotificationService {
-  private readonly API_URL = 'https://projeto-faculride.onrender.com/api/notifications';
+  private readonly API_URL = 'http://faculride-api.duckdns.org/api/notifications';
 
   private notificationsSubject = new BehaviorSubject<Notification[]>([]);
   notifications$ = this.notificationsSubject.asObservable();

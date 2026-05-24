@@ -17,7 +17,7 @@ export interface PixPagamentoResponse {
 export class ApoioService {
 
   // base em /api (igual ao app.use("/api", pagamentoRoutes))
-  private readonly API_URL = 'https://projeto-faculride.onrender.com/api';
+  private readonly API_URL = 'http://faculride-api.duckdns.org/api';
 
   constructor(private http: HttpClient) {}
 
