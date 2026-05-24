@@ -26,10 +26,18 @@ export class GerenciarComponent implements OnInit {
   temVeiculo: boolean = false;
   idVeiculo: number | null = null;
 
-  // ===== NOVO: estado da foto =====
+  // FOTO PERFIL
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   fotoRemovida = false;
+
+  // CNH
+  selectedCnhFile: File | null = null;
+  previewCnhUrl: string | null = null;
+  cnhFotoUrl: string | null = null;
+  cnhRemovida = false;
+  cnhFileType: string | null = null;
+  isCnhPdf = false;
 
   baseURL = isBrowser() && window.location.hostname.includes('localhost')
     ? 'http://localhost:3000/api'
@@ -70,7 +78,6 @@ export class GerenciarComponent implements OnInit {
         return;
       }
 
-      // Garante que tenha sempre o campo 'id'
       this.usuarioLogado = { ...usuario, id: id };
 
       this.temVeiculo = !!usuario.veiculo;
@@ -101,9 +108,21 @@ export class GerenciarComponent implements OnInit {
         });
       }
 
-      // Pré-visualizar foto atual (se existir)
+      // FOTO PERFIL
       if (usuario.foto || usuario.fotoUrl) {
         this.previewUrl = usuario.foto || usuario.fotoUrl;
+      }
+
+      // CNH
+      if (usuario.cnhFotoUrl) {
+        this.cnhFotoUrl = usuario.cnhFotoUrl;
+
+        const lower = usuario.cnhFotoUrl.toLowerCase();
+        this.isCnhPdf = lower.endsWith('.pdf');
+
+        if (!this.isCnhPdf) {
+          this.previewCnhUrl = usuario.cnhFotoUrl;
+        }
       }
     }
   }
@@ -156,6 +175,7 @@ export class GerenciarComponent implements OnInit {
         alert('Veículo removido com sucesso!');
         this.temVeiculo = false;
         this.idVeiculo = null;
+
         this.form.patchValue({
           modeloCarro: '',
           anoCarro: '',
@@ -181,19 +201,21 @@ export class GerenciarComponent implements OnInit {
     });
   }
 
-  // ===== NOVO: seleção/remoção da foto =====
+  // FOTO PERFIL
   onFotoChange(evt: Event) {
     const input = evt.target as HTMLInputElement;
     const file = input.files && input.files[0] ? input.files[0] : null;
     if (!file) return;
 
     const allow = ['image/jpeg', 'image/png', 'image/webp'];
+
     if (!allow.includes(file.type)) {
       alert('Arquivo inválido. Use JPG, PNG ou WEBP.');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Arquivo muito grande (máx. 2MB).');
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Arquivo muito grande (máx. 5MB).');
       return;
     }
 
@@ -204,25 +226,134 @@ export class GerenciarComponent implements OnInit {
 
   removerFoto() {
     this.selectedFile = null;
-    // se previewUrl for blob local, revoga; se for URL pública, apenas some o preview
-    try { if (this.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl); } catch {}
+
+    try {
+      if (this.previewUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(this.previewUrl);
+      }
+    } catch {}
+
     this.previewUrl = null;
     this.fotoRemovida = true;
   }
 
-  // ===== NOVO: helpers de upload/limpeza no back =====
+  // CNH
+  onCnhChange(evt: Event) {
+    const input = evt.target as HTMLInputElement;
+    const file = input.files && input.files[0] ? input.files[0] : null;
+
+    if (!file) return;
+
+    const allow = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'application/pdf'
+    ];
+
+    if (!allow.includes(file.type)) {
+      alert('Arquivo inválido. Use JPG, PNG, WEBP ou PDF.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Arquivo muito grande (máx. 5MB).');
+      return;
+    }
+
+    this.selectedCnhFile = file;
+    this.cnhFileType = file.type;
+    this.cnhRemovida = false;
+
+    if (file.type === 'application/pdf') {
+      this.previewCnhUrl = null;
+      this.isCnhPdf = true;
+    } else {
+      this.previewCnhUrl = URL.createObjectURL(file);
+      this.isCnhPdf = false;
+    }
+  }
+
+  removerCnh() {
+    this.selectedCnhFile = null;
+    this.previewCnhUrl = null;
+    this.cnhFotoUrl = null;
+    this.cnhFileType = null;
+    this.isCnhPdf = false;
+    this.cnhRemovida = true;
+  }
+
   private uploadFoto(token: string) {
-    if (!this.selectedFile) return Promise.resolve<{ fotoUrl?: string }>({});
+    if (!this.selectedFile) {
+      return Promise.resolve<{ fotoUrl?: string }>({});
+    }
+
     const fd = new FormData();
     fd.append('file', this.selectedFile, this.selectedFile.name);
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-    return this.http.post<any>(`${this.baseURL}/usuario/foto/upload`, fd, { headers }).toPromise();
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    return this.http
+      .post<any>(`${this.baseURL}/usuario/foto/upload`, fd, { headers })
+      .toPromise();
+  }
+
+  private uploadCnh(token: string) {
+    if (!this.selectedCnhFile) {
+      return Promise.resolve<{ cnhFotoUrl?: string }>({});
+    }
+
+    const fd = new FormData();
+    fd.append('file', this.selectedCnhFile, this.selectedCnhFile.name);
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    return this.http
+      .post<any>(`${this.baseURL}/usuario/cnh/upload`, fd, { headers })
+      .toPromise();
   }
 
   private limparFoto(token: string) {
-    if (!this.fotoRemovida) return Promise.resolve();
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-    return this.http.patch(`${this.baseURL}/usuario/foto`, { fotoUrl: null, fotoPath: null }, { headers }).toPromise();
+    if (!this.fotoRemovida) {
+      return Promise.resolve();
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    return this.http
+      .patch(
+        `${this.baseURL}/usuario/foto`,
+        { fotoUrl: null, fotoPath: null },
+        { headers }
+      )
+      .toPromise();
+  }
+
+  private limparCnh(token: string) {
+    if (!this.cnhRemovida) {
+      return Promise.resolve();
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    return this.http
+      .patch(
+        `${this.baseURL}/usuario/cnh`,
+        {
+          cnhFotoUrl: null,
+          cnhFotoPath: null
+        },
+        { headers }
+      )
+      .toPromise();
   }
 
   onSubmit() {
@@ -253,28 +384,73 @@ export class GerenciarComponent implements OnInit {
 
       this.http.put(`${this.baseURL}/usuario/${id}`, usuarioAtualizado).subscribe({
         next: async () => {
-          // ===== NOVO: processa foto após atualizar dados =====
           try {
-            const token = (isBrowser() ? localStorage.getItem('token') : null) || '';
+            const token =
+              (isBrowser() ? localStorage.getItem('token') : null) || '';
+
             if (token) {
+              // FOTO
               if (this.selectedFile) {
                 const up: any = await this.uploadFoto(token);
+
                 if (up?.fotoUrl) {
-                  this.usuarioLogado = { ...this.usuarioLogado, foto: up.fotoUrl, fotoUrl: up.fotoUrl };
+                  this.usuarioLogado = {
+                    ...this.usuarioLogado,
+                    foto: up.fotoUrl,
+                    fotoUrl: up.fotoUrl
+                  };
                 }
               } else if (this.fotoRemovida) {
                 await this.limparFoto(token);
-                this.usuarioLogado = { ...this.usuarioLogado, foto: null, fotoUrl: null };
+
+                this.usuarioLogado = {
+                  ...this.usuarioLogado,
+                  foto: null,
+                  fotoUrl: null
+                };
+              }
+
+              // CNH
+              if (this.selectedCnhFile) {
+                const upCnh: any = await this.uploadCnh(token);
+
+                if (upCnh?.cnhFotoUrl) {
+                  this.usuarioLogado = {
+                    ...this.usuarioLogado,
+                    cnhFotoUrl: upCnh.cnhFotoUrl
+                  };
+
+                  this.cnhFotoUrl = upCnh.cnhFotoUrl;
+
+                  const lower = upCnh.cnhFotoUrl.toLowerCase();
+
+                  this.isCnhPdf = lower.endsWith('.pdf');
+
+                  if (!this.isCnhPdf) {
+                    this.previewCnhUrl = upCnh.cnhFotoUrl;
+                  }
+                }
+              } else if (this.cnhRemovida) {
+                await this.limparCnh(token);
+
+                this.usuarioLogado = {
+                  ...this.usuarioLogado,
+                  cnhFotoUrl: null
+                };
+
+                this.cnhFotoUrl = null;
               }
             }
           } catch (e) {
-            console.warn('Falha ao processar foto (upload/limpar), seguindo com atualização:', e);
+            console.warn('Falha ao processar uploads:', e);
           }
 
           if (this.temVeiculo) {
             const veiculo = {
               Modelo: formData.modeloCarro,
-              Ano: formData.anoCarro ? Number(formData.anoCarro) : null,
+              Ano: formData.anoCarro
+                ? Number(formData.anoCarro)
+                : null,
               Cor: formData.corCarro,
               Placa_veiculo: formData.placa,
               idUsuario: id
@@ -306,7 +482,11 @@ export class GerenciarComponent implements OnInit {
         },
         error: (err) => {
           console.error('Erro ao atualizar usuário:', err);
-          alert(err?.error?.erro || 'Erro ao atualizar os dados. Verifique e tente novamente.');
+
+          alert(
+            err?.error?.erro ||
+            'Erro ao atualizar os dados. Verifique e tente novamente.'
+          );
         }
       });
     } else {
@@ -319,15 +499,31 @@ export class GerenciarComponent implements OnInit {
       ...usuarioAtualizado,
       id: this.usuarioLogado.id,
       veiculo: veiculo,
-      // mantém a foto atualizada (upload/limpeza)
-      foto: this.usuarioLogado.foto ?? this.usuarioLogado.fotoUrl ?? null
+
+      foto:
+        this.usuarioLogado.foto ??
+        this.usuarioLogado.fotoUrl ??
+        null,
+
+      fotoUrl:
+        this.usuarioLogado.fotoUrl ??
+        this.usuarioLogado.foto ??
+        null,
+
+      cnhFotoUrl:
+        this.usuarioLogado.cnhFotoUrl ??
+        null
     };
 
     if (isBrowser()) {
-      localStorage.setItem('usuarioLogado', JSON.stringify(usuarioSalvo));
+      localStorage.setItem(
+        'usuarioLogado',
+        JSON.stringify(usuarioSalvo)
+      );
     }
 
     alert('Dados atualizados com sucesso!');
+
     if (isBrowser()) {
       window.location.reload();
     }
