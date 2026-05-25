@@ -108,14 +108,15 @@
 
           <div class="foto-preview" *ngIf="previewCnhUrl || cnhFotoUrl || selectedCnhFile">
             <img
-              *ngIf="cnhFileType !== 'application/pdf' && (previewCnhUrl || cnhFotoUrl)"
+              *ngIf="!isCnhPdf && (previewCnhUrl || cnhFotoUrl)"
               [src]="previewCnhUrl || cnhFotoUrl"
               alt="Pré-visualização da CNH"
               style="width:96px;height:96px;object-fit:cover;border-radius:8px;border:2px solid #ddd" />
 
-            <span *ngIf="cnhFileType === 'application/pdf' || isCnhPdf">
-              PDF da CNH selecionado/enviado
-            </span>
+            <div *ngIf="isCnhPdf" style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:32px;">📄</span>
+              <span>{{ selectedCnhFile?.name || 'CNH em PDF enviada' }}</span>
+            </div>
 
             <button type="button" (click)="removerCnh()">Remover</button>
           </div>
