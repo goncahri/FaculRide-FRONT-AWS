@@ -4,6 +4,20 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { isBrowser } from '../utils/is-browser';
 
+type DiaCalendario = {
+  dia: number;
+  dateStr: string | null;
+  desabilitado: boolean;
+};
+
+type CalendarioMes = {
+  key: string;
+  label: string;
+  dias: DiaCalendario[];
+};
+
+type ModoVigencia = 'mensal' | 'semestre';
+
 @Component({
   selector: 'app-mapa',
   standalone: true,
@@ -17,12 +31,9 @@ export class MapaComponent implements AfterViewInit, OnInit {
   map!: google.maps.Map;
   directionsRenderer!: google.maps.DirectionsRenderer;
 
-  // ===== marcadores no mapa =====
   markers: google.maps.Marker[] = [];
   infoWindow!: google.maps.InfoWindow;
-  // ==============================
 
-  // ===== Spinner/estado de carregamento =====
   carregando: boolean = true;
   private _loads = { usuarios: false, viagens: false, avaliacoes: false };
   private markLoaded(key: 'usuarios' | 'viagens' | 'avaliacoes') {
@@ -31,38 +42,29 @@ export class MapaComponent implements AfterViewInit, OnInit {
       this.carregando = false;
     }
   }
-  // =========================================
 
-  // Dados do formulário
   tipoCarona: string = 'oferecer';
   origem: string = '';
+  cidadePartida: string = '';
   destino: string = '';
   entradaFatec: string = '';
   saidaFatec: string = '';
   ajudaCusto: number | null = null;
 
-  // ===== CALENDÁRIO MANUAL =====
-  mostrarCalendario: boolean = false;     // controla abrir/fechar popup
-  datasRota: string[] = [];               // datas selecionadas (YYYY-MM-DD)
+  mostrarCalendario: boolean = false;
+  datasRota: string[] = [];
 
-  // células do calendário do mês atual
-  diasCalendario: {
-    dia: number;
-    dateStr: string | null;
-    desabilitado: boolean;
-  }[] = [];
+  diasCalendario: DiaCalendario[] = [];
+  calendariosMensais: CalendarioMes[] = [];
+  modoVigencia: ModoVigencia = 'mensal';
 
   mesAtualLabel: string = '';
-
   hojeISO: string = new Date().toISOString().split('T')[0];
-  // =========================================
 
-  // Dados das viagens
   viagens: any[] = [];
   caronasOferecidas: any[] = [];
   caronasProcuradas: any[] = [];
 
-  // Dados das avaliações
   mostrarAvaliacao: boolean = false;
   nomeUsuarioSelecionado: string = '';
   idUsuarioSelecionado: number | null = null;
@@ -73,7 +75,6 @@ export class MapaComponent implements AfterViewInit, OnInit {
   avaliacoesEnviadas: any[] = [];
   usuarios: any[] = [];
 
-  // Configuração da API
   baseURL = isBrowser() && window.location.hostname.includes('localhost')
     ? 'http://localhost:3000/api'
     : 'http://faculride-api.duckdns.org/api';
@@ -82,8 +83,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
   meuId = Number(this.usuarioLogado.idUsuario || this.usuarioLogado.id);
 
   constructor(private http: HttpClient) {
-    // monta o calendário do mês atual logo na criação
-    this.gerarCalendarioMesCorrente();
+    this.gerarCalendariosMensais();
   }
 
   ngOnInit(): void {
@@ -113,10 +113,9 @@ export class MapaComponent implements AfterViewInit, OnInit {
     this.directionsRenderer.setMap(this.map);
 
     this.infoWindow = new google.maps.InfoWindow();
-    this.atualizarMarcadoresViagens(); // caso já tenha viagem carregada
+    this.atualizarMarcadoresViagens();
   }
 
-  // Helper para obter tipo normalizado.
   public tipoNormalizado(v: any): 'motorista' | 'passageiro' {
     const fromViagem = (v?.usuario?.tipoUsuario ?? v?.tipoUsuario ?? '')
       .toString()
@@ -138,7 +137,6 @@ export class MapaComponent implements AfterViewInit, OnInit {
     return fromUsuario === 'motorista' ? 'motorista' : 'passageiro';
   }
 
-  // Normalização de usuários
   private normalizeUsuario(u: any) {
     const bruto = (u?.tipoUsuario ?? u?.tipo_usuario ?? u?.tipo ?? '')
       .toString()
@@ -156,19 +154,12 @@ export class MapaComponent implements AfterViewInit, OnInit {
     };
   }
 
-  // ====== NORMALIZA AS DATAS VINDAS DO BACK (inclusive viajem_agendada) ======
   private normalizarDatasViagem(v: any): string[] {
     const datas: string[] = [];
 
-    if (Array.isArray(v?.diasAgendados)) {
-      datas.push(...v.diasAgendados);
-    }
-    if (Array.isArray(v?.datasAgendadas)) {
-      datas.push(...v.datasAgendadas);
-    }
-    if (Array.isArray(v?.datasRota)) {
-      datas.push(...v.datasRota);
-    }
+    if (Array.isArray(v?.diasAgendados)) datas.push(...v.diasAgendados);
+    if (Array.isArray(v?.datasAgendadas)) datas.push(...v.datasAgendadas);
+    if (Array.isArray(v?.datasRota)) datas.push(...v.datasRota);
 
     const ag1 = (v as any).viajem_agendada;
     const ag2 = (v as any).viajemAgendada;
@@ -260,8 +251,6 @@ export class MapaComponent implements AfterViewInit, OnInit {
     });
   }
 
-  // =============== LÓGICA DO CALENDÁRIO MANUAL ===============
-
   private toISODate(d: Date): string {
     const ano = d.getFullYear();
     const mes = String(d.getMonth() + 1).padStart(2, '0');
@@ -269,36 +258,29 @@ export class MapaComponent implements AfterViewInit, OnInit {
     return `${ano}-${mes}-${dia}`;
   }
 
-  private gerarCalendarioMesCorrente(): void {
+  private nomesMes = [
+    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+  ];
+
+  private gerarCalendarioDeUmMes(ano: number, mes: number): DiaCalendario[] {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
-    const ano = hoje.getFullYear();
-    const mes = hoje.getMonth(); // 0..11
-
-    const nomesMes = [
-      'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-      'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
-    ];
-    this.mesAtualLabel = `${nomesMes[mes]} de ${ano}`;
-
     const primeiroDia = new Date(ano, mes, 1);
-    const primeiroDiaSemana = primeiroDia.getDay(); // 0 = domingo
-
+    const primeiroDiaSemana = primeiroDia.getDay();
     const diasNoMes = new Date(ano, mes + 1, 0).getDate();
 
-    this.diasCalendario = [];
+    const calendario: DiaCalendario[] = [];
 
-    // espaços em branco antes do dia 1
     for (let i = 0; i < primeiroDiaSemana; i++) {
-      this.diasCalendario.push({
+      calendario.push({
         dia: 0,
         dateStr: null,
         desabilitado: true
       });
     }
 
-    // dias do mês
     for (let d = 1; d <= diasNoMes; d++) {
       const data = new Date(ano, mes, d);
       data.setHours(0, 0, 0, 0);
@@ -306,11 +288,97 @@ export class MapaComponent implements AfterViewInit, OnInit {
       const isPassado = data <= hoje;
       const isDomingo = data.getDay() === 0;
 
-      this.diasCalendario.push({
+      calendario.push({
         dia: d,
         dateStr: this.toISODate(data),
         desabilitado: isPassado || isDomingo
       });
+    }
+
+    return calendario;
+  }
+
+  private gerarCalendariosMensais(): void {
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth();
+
+    const proximoMesDate = new Date(anoAtual, mesAtual + 1, 1);
+    const anoProximoMes = proximoMesDate.getFullYear();
+    const mesProximo = proximoMesDate.getMonth();
+
+    this.mesAtualLabel = `${this.nomesMes[mesAtual]} de ${anoAtual}`;
+
+    const mesAtualObj: CalendarioMes = {
+      key: `${anoAtual}-${String(mesAtual + 1).padStart(2, '0')}`,
+      label: `${this.nomesMes[mesAtual]} de ${anoAtual}`,
+      dias: this.gerarCalendarioDeUmMes(anoAtual, mesAtual),
+    };
+
+    const proximoMesObj: CalendarioMes = {
+      key: `${anoProximoMes}-${String(mesProximo + 1).padStart(2, '0')}`,
+      label: `${this.nomesMes[mesProximo]} de ${anoProximoMes}`,
+      dias: this.gerarCalendarioDeUmMes(anoProximoMes, mesProximo),
+    };
+
+    this.calendariosMensais = [mesAtualObj, proximoMesObj];
+    this.diasCalendario = mesAtualObj.dias;
+  }
+
+  private gerarDatasDoSemestreAtual(): string[] {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const ano = hoje.getFullYear();
+    const mesAtual = hoje.getMonth();
+
+    const primeiroSemestre = mesAtual <= 5;
+
+    const inicioSemestre = primeiroSemestre
+      ? new Date(ano, 0, 1)
+      : new Date(ano, 6, 1);
+
+    const fimSemestre = primeiroSemestre
+      ? new Date(ano, 5, 30)
+      : new Date(ano, 11, 31);
+
+    inicioSemestre.setHours(0, 0, 0, 0);
+    fimSemestre.setHours(0, 0, 0, 0);
+
+    const datas: string[] = [];
+    const dataAtual = new Date(inicioSemestre);
+
+    while (dataAtual <= fimSemestre) {
+      const diaSemana = dataAtual.getDay();
+      const naoEhDomingo = diaSemana !== 0;
+      const naoEhPassado = dataAtual >= hoje;
+
+      if (naoEhDomingo && naoEhPassado) {
+        datas.push(this.toISODate(dataAtual));
+      }
+
+      dataAtual.setDate(dataAtual.getDate() + 1);
+    }
+
+    return datas;
+  }
+
+  get resumoSemestre(): string {
+    const datas = this.gerarDatasDoSemestreAtual();
+
+    if (!datas.length) {
+      return 'Nenhuma data futura encontrada para este semestre.';
+    }
+
+    const primeira = this.formatarDataTag(datas[0]);
+    const ultima = this.formatarDataTag(datas[datas.length - 1]);
+
+    return `${datas.length} datas serão geradas automaticamente, de ${primeira} até ${ultima}, considerando segunda a sábado e excluindo domingos.`;
+  }
+
+  onChangeModoVigencia(): void {
+    if (this.modoVigencia === 'semestre') {
+      this.mostrarCalendario = false;
     }
   }
 
@@ -340,31 +408,46 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   formatarDataTag(d: string): string {
     if (!d || d.length < 10) return d;
-    const [ano, mes, dia] = d.split('-');
+    const [, mes, dia] = d.split('-');
     return `${dia}/${mes}`;
   }
 
-  // =============================================================
+  private montarPartidaCompleta(): string {
+    const origemLimpa = String(this.origem || '').trim();
+    const cidadeLimpa = String(this.cidadePartida || '').trim();
+
+    if (origemLimpa && cidadeLimpa) {
+      return `${origemLimpa}, ${cidadeLimpa}`;
+    }
+
+    return origemLimpa || cidadeLimpa;
+  }
 
   tracarRota(): void {
-    if (!this.origem || !this.destino || !this.entradaFatec || !this.saidaFatec) {
+    if (!this.origem || !this.cidadePartida || !this.destino || !this.entradaFatec || !this.saidaFatec) {
       alert('Preencha todos os campos.');
       return;
     }
 
-    const datasSelecionadas = this.datasRota;
+    const datasSelecionadas =
+      this.modoVigencia === 'semestre'
+        ? this.gerarDatasDoSemestreAtual()
+        : this.datasRota;
 
     if (!datasSelecionadas.length) {
-      const continuar = confirm(
-        'Você não selecionou nenhuma data.\n' +
-        'Deseja cadastrar a rota mesmo assim?'
+      alert(
+        this.modoVigencia === 'semestre'
+          ? 'Não foi possível gerar datas para o semestre atual.'
+          : 'Selecione pelo menos um dia para que esta rota seja válida.'
       );
-      if (!continuar) return;
+      return;
     }
+
+    const partidaCompleta = this.montarPartidaCompleta();
 
     const dadosViagem: any = {
       tipoUsuario: this.tipoCarona === 'oferecer' ? 'motorista' : 'passageiro',
-      partida: this.origem,
+      partida: partidaCompleta,
       destino: this.destino,
       horarioEntrada: this.entradaFatec,
       horarioSaida: this.saidaFatec,
@@ -378,7 +461,12 @@ export class MapaComponent implements AfterViewInit, OnInit {
         alert('Rota cadastrada com sucesso!');
         this.carregarViagens();
 
-        // 👉 após cadastrar com sucesso, rola suavemente até o mapa
+        if (this.modoVigencia === 'mensal') {
+          this.datasRota = [];
+        }
+
+        this.mostrarCalendario = false;
+
         if (isBrowser() && this.mapContainer?.nativeElement) {
           setTimeout(() => {
             this.mapContainer.nativeElement.scrollIntoView({
@@ -396,13 +484,17 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
     if (isBrowser()) {
       const request: google.maps.DirectionsRequest = {
-        origin: this.origem,
+        origin: partidaCompleta,
         destination: this.destino,
         travelMode: google.maps.TravelMode.DRIVING
       };
+
       const directionsService = new google.maps.DirectionsService();
+
       directionsService.route(request, (result, status) => {
-        if (status === 'OK' && result) this.directionsRenderer.setDirections(result);
+        if (status === 'OK' && result) {
+          this.directionsRenderer.setDirections(result);
+        }
       });
     }
   }
@@ -415,9 +507,11 @@ export class MapaComponent implements AfterViewInit, OnInit {
         destination: destino,
         travelMode: google.maps.TravelMode.DRIVING
       };
+
       directionsService.route(request, (result, status) => {
         if (status === 'OK' && result) this.directionsRenderer.setDirections(result);
       });
+
       setTimeout(
         () => this.mapContainer.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' }),
         100
@@ -428,6 +522,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
   abrirWhatsapp(nome: string, idUsuario: number, numeroWhatsapp: string) {
     if (!numeroWhatsapp) return alert('Número de WhatsApp não disponível');
     if (isBrowser()) window.open(`https://wa.me/${numeroWhatsapp}`, '_blank');
+
     setTimeout(() => {
       if (confirm(`A carona com ${nome} foi realizada? Deseja avaliar?`)) {
         this.nomeUsuarioSelecionado = nome;
@@ -439,12 +534,14 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   enviarAvaliacao() {
     if (!this.avaliacaoSelecionada) return alert('Por favor, selecione uma nota.');
+
     const avaliacao = {
       ID_Avaliador: this.meuId,
       ID_Avaliado: this.idUsuarioSelecionado,
       Comentario: this.comentarioAvaliacao,
       Estrelas: this.avaliacaoSelecionada
     };
+
     this.http.post(`${this.baseURL}/avaliacao`, avaliacao).subscribe({
       next: () => {
         alert(`✅ Avaliação enviada! Você avaliou ${this.nomeUsuarioSelecionado} com ${this.avaliacaoSelecionada} ⭐`);
@@ -466,6 +563,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
         this.avaliacoesRecebidas = res
           .filter(a => a.ID_Avaliado === this.meuId)
           .map(a => ({ ...a, nomeAvaliador: this.pegarNomeUsuario(a.ID_Avaliador) }));
+
         this.avaliacoesEnviadas = res
           .filter(a => a.ID_Avaliador === this.meuId)
           .map(a => ({ ...a, nomeAvaliado: this.pegarNomeUsuario(a.ID_Avaliado) }));
@@ -495,6 +593,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   excluirCarona(idViagem: number) {
     if (!confirm('Tem certeza que deseja excluir esta carona?')) return;
+
     this.http.delete(`${this.baseURL}/viagem/${idViagem}`).subscribe({
       next: () => {
         alert('Carona excluída com sucesso!');
@@ -507,7 +606,6 @@ export class MapaComponent implements AfterViewInit, OnInit {
     });
   }
 
-  // ========= Exibir dias da rota no card (usado no HTML) =========
   formatDiasViagem(v: any): string {
     if (Array.isArray(v?.diasAgendados) && v.diasAgendados.length) {
       return v.diasAgendados.map((d: string) => this.formatarDataTag(d)).join(', ');
@@ -527,8 +625,6 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
     return '';
   }
-
-  // ===================== Marcadores de viagens no mapa =====================
 
   private atualizarMarcadoresViagens(): void {
     if (!isBrowser()) return;
@@ -607,17 +703,17 @@ export class MapaComponent implements AfterViewInit, OnInit {
     });
   }
 
-  // ===================== EXPORTAÇÃO (PDF / EXCEL) =====================
-
   private getCaronasParaExportar() {
     const oferecidas = (this.caronasOferecidas || []).map(c => ({
       Partida: c.partida, Destino: c.destino, Entrada: c.entrada,
       Saida: c.saida, Ajuda: String(c.ajuda ?? ''), Tipo: 'Motorista'
     }));
+
     const procuradas = (this.caronasProcuradas || []).map(c => ({
       Partida: c.partida, Destino: c.destino, Entrada: c.entrada,
       Saida: c.saida, Ajuda: String(c.ajuda ?? ''), Tipo: 'Passageiro'
     }));
+
     return [...oferecidas, ...procuradas];
   }
 
@@ -656,6 +752,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   async exportarExcel(): Promise<void> {
     const linhas = this.getCaronasParaExportar();
+
     if (!linhas.length) {
       alert('Sem caronas para exportar.');
       return;
@@ -669,6 +766,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
       const saveAs: any = fsMod?.saveAs ?? fsMod?.default;
 
       const ws = XLSX.utils.json_to_sheet(linhas);
+
       (ws as any)['!cols'] = [
         { wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }
       ];
