@@ -347,7 +347,7 @@ export class CadastroComponent implements OnInit {
 
           localStorage.setItem('usuarioLogado', JSON.stringify(usuarioSalvo));
           alert('✅ Conta criada com sucesso!');
-          this.router.navigate(['/login']);
+          this.router.navigate(['/usuario']);
         } catch (e) {
           console.error('Falha no login/upload pós-cadastro:', e);
 
