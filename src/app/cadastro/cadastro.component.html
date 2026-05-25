@@ -158,9 +158,20 @@
     <!-- Senha -->
     <div class="form-group">
       <label for="senha">Senha</label>
-      <input id="senha" type="password" formControlName="senha"
+
+      <input
+        id="senha"
+        type="password"
+        formControlName="senha"
         [ngClass]="{'campo-invalido': cadastroForm.get('senha')?.invalid && cadastroForm.get('senha')?.touched}"
-        placeholder="Mínimo 6 caracteres" />
+        placeholder="Mínimo 6 caracteres"
+      />
+
+      <small class="senha-info">
+        A senha deve conter no mínimo 6 caracteres, incluindo:
+        letra maiúscula, letra minúscula, número e caractere especial.
+      </small>
+
       <div class="erro" *ngIf="cadastroForm.get('senha')?.invalid && cadastroForm.get('senha')?.touched">
         Senha deve ter no mínimo 6 caracteres.
       </div>
