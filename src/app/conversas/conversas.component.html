@@ -7,6 +7,10 @@
       </div>
     </div>
 
+    <div *ngIf="erro" class="erro-sidebar">
+      {{ erro }}
+    </div>
+
     <div *ngIf="carregandoConversas" class="loading-sidebar">
       Carregando conversas...
     </div>
@@ -24,7 +28,7 @@
       <img
         *ngIf="fotoOutroUsuario(conversa)"
         [src]="fotoOutroUsuario(conversa)"
-        alt="Foto"
+        alt="Foto do contato"
         class="avatar-img"
       />
 
@@ -35,6 +39,10 @@
       <div class="conversa-info">
         <strong>{{ nomeOutroUsuario(conversa) }}</strong>
         <small>{{ statusLabel(conversa) }}</small>
+
+        <span class="conversa-rota">
+          {{ conversa.viagem?.partida || '-' }} → {{ conversa.viagem?.destino || '-' }}
+        </span>
       </div>
 
       <span class="status-dot" [ngClass]="statusClasse(conversa)"></span>
@@ -47,7 +55,7 @@
         <img
           *ngIf="fotoOutroUsuario()"
           [src]="fotoOutroUsuario()"
-          alt="Foto"
+          alt="Foto do contato"
           class="avatar-img grande"
         />
 
@@ -95,7 +103,7 @@
       </p>
     </div>
 
-    <div class="notice-card">
+    <div class="notice-card" [ngClass]="statusClasse()">
       {{ observacaoStatus() }}
     </div>
 
@@ -146,7 +154,7 @@
       <input
         [(ngModel)]="mensagem"
         [disabled]="!podeEnviarMensagem() || enviandoMensagem"
-        placeholder="Digite sua mensagem..."
+        [placeholder]="podeEnviarMensagem() ? 'Digite sua mensagem...' : 'Essa conversa não aceita novas mensagens.'"
         (keyup.enter)="enviarMensagem()"
       />
 
@@ -154,7 +162,7 @@
         (click)="enviarMensagem()"
         [disabled]="!podeEnviarMensagem() || enviandoMensagem || !mensagem.trim()"
       >
-        Enviar
+        {{ enviandoMensagem ? 'Enviando...' : 'Enviar' }}
       </button>
     </div>
   </main>
@@ -163,7 +171,10 @@
     <main class="chat-area empty-chat">
       <div class="empty-chat-content">
         <h2>Selecione uma conversa</h2>
-        <p>Escolha uma conversa na lateral para visualizar mensagens e detalhes da carona.</p>
+        <p>
+          Escolha uma conversa na lateral para visualizar mensagens,
+          detalhes da carona e ações de aceite ou recusa.
+        </p>
       </div>
     </main>
   </ng-template>
