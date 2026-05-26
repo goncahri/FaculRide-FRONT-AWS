@@ -86,6 +86,7 @@ export class ConversasComponent implements OnInit, OnDestroy {
   idViagemParam: number | null = null;
 
   private intervalId: any = null;
+  private conversaInicializada = false;
 
   constructor(
     private http: HttpClient,
@@ -93,13 +94,16 @@ export class ConversasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.idViagemParam = Number(this.route.snapshot.queryParamMap.get('idViagem')) || null;
-    this.inicializarTela();
+    this.route.queryParamMap.subscribe(params => {
+      this.idViagemParam = Number(params.get('idViagem')) || null;
+      this.inicializarTela();
+    });
 
     this.intervalId = setInterval(() => {
       if (this.conversaSelecionada?.idConversa) {
         this.carregarMensagens(this.conversaSelecionada.idConversa, true);
       }
+
       this.carregarConversas(true);
     }, 5000);
   }
@@ -110,11 +114,22 @@ export class ConversasComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getHeaders(): HttpHeaders {
-    const token =
+  private getToken(): string {
+    const usuarioLogado = isBrowser()
+      ? JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
+      : {};
+
+    return (
       localStorage.getItem('token') ||
       localStorage.getItem('accessToken') ||
-      '';
+      localStorage.getItem('jwt') ||
+      usuarioLogado?.token ||
+      ''
+    );
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = this.getToken();
 
     return new HttpHeaders({
       Authorization: `Bearer ${token}`,
@@ -124,25 +139,50 @@ export class ConversasComponent implements OnInit, OnDestroy {
 
   async inicializarTela(): Promise<void> {
     try {
+      this.erro = '';
       this.carregandoConversas = true;
 
-      if (this.idViagemParam) {
-        await this.iniciarConversa(this.idViagemParam);
+      let conversaInicial: Conversa | null = null;
+
+      if (this.idViagemParam && !this.conversaInicializada) {
+        conversaInicial = await this.iniciarConversa(this.idViagemParam);
+        this.conversaInicializada = true;
       }
 
       await this.carregarConversas();
 
+      if (conversaInicial?.idConversa) {
+        const conversaNaLista = this.conversas.find(
+          c => Number(c.idConversa) === Number(conversaInicial?.idConversa)
+        );
+
+        const conversaFinal = conversaNaLista || conversaInicial;
+
+        if (!conversaNaLista) {
+          this.conversas = this.deduplicarConversas([conversaFinal, ...this.conversas]);
+        }
+
+        this.selecionarConversa(conversaFinal);
+        return;
+      }
+
       if (this.idViagemParam && this.conversas.length) {
-        const conversaDaViagem = this.conversas.find(c => Number(c.idViagem) === Number(this.idViagemParam));
+        const conversaDaViagem = this.conversas.find(
+          c => Number(c.idViagem) === Number(this.idViagemParam)
+        );
+
         if (conversaDaViagem) {
           this.selecionarConversa(conversaDaViagem);
+          return;
         }
-      } else if (this.conversas.length) {
+      }
+
+      if (!this.conversaSelecionada && this.conversas.length) {
         this.selecionarConversa(this.conversas[0]);
       }
     } catch (error: any) {
       console.error('Erro ao inicializar conversas:', error);
-      this.erro = 'Não foi possível carregar as conversas.';
+      this.erro = error?.error?.erro || error?.message || 'Não foi possível carregar as conversas.';
     } finally {
       this.carregandoConversas = false;
     }
@@ -172,8 +212,13 @@ export class ConversasComponent implements OnInit, OnDestroy {
           this.conversas = this.deduplicarConversas(Array.isArray(res) ? res : []);
 
           if (this.conversaSelecionada) {
-            const atualizada = this.conversas.find(c => c.idConversa === this.conversaSelecionada?.idConversa);
-            if (atualizada) this.conversaSelecionada = atualizada;
+            const atualizada = this.conversas.find(
+              c => Number(c.idConversa) === Number(this.conversaSelecionada?.idConversa)
+            );
+
+            if (atualizada) {
+              this.conversaSelecionada = atualizada;
+            }
           }
 
           if (!silencioso) this.carregandoConversas = false;
