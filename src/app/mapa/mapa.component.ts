@@ -582,25 +582,37 @@ export class MapaComponent implements AfterViewInit, OnInit {
     return usuario ? usuario.nome : 'Usuário';
   }
 
-  obterFotoUsuario(email: string, genero: any, idUsuario?: number): string {
-    const usuarioEncontrado = this.usuarios.find(u =>
-      Number(u?.idUsuario ?? u?.id) === Number(idUsuario) ||
-      u?.email?.trim().toLowerCase() === (email || '').trim().toLowerCase()
-    );
+  obterFotoUsuario(
+  email: string,
+  genero: any,
+  idUsuario?: number,
+  usuarioViagem?: any
+): string {
 
-    const url =
-      usuarioEncontrado?.foto ||
-      usuarioEncontrado?.fotoUrl ||
-      usuarioEncontrado?.foto_perfil;
+  const urlDireta =
+    usuarioViagem?.fotoUrl ||
+    usuarioViagem?.foto ||
+    usuarioViagem?.foto_perfil;
 
-    if (url) return url;
+  if (urlDireta) return urlDireta;
 
-    if (genero === true) return 'assets/profile_man.jpeg';
-    if (genero === false) return 'assets/profile_woman.jpeg';
+  const usuarioEncontrado = this.usuarios.find(u =>
+    Number(u?.idUsuario ?? u?.id) === Number(idUsuario) ||
+    u?.email?.trim().toLowerCase() === (email || '').trim().toLowerCase()
+  );
 
-    return 'assets/usuario.png';
-  }
+  const url =
+    usuarioEncontrado?.fotoUrl ||
+    usuarioEncontrado?.foto ||
+    usuarioEncontrado?.foto_perfil;
 
+  if (url) return url;
+
+  if (genero === true) return 'assets/profile_man.jpeg';
+  if (genero === false) return 'assets/profile_woman.jpeg';
+
+  return 'assets/usuario.png';
+}
   excluirCarona(idViagem: number) {
     if (!confirm('Tem certeza que deseja excluir esta carona?')) return;
 
