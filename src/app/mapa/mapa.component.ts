@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { isBrowser } from '../utils/is-browser';
 
 type DiaCalendario = {
@@ -82,7 +83,10 @@ export class MapaComponent implements AfterViewInit, OnInit {
   usuarioLogado = isBrowser() ? JSON.parse(localStorage.getItem('usuarioLogado') || '{}') : {};
   meuId = Number(this.usuarioLogado.idUsuario || this.usuarioLogado.id);
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.gerarCalendariosMensais();
   }
 
@@ -519,17 +523,17 @@ export class MapaComponent implements AfterViewInit, OnInit {
     }
   }
 
-  abrirWhatsapp(nome: string, idUsuario: number, numeroWhatsapp: string) {
-    if (!numeroWhatsapp) return alert('Número de WhatsApp não disponível');
-    if (isBrowser()) window.open(`https://wa.me/${numeroWhatsapp}`, '_blank');
+  abrirConversa(viagem: any): void {
+    if (!viagem?.idViagem) {
+      alert('Não foi possível abrir a conversa desta carona.');
+      return;
+    }
 
-    setTimeout(() => {
-      if (confirm(`A carona com ${nome} foi realizada? Deseja avaliar?`)) {
-        this.nomeUsuarioSelecionado = nome;
-        this.idUsuarioSelecionado = idUsuario;
-        this.mostrarAvaliacao = true;
+    this.router.navigate(['/conversas'], {
+      queryParams: {
+        idViagem: viagem.idViagem
       }
-    }, 1000);
+    });
   }
 
   enviarAvaliacao() {
