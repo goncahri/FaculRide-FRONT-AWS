@@ -582,12 +582,22 @@ export class MapaComponent implements AfterViewInit, OnInit {
     return usuario ? usuario.nome : 'Usuário';
   }
 
-  obterFotoUsuario(email: string, genero: any): string {
-    const u = this.usuarios.find(x => x?.email?.trim().toLowerCase() === (email || '').trim().toLowerCase());
-    const url = u?.foto || u?.fotoUrl;
+  obterFotoUsuario(email: string, genero: any, idUsuario?: number): string {
+    const usuarioEncontrado = this.usuarios.find(u =>
+      Number(u?.idUsuario ?? u?.id) === Number(idUsuario) ||
+      u?.email?.trim().toLowerCase() === (email || '').trim().toLowerCase()
+    );
+
+    const url =
+      usuarioEncontrado?.foto ||
+      usuarioEncontrado?.fotoUrl ||
+      usuarioEncontrado?.foto_perfil;
+
     if (url) return url;
+
     if (genero === true) return 'assets/profile_man.jpeg';
     if (genero === false) return 'assets/profile_woman.jpeg';
+
     return 'assets/usuario.png';
   }
 
@@ -624,6 +634,28 @@ export class MapaComponent implements AfterViewInit, OnInit {
     }
 
     return '';
+  }
+
+  resumirDiasRota(v: any): string {
+    const datas =
+      v?.diasAgendados ||
+      v?.datasAgendadas ||
+      v?.datasRota ||
+      [];
+
+    if (!Array.isArray(datas) || !datas.length) {
+      return '';
+    }
+
+    const datasOrdenadas = [...datas].sort();
+
+    if (datasOrdenadas.length >= 20) {
+      return `Semestre fechado: ${this.formatarDataTag(datasOrdenadas[0])} até ${this.formatarDataTag(datasOrdenadas[datasOrdenadas.length - 1])}`;
+    }
+
+    return datasOrdenadas
+      .map((d: string) => this.formatarDataTag(d))
+      .join(' ');
   }
 
   private atualizarMarcadoresViagens(): void {
@@ -663,7 +695,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
               ? 'Motorista (oferece carona)'
               : 'Passageiro (procura carona)';
 
-            const diasLabel = this.formatDiasViagem(v);
+            const diasLabel = this.resumirDiasRota(v);
             const diasHtml = diasLabel
               ? `<div><strong>Dias:</strong> ${diasLabel}</div>`
               : '';
