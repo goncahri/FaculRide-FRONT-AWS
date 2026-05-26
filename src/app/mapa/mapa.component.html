@@ -175,7 +175,11 @@
     <div class="caronas-disponiveis-lista">
       <div *ngFor="let viagem of viagens" class="carona-card">
         <img
-          [src]="obterFotoUsuario(viagem.usuario?.email, viagem.usuario?.genero)"
+          [src]="obterFotoUsuario(
+            viagem.usuario?.email,
+            viagem.usuario?.genero,
+            viagem.idUsuario
+          )"
           alt="Foto"
           class="carona-foto"
         />
@@ -196,10 +200,8 @@
           <p>Ajuda Mensal: R$ {{ viagem.ajudaDeCusto }}</p>
 
           <p *ngIf="(viagem.diasAgendados?.length || viagem.datasRota?.length)" class="dias-aula">
-            Dias desta rota:
-            <span class="chip-dia" *ngFor="let d of (viagem.diasAgendados || viagem.datasRota)">
-              {{ d | date: 'dd/MM' }}
-            </span>
+            <strong>Dias desta rota:</strong>
+            {{ resumirDiasRota(viagem) }}
           </p>
 
           <button (click)="mostrarRota(viagem.partida, viagem.destino)">Ver rota</button>
@@ -249,9 +251,7 @@
 
         <p *ngIf="(c.diasAgendados?.length || c.datasRota?.length)" class="dias-aula">
           <strong>Dias desta rota:</strong>
-          <span class="chip-dia" *ngFor="let d of (c.diasAgendados || c.datasRota)">
-            {{ d | date: 'dd/MM' }}
-          </span>
+          {{ resumirDiasRota(c) }}
         </p>
       </div>
     </div>
@@ -267,9 +267,7 @@
 
         <p *ngIf="(c.diasAgendados?.length || c.datasRota?.length)" class="dias-aula">
           <strong>Dias desta rota:</strong>
-          <span class="chip-dia" *ngFor="let d of (c.diasAgendados || c.datasRota)">
-            {{ d | date: 'dd/MM' }}
-          </span>
+          {{ resumirDiasRota(c) }}
         </p>
       </div>
     </div>
