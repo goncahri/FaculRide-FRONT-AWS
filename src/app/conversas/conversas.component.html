@@ -1,0 +1,170 @@
+<section class="conversas-page">
+  <aside class="conversas-sidebar">
+    <div class="sidebar-header">
+      <div>
+        <h2>Conversas</h2>
+        <span>Negocie suas caronas pelo FaculRide</span>
+      </div>
+    </div>
+
+    <div *ngIf="carregandoConversas" class="loading-sidebar">
+      Carregando conversas...
+    </div>
+
+    <div *ngIf="!carregandoConversas && conversas.length === 0" class="empty-sidebar">
+      Nenhuma conversa encontrada.
+    </div>
+
+    <div
+      *ngFor="let conversa of conversas"
+      class="conversa-item"
+      [class.active]="conversaSelecionada?.idConversa === conversa.idConversa"
+      (click)="selecionarConversa(conversa)"
+    >
+      <img
+        *ngIf="fotoOutroUsuario(conversa)"
+        [src]="fotoOutroUsuario(conversa)"
+        alt="Foto"
+        class="avatar-img"
+      />
+
+      <div *ngIf="!fotoOutroUsuario(conversa)" class="avatar">
+        {{ iniciais(nomeOutroUsuario(conversa)) }}
+      </div>
+
+      <div class="conversa-info">
+        <strong>{{ nomeOutroUsuario(conversa) }}</strong>
+        <small>{{ statusLabel(conversa) }}</small>
+      </div>
+
+      <span class="status-dot" [ngClass]="statusClasse(conversa)"></span>
+    </div>
+  </aside>
+
+  <main class="chat-area" *ngIf="conversaSelecionada; else semConversa">
+    <header class="chat-header">
+      <div class="header-left">
+        <img
+          *ngIf="fotoOutroUsuario()"
+          [src]="fotoOutroUsuario()"
+          alt="Foto"
+          class="avatar-img grande"
+        />
+
+        <div *ngIf="!fotoOutroUsuario()" class="avatar grande">
+          {{ iniciais(nomeOutroUsuario()) }}
+        </div>
+
+        <div>
+          <h3>{{ nomeOutroUsuario() }}</h3>
+          <p>{{ statusLabel() }}</p>
+        </div>
+      </div>
+
+      <span class="status-badge" [ngClass]="statusClasse()">
+        {{ statusLabel() }}
+      </span>
+    </header>
+
+    <div class="ride-card">
+      <div class="ride-card-title">
+        <strong>Detalhes da carona</strong>
+      </div>
+
+      <p>
+        <strong>Partida:</strong>
+        {{ conversaSelecionada.viagem?.partida || '-' }}
+      </p>
+
+      <p>
+        <strong>Destino:</strong>
+        {{ conversaSelecionada.viagem?.destino || '-' }}
+      </p>
+
+      <p>
+        <strong>Entrada:</strong>
+        {{ conversaSelecionada.viagem?.horarioEntrada || '-' }}
+        •
+        <strong>Saída:</strong>
+        {{ conversaSelecionada.viagem?.horarioSaida || '-' }}
+      </p>
+
+      <p>
+        <strong>Ajuda de custo:</strong>
+        R$ {{ conversaSelecionada.viagem?.ajudaDeCusto || '0' }}
+      </p>
+    </div>
+
+    <div class="notice-card">
+      {{ observacaoStatus() }}
+    </div>
+
+    <div class="messages">
+      <div *ngIf="carregandoMensagens" class="loading-messages">
+        Carregando mensagens...
+      </div>
+
+      <div *ngIf="!carregandoMensagens && mensagens.length === 0" class="empty-messages">
+        Nenhuma mensagem ainda. Comece a conversa abaixo.
+      </div>
+
+      <div
+        *ngFor="let msg of mensagens"
+        class="message-row"
+        [class.me-row]="msg.idRemetente === meuId"
+      >
+        <div
+          class="message"
+          [class.me]="msg.idRemetente === meuId"
+          [class.other]="msg.idRemetente !== meuId"
+        >
+          <span>{{ msg.mensagem }}</span>
+          <small>{{ formatarHora(msg.createdAt) }}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-actions">
+      <button
+        class="btn-accept"
+        (click)="aceitarCarona()"
+        [disabled]="!podeAceitar() || salvandoAcao"
+      >
+        {{ euJaAceitei() ? 'Você já aceitou' : 'Aceitar carona' }}
+      </button>
+
+      <button
+        class="btn-reject"
+        (click)="recusarCarona()"
+        [disabled]="!podeRecusar() || salvandoAcao"
+      >
+        Recusar carona
+      </button>
+    </div>
+
+    <div class="chat-input" [class.disabled]="!podeEnviarMensagem()">
+      <input
+        [(ngModel)]="mensagem"
+        [disabled]="!podeEnviarMensagem() || enviandoMensagem"
+        placeholder="Digite sua mensagem..."
+        (keyup.enter)="enviarMensagem()"
+      />
+
+      <button
+        (click)="enviarMensagem()"
+        [disabled]="!podeEnviarMensagem() || enviandoMensagem || !mensagem.trim()"
+      >
+        Enviar
+      </button>
+    </div>
+  </main>
+
+  <ng-template #semConversa>
+    <main class="chat-area empty-chat">
+      <div class="empty-chat-content">
+        <h2>Selecione uma conversa</h2>
+        <p>Escolha uma conversa na lateral para visualizar mensagens e detalhes da carona.</p>
+      </div>
+    </main>
+  </ng-template>
+</section>

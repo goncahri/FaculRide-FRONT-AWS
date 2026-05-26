@@ -4,6 +4,7 @@ import { DevsComponent } from './devs/devs.component';
 import { AjudaComponent } from './ajuda/ajuda.component';
 import { LoginComponent } from './login/login.component';
 import { UsuarioComponent } from './usuario/usuario.component';
+import { ConversasComponent } from './conversas/conversas.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -12,7 +13,8 @@ export const routes: Routes = [
   { path: 'ajuda', component: AjudaComponent },
   { path: 'login', component: LoginComponent },
   { path: 'usuario', component: UsuarioComponent },
+  { path: 'conversas', component: ConversasComponent },
+
   { path: 'cadastro', loadComponent: () => import('./cadastro/cadastro.component').then(m => m.CadastroComponent) },
   { path: 'gerenciar', loadComponent: () => import('./gerenciar-conta/gerenciar.component').then(m => m.GerenciarComponent) }
 ];
-
