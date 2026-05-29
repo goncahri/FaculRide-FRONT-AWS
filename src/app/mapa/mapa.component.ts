@@ -50,6 +50,8 @@ export class MapaComponent implements AfterViewInit, OnInit {
   tipoCarona: string = 'oferecer';
   filtroTipo: FiltroTipo = 'todos';
 
+  modoEdicaoAtivo: boolean = false;
+  idViagemEdicao: number | null = null;
   mostrarSecaoEncontre = true;
   mostrarSecaoMinhasCaronas = true;
   mostrarSecaoAvaliacoes = true;
@@ -506,6 +508,28 @@ export class MapaComponent implements AfterViewInit, OnInit {
     return origemLimpa || cidadeLimpa;
   }
 
+  private extrairOrigemECidade(partidaCompleta?: string): { origem: string; cidade: string } {
+  const texto = String(partidaCompleta || '').trim();
+
+  if (!texto) {
+    return { origem: '', cidade: '' };
+  }
+
+  const partes = texto.split(',').map(p => p.trim()).filter(Boolean);
+
+  if (partes.length >= 2) {
+    return {
+      origem: partes.slice(0, partes.length - 1).join(', '),
+      cidade: partes[partes.length - 1]
+    };
+  }
+
+  return {
+    origem: texto,
+    cidade: ''
+  };
+}
+
   tracarRota(): void {
     if (!this.origem || !this.cidadePartida || !this.destino || !this.entradaFatec || !this.saidaFatec) {
       alert('Preencha todos os campos.');
@@ -539,10 +563,19 @@ export class MapaComponent implements AfterViewInit, OnInit {
       datasAgendadas: datasSelecionadas
     };
 
-    this.http.post(`${this.baseURL}/viagem`, dadosViagem).subscribe({
+    const request$ = this.modoEdicaoAtivo && this.idViagemEdicao
+      ? this.http.put(`${this.baseURL}/viagem/${this.idViagemEdicao}`, dadosViagem)
+      : this.http.post(`${this.baseURL}/viagem`, dadosViagem);
+
+    request$.subscribe({
       next: () => {
-        alert('Rota cadastrada com sucesso!');
+        alert(this.modoEdicaoAtivo ? 'Rota atualizada com sucesso!' : 'Rota cadastrada com sucesso!');
+
         this.carregarViagens();
+
+        if (this.modoEdicaoAtivo) {
+          this.cancelarEdicao(false);
+        }
 
         if (this.modoVigencia === 'mensal') {
           this.datasRota = [];
@@ -561,7 +594,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
       },
       error: (err) => {
         console.error('Erro ao cadastrar viagem:', err);
-        alert('Erro ao cadastrar rota.');
+        alert(this.modoEdicaoAtivo ? 'Erro ao atualizar rota.' : 'Erro ao cadastrar rota.');
       }
     });
 
@@ -605,6 +638,59 @@ export class MapaComponent implements AfterViewInit, OnInit {
   ehMinhaCarona(viagem: any): boolean {
     return Number(viagem?.idUsuario) === Number(this.meuId);
   }
+
+  editarCarona(viagem: any): void {
+  if (!viagem?.idViagem && !viagem?.id) {
+    alert('Não foi possível identificar esta carona para edição.');
+    return;
+  }
+
+  const { origem, cidade } = this.extrairOrigemECidade(viagem.partida);
+
+  this.modoEdicaoAtivo = true;
+  this.idViagemEdicao = Number(viagem.idViagem || viagem.id);
+
+  this.tipoCarona = this.tipoNormalizado(viagem) === 'motorista' ? 'oferecer' : 'procurar';
+  this.origem = origem;
+  this.cidadePartida = cidade;
+  this.destino = viagem.destino || '';
+  this.entradaFatec = viagem.horarioEntrada || viagem.entrada || '';
+  this.saidaFatec = viagem.horarioSaida || viagem.saida || '';
+  this.ajudaCusto = viagem.ajudaDeCusto || viagem.ajuda || null;
+
+  const datas = this.normalizarDatasViagem(viagem);
+  this.datasRota = datas;
+  this.modoVigencia = datas.length >= 20 ? 'semestre' : 'mensal';
+
+  this.mostrarCalendario = false;
+
+  if (isBrowser()) {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 100);
+  }
+}
+
+cancelarEdicao(limparFormulario: boolean = true): void {
+  this.modoEdicaoAtivo = false;
+  this.idViagemEdicao = null;
+
+  if (!limparFormulario) return;
+
+  this.tipoCarona = 'oferecer';
+  this.origem = '';
+  this.cidadePartida = '';
+  this.destino = '';
+  this.entradaFatec = '';
+  this.saidaFatec = '';
+  this.ajudaCusto = null;
+  this.datasRota = [];
+  this.modoVigencia = 'mensal';
+  this.mostrarCalendario = false;
+}
 
   abrirConversa(viagem: any): void {
     if (!viagem?.idViagem) {

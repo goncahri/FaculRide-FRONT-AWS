@@ -1,5 +1,5 @@
 <section class="mapa-section">
-  <h2>Planeje sua Carona</h2>
+  <h2>{{ modoEdicaoAtivo ? 'Editar sua Carona' : 'Planeje sua Carona' }}</h2>
 
   <div class="tipo-carona">
     <label for="tipoCarona">O que você procura?</label>
@@ -151,9 +151,15 @@
         </p>
       </div>
 
+      <div class="botao-centro botoes-edicao" *ngIf="modoEdicaoAtivo">
+        <button class="btn-mapa btn-cancelar-edicao" type="button" (click)="cancelarEdicao()">
+          Cancelar edição
+        </button>
+      </div>
+
       <div class="botao-centro">
         <button class="btn-mapa primary" type="submit">
-          Cadastrar Rota
+          {{ modoEdicaoAtivo ? 'Salvar Alterações' : 'Cadastrar Rota' }}
         </button>
       </div>
     </div>
@@ -255,6 +261,15 @@
               <button
                 *ngIf="ehMinhaCarona(viagem)"
                 type="button"
+                class="btn-card btn-editar"
+                (click)="editarCarona(viagem)"
+              >
+                ✏️ Editar
+              </button>
+
+              <button
+                *ngIf="ehMinhaCarona(viagem)"
+                type="button"
                 class="btn-card btn-excluir"
                 (click)="excluirCarona(viagem.idViagem)"
               >
@@ -331,13 +346,23 @@
             {{ resumirDiasRota(c) }}
           </p>
 
-          <button
-            type="button"
-            class="btn-card btn-rota"
-            (click)="mostrarRota(c.partida, c.destino)"
-          >
-            Ver rota
-          </button>
+          <div class="carona-acoes">
+            <button
+              type="button"
+              class="btn-card btn-rota"
+              (click)="mostrarRota(c.partida, c.destino)"
+            >
+              Ver rota
+            </button>
+
+            <button
+              type="button"
+              class="btn-card btn-editar"
+              (click)="editarCarona(c)"
+            >
+              ✏️ Editar
+            </button>
+          </div>
         </div>
       </div>
 
@@ -363,13 +388,23 @@
             {{ resumirDiasRota(c) }}
           </p>
 
-          <button
-            type="button"
-            class="btn-card btn-rota"
-            (click)="mostrarRota(c.partida, c.destino)"
-          >
-            Ver rota
-          </button>
+          <div class="carona-acoes">
+            <button
+              type="button"
+              class="btn-card btn-rota"
+              (click)="mostrarRota(c.partida, c.destino)"
+            >
+              Ver rota
+            </button>
+
+            <button
+              type="button"
+              class="btn-card btn-editar"
+              (click)="editarCarona(c)"
+            >
+              ✏️ Editar
+            </button>
+          </div>
         </div>
       </div>
 
