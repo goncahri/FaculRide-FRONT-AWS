@@ -30,6 +30,17 @@
   color: #64748b;
 }
 
+.erro-sidebar {
+  margin-top: 14px;
+  padding: 12px;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .loading-sidebar,
 .empty-sidebar {
   margin-top: 20px;
@@ -104,6 +115,13 @@
   margin-top: 3px;
 }
 
+.conversa-rota {
+  color: #334155;
+  font-size: 12px;
+  margin-top: 5px;
+  line-height: 1.35;
+}
+
 .status-dot {
   width: 10px;
   height: 10px;
@@ -151,6 +169,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  background: #0f172a;
 }
 
 .header-left {
@@ -162,13 +181,14 @@
 
 .chat-header h3 {
   margin: 0;
-  color: #0f172a;
+  color: #ffffff;
   font-size: 20px;
+  font-weight: 800;
 }
 
 .chat-header p {
   margin: 4px 0 0;
-  color: #64748b;
+  color: #cbd5e1;
   font-size: 13px;
 }
 
@@ -233,6 +253,30 @@
   border: 1px solid #bfdbfe;
   border-radius: 16px;
   font-size: 14px;
+}
+
+.notice-card.aceita {
+  background: #dcfce7;
+  color: #14532d;
+  border-color: #86efac;
+}
+
+.notice-card.recusada {
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-color: #fecaca;
+}
+
+.notice-card.cancelada {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.notice-card.concluida {
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-color: #93c5fd;
 }
 
 .messages {
@@ -323,15 +367,27 @@
   flex: 1;
 }
 
+.btn-accept:hover:not(:disabled) {
+  background: #15803d;
+}
+
 .btn-reject {
   background: #dc2626;
   flex: 1;
+}
+
+.btn-reject:hover:not(:disabled) {
+  background: #b91c1c;
 }
 
 .chat-input {
   display: flex;
   gap: 10px;
   padding: 0 16px 16px;
+}
+
+.chat-input.disabled {
+  opacity: 0.85;
 }
 
 .chat-input input {
@@ -350,6 +406,10 @@
 .chat-input button {
   background: #2563eb;
   min-width: 100px;
+}
+
+.chat-input button:hover:not(:disabled) {
+  background: #1d4ed8;
 }
 
 .empty-chat {

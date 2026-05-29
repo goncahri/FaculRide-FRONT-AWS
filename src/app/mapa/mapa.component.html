@@ -171,9 +171,45 @@
   </div>
 
   <div class="caronas-disponiveis-faixa">
-    <h3 class="titulo-centralizado">Caronas Disponíveis</h3>
+    <div class="encontre-header">
+      <h3 class="titulo-centralizado">🔍 Encontre</h3>
+      <p>
+        Encontre sua carona ideal, visualize a rota e converse diretamente com outros alunos pelo FaculRide.
+      </p>
+    </div>
+
+    <div class="filtros-encontre">
+      <h4>Filtros</h4>
+
+      <div class="filtros-botoes">
+        <button
+          type="button"
+          [class.active]="filtroTipo === 'todos'"
+          (click)="alterarFiltroTipo('todos')"
+        >
+          Todos
+        </button>
+
+        <button
+          type="button"
+          [class.active]="filtroTipo === 'motorista'"
+          (click)="alterarFiltroTipo('motorista')"
+        >
+          Motorista
+        </button>
+
+        <button
+          type="button"
+          [class.active]="filtroTipo === 'passageiro'"
+          (click)="alterarFiltroTipo('passageiro')"
+        >
+          Passageiro
+        </button>
+      </div>
+    </div>
+
     <div class="caronas-disponiveis-lista">
-      <div *ngFor="let viagem of viagens" class="carona-card">
+      <div *ngFor="let viagem of viagensFiltradas()" class="carona-card">
         <img
           [src]="obterFotoUsuario(
             viagem.usuario?.email,
@@ -186,32 +222,54 @@
         />
 
         <div class="carona-info">
-          <div *ngIf="viagem.idUsuario === meuId" class="excluir-carona">
-            <button (click)="excluirCarona(viagem.idViagem)">
-              🗑️ Excluir Carona
-            </button>
-          </div>
-
           <strong>{{ viagem.usuario?.nome || 'Usuário' }}</strong>
-          <p>{{ tipoNormalizado(viagem) === 'motorista' ? 'motorista' : 'passageiro' }}</p>
-          <p>Partida: {{ viagem.partida }}</p>
-          <p>Destino: {{ viagem.destino }}</p>
-          <p>Entrada: {{ viagem.horarioEntrada }}</p>
-          <p>Saída: {{ viagem.horarioSaida }}</p>
-          <p>Ajuda Mensal: R$ {{ viagem.ajudaDeCusto }}</p>
+          <p class="tipo-usuario-card">
+            {{ tipoNormalizado(viagem) === 'motorista' ? 'Motorista' : 'Passageiro' }}
+          </p>
+
+          <p><strong>Partida:</strong> {{ viagem.partida }}</p>
+          <p><strong>Destino:</strong> {{ viagem.destino }}</p>
+          <p><strong>Entrada:</strong> {{ viagem.horarioEntrada }}</p>
+          <p><strong>Saída:</strong> {{ viagem.horarioSaida }}</p>
+          <p><strong>Ajuda mensal:</strong> R$ {{ viagem.ajudaDeCusto }}</p>
 
           <p *ngIf="(viagem.diasAgendados?.length || viagem.datasRota?.length)" class="dias-aula">
-            <strong>Dias desta rota:</strong>
+            <strong>Dias:</strong>
             {{ resumirDiasRota(viagem) }}
           </p>
 
-          <button (click)="mostrarRota(viagem.partida, viagem.destino)">Ver rota</button>
+          <div class="carona-acoes">
+            <button
+              type="button"
+              class="btn-card btn-rota"
+              (click)="mostrarRota(viagem.partida, viagem.destino)"
+            >
+              Ver rota
+            </button>
 
-          <a (click)="abrirConversa(viagem)">
-            <img src="assets/whats1.png" class="whatsapp-icon" alt="WhatsApp" />
-            Entrar em contato
-          </a>
+            <button
+              *ngIf="ehMinhaCarona(viagem)"
+              type="button"
+              class="btn-card btn-excluir"
+              (click)="excluirCarona(viagem.idViagem)"
+            >
+              🗑️ Excluir
+            </button>
+
+            <button
+              *ngIf="!ehMinhaCarona(viagem)"
+              type="button"
+              class="btn-card btn-contato"
+              (click)="abrirConversa(viagem)"
+            >
+              💬 Entrar em contato
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div *ngIf="viagensFiltradas().length === 0" class="sem-caronas-filtro">
+        Nenhuma carona encontrada para este filtro.
       </div>
     </div>
   </div>

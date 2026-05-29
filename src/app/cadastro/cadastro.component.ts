@@ -328,22 +328,37 @@ export class CadastroComponent implements OnInit {
           }
 
           if (token && v.tipoUsuario === 'motorista' && this.selectedCnhFile) {
-            const fdCnh = new FormData();
-            fdCnh.append('file', this.selectedCnhFile, this.selectedCnhFile.name);
+          const fdCnh = new FormData();
+          fdCnh.append('file', this.selectedCnhFile, this.selectedCnhFile.name);
+
+          try {
+            const upCnh: any = await this.http
+              .post(`${this.baseURL}/cnh/upload`, fdCnh, { headers })
+              .toPromise();
+
+            if (upCnh?.cnhFotoUrl || upCnh?.url) {
+              usuarioSalvo.cnhFotoUrl = upCnh.cnhFotoUrl || upCnh.url;
+              usuarioSalvo.cnhFotoPath = upCnh.cnhFotoPath ?? usuarioSalvo.cnhFotoPath;
+            }
 
             try {
-              const upCnh: any = await this.http
-                .post(`${this.baseURL}/cnh/upload`, fdCnh, { headers })
-                .toPromise();
+              const idUsuarioValidacao = usuarioSalvo.idUsuario || usuarioSalvo.id || res?.id;
 
-              if (upCnh?.cnhFotoUrl || upCnh?.url) {
-                usuarioSalvo.cnhFotoUrl = upCnh.cnhFotoUrl || upCnh.url;
-                usuarioSalvo.cnhFotoPath = upCnh.cnhFotoPath ?? usuarioSalvo.cnhFotoPath;
+              if (idUsuarioValidacao) {
+                await this.http
+                  .patch(`${this.baseURL}/cnh/validar/${idUsuarioValidacao}`, {}, { headers })
+                  .toPromise();
+
+                console.log('E-mail de validação da CNH enviado com sucesso.');
               }
             } catch (e) {
-              console.warn('Upload da CNH falhou após cadastro:', e);
+              console.warn('E-mail de validação da CNH falhou após upload:', e);
             }
+          } catch (e) {
+            console.warn('Upload da CNH falhou após cadastro:', e);
           }
+
+        }
 
           localStorage.setItem('usuarioLogado', JSON.stringify(usuarioSalvo));
           alert('✅ Conta criada com sucesso!');
