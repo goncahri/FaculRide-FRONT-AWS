@@ -7,7 +7,7 @@
 .titulo-centralizado {
   text-align: center;
   color: white;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .mapa-form-layout {
@@ -82,9 +82,72 @@
 
 .caronas-disponiveis-faixa {
   background-color: #0f172a;
-  padding: 20px;
+  padding: 28px 20px;
   border-radius: 12px;
   margin: 40px 0;
+}
+
+.encontre-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 22px auto;
+}
+
+.encontre-header h3 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.encontre-header p {
+  color: #cbd5e1;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.filtros-encontre {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  max-width: 560px;
+  margin: 0 auto 28px auto;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+.filtros-encontre h4 {
+  margin: 0 0 14px 0;
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.filtros-botoes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filtros-botoes button {
+  flex: 1;
+  min-width: 130px;
+  padding: 13px 18px;
+  border: none;
+  border-radius: 12px;
+  background-color: #e2e8f0;
+  color: #334155;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filtros-botoes button:hover {
+  background-color: #cbd5e1;
+}
+
+.filtros-botoes button.active {
+  background-color: #00345f;
+  color: #ffffff;
 }
 
 .caronas-disponiveis-lista {
@@ -92,24 +155,26 @@
   gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: stretch;
 }
 
 .carona-card {
   background-color: white;
-  border-radius: 12px;
-  padding: 15px;
-  width: 300px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 18px;
+  width: 340px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: flex-start;
 }
 
 .carona-foto {
-  width: 70px;
-  height: 70px;
-  border-radius: 8px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .carona-info {
@@ -118,7 +183,79 @@
 
 .carona-info strong {
   color: #0f172a;
-  display: block;
+  font-weight: 800;
+}
+
+.carona-info p {
+  margin: 4px 0;
+  color: #334155;
+  line-height: 1.35;
+}
+
+.tipo-usuario-card {
+  color: #64748b !important;
+  margin-top: 2px !important;
+  margin-bottom: 8px !important;
+}
+
+.dias-aula {
+  margin-top: 8px !important;
+}
+
+.carona-acoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.btn-card {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-rota {
+  background-color: #eef4ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.btn-rota:hover {
+  background-color: #dbeafe;
+}
+
+.btn-contato {
+  background-color: #00345f;
+  color: #ffffff;
+  border-color: #00345f;
+}
+
+.btn-contato:hover {
+  background-color: #002744;
+}
+
+.btn-excluir {
+  background-color: #fff1f2;
+  color: #dc2626;
+  border-color: #fecdd3;
+}
+
+.btn-excluir:hover {
+  background-color: #ffe4e6;
+}
+
+.sem-caronas-filtro {
+  width: 100%;
+  max-width: 560px;
+  background-color: #ffffff;
+  color: #475569;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
   font-weight: 600;
 }
 
@@ -359,8 +496,6 @@ a:hover {
   margin: 15px auto 0 auto;
 }
 
-/* ===== Overlay de carregamento no mapa ===== */
-
 .loading-overlay {
   position: absolute;
   inset: 0;
@@ -395,8 +530,6 @@ a:hover {
   }
 }
 
-/* ===== Calendário simples das datas da rota ===== */
-
 .calendario-container {
   margin-top: 10px;
   background-color: #ffffff;
@@ -412,7 +545,6 @@ a:hover {
   display: block;
 }
 
-/* chips com dias selecionados */
 .datas-selecionadas {
   margin-top: 10px;
   display: flex;
@@ -444,57 +576,6 @@ a:hover {
   color: #fecaca;
 }
 
-/* ===== Responsividade geral ===== */
-
-@media (max-width: 768px) {
-  .linha-horizontal {
-    flex-direction: column;
-  }
-
-  .input-group {
-    flex: 1 1 100%;
-  }
-
-  .carona-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .carona-foto {
-    margin-bottom: 10px;
-  }
-
-  .mapa-container {
-    height: 350px;
-  }
-
-  .tipo-carona select {
-    width: 100%;
-  }
-
-  .input-comentario {
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    padding: 8px;
-    font-size: 1rem;
-    resize: none;
-    margin-top: 10px;
-  }
-
-  .botao-centro {
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .btn-mapa {
-    width: 100%;
-    border-radius: 12px;
-  }
-}
-
-/* trigger que abre/fecha o calendário */
 .calendario-trigger {
   margin-top: 8px;
   margin-bottom: 10px;
@@ -518,7 +599,6 @@ a:hover {
   margin-left: 8px;
 }
 
-/* caixa do calendário aberto */
 .calendario-popup {
   margin-top: 8px;
   padding: 12px;
@@ -527,8 +607,6 @@ a:hover {
   color: #e5e7eb;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
-
-/* ===== NOVO GRID DO CALENDÁRIO ===== */
 
 .calendario-header {
   display: flex;
@@ -554,7 +632,6 @@ a:hover {
   font-size: 0.9rem;
 }
 
-/* cabeçalho D S T Q Q S S */
 .calendario-weekday {
   text-align: center;
   font-weight: 600;
@@ -563,7 +640,6 @@ a:hover {
   padding-bottom: 4px;
 }
 
-/* botão de cada dia */
 .calendario-dia {
   border-radius: 999px;
   border: 1px solid transparent;
@@ -594,23 +670,88 @@ a:hover {
   cursor: not-allowed;
 }
 
-/* Variação “primária” azul (se usar) */
 .btn-mapa.primary {
   background-color: #2563eb;
   border: 1px solid #2563eb;
   color: #fff;
 }
 
-/* Estado desabilitado (enquanto carrega/sem dados) */
 .btn-mapa:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Ícones nos botões (se colocar) */
 .btn-mapa .icon {
   width: 18px;
   height: 18px;
   margin-right: 6px;
   vertical-align: -3px;
+}
+
+@media (max-width: 768px) {
+  .linha-horizontal {
+    flex-direction: column;
+  }
+
+  .input-group {
+    flex: 1 1 100%;
+  }
+
+  .carona-card {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .carona-foto {
+    width: 58px;
+    height: 58px;
+  }
+
+  .mapa-container {
+    height: 350px;
+  }
+
+  .tipo-carona select {
+    width: 100%;
+  }
+
+  .input-comentario {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 1rem;
+    resize: none;
+    margin-top: 10px;
+  }
+
+  .botao-centro {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-mapa {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .filtros-botoes {
+    flex-direction: column;
+  }
+
+  .filtros-botoes button {
+    width: 100%;
+  }
+
+  .carona-acoes {
+    flex-direction: column;
+  }
+
+  .btn-card {
+    width: 100%;
+  }
+
+  .encontre-header h3 {
+    font-size: 1.6rem;
+  }
 }

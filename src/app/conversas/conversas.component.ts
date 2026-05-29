@@ -86,7 +86,7 @@ export class ConversasComponent implements OnInit, OnDestroy {
   idViagemParam: number | null = null;
 
   private intervalId: any = null;
-  private conversaInicializada = false;
+  private ultimaViagemInicializada: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -95,7 +95,13 @@ export class ConversasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
-      this.idViagemParam = Number(params.get('idViagem')) || null;
+      const novoIdViagem = Number(params.get('idViagem')) || null;
+
+      if (novoIdViagem !== this.idViagemParam) {
+        this.ultimaViagemInicializada = null;
+      }
+
+      this.idViagemParam = novoIdViagem;
       this.inicializarTela();
     });
 
@@ -144,9 +150,12 @@ export class ConversasComponent implements OnInit, OnDestroy {
 
       let conversaInicial: Conversa | null = null;
 
-      if (this.idViagemParam && !this.conversaInicializada) {
+      if (
+        this.idViagemParam &&
+        this.ultimaViagemInicializada !== this.idViagemParam
+      ) {
         conversaInicial = await this.iniciarConversa(this.idViagemParam);
-        this.conversaInicializada = true;
+        this.ultimaViagemInicializada = this.idViagemParam;
       }
 
       await this.carregarConversas();
@@ -301,10 +310,16 @@ export class ConversasComponent implements OnInit, OnDestroy {
       {},
       { headers: this.getHeaders() }
     ).subscribe({
-      next: (res) => {
+      next: async (res) => {
         this.conversaSelecionada = { ...this.conversaSelecionada!, ...res };
         this.salvandoAcao = false;
-        this.carregarConversas(true);
+
+        await this.carregarConversas(true);
+
+        if (this.conversaSelecionada?.idConversa) {
+          this.carregarMensagens(this.conversaSelecionada.idConversa, true);
+        }
+
         alert('Confirmação registrada com sucesso.');
       },
       error: (err) => {
@@ -318,7 +333,7 @@ export class ConversasComponent implements OnInit, OnDestroy {
   recusarCarona(): void {
     if (!this.conversaSelecionada?.idConversa || this.salvandoAcao) return;
 
-    if (!confirm('Tem certeza que deseja recusar esta carona?')) return;
+    if (!confirm('Tem certeza que deseja recusar esta carona? A conversa ficará encerrada.')) return;
 
     this.salvandoAcao = true;
 
@@ -327,11 +342,17 @@ export class ConversasComponent implements OnInit, OnDestroy {
       {},
       { headers: this.getHeaders() }
     ).subscribe({
-      next: (res) => {
+      next: async (res) => {
         this.conversaSelecionada = { ...this.conversaSelecionada!, ...res };
         this.salvandoAcao = false;
-        this.carregarConversas(true);
-        alert('Carona recusada.');
+
+        await this.carregarConversas(true);
+
+        if (this.conversaSelecionada?.idConversa) {
+          this.carregarMensagens(this.conversaSelecionada.idConversa, true);
+        }
+
+        alert('Carona recusada e conversa encerrada.');
       },
       error: (err) => {
         console.error('Erro ao recusar carona:', err);
@@ -412,6 +433,7 @@ export class ConversasComponent implements OnInit, OnDestroy {
       usuario?.foto ||
       usuario?.avatarUrl ||
       usuario?.imagem ||
+      usuario?.fotoPath ||
       ''
     );
   }
@@ -473,7 +495,7 @@ export class ConversasComponent implements OnInit, OnDestroy {
     if (statusViagem === 'concluida') return 'Essa carona já foi concluída. Você pode revisar o histórico da conversa.';
 
     if (this.conversaSelecionada.status === 'aceita') {
-      return 'Os dois lados aceitaram. Essa carona foi combinada com sucesso.';
+      return 'Os dois lados já aceitaram. Essa carona foi combinada com sucesso.';
     }
 
     if (this.conversaSelecionada.status === 'recusada') {
@@ -488,6 +510,8 @@ export class ConversasComponent implements OnInit, OnDestroy {
       if (!this.euJaAceitei() && this.outroJaAceitou()) {
         return 'O outro participante já aceitou. Falta sua confirmação.';
       }
+
+      return 'Aguardando confirmação dos participantes.';
     }
 
     return 'Converse e alinhe os detalhes antes de aceitar ou recusar.';

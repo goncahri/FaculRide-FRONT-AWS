@@ -18,6 +18,7 @@ type CalendarioMes = {
 };
 
 type ModoVigencia = 'mensal' | 'semestre';
+type FiltroTipo = 'todos' | 'motorista' | 'passageiro';
 
 @Component({
   selector: 'app-mapa',
@@ -37,6 +38,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   carregando: boolean = true;
   private _loads = { usuarios: false, viagens: false, avaliacoes: false };
+
   private markLoaded(key: 'usuarios' | 'viagens' | 'avaliacoes') {
     this._loads[key] = true;
     if (this._loads.usuarios && this._loads.viagens && this._loads.avaliacoes) {
@@ -45,6 +47,8 @@ export class MapaComponent implements AfterViewInit, OnInit {
   }
 
   tipoCarona: string = 'oferecer';
+  filtroTipo: FiltroTipo = 'todos';
+
   origem: string = '';
   cidadePartida: string = '';
   destino: string = '';
@@ -139,6 +143,18 @@ export class MapaComponent implements AfterViewInit, OnInit {
       .toLowerCase();
 
     return fromUsuario === 'motorista' ? 'motorista' : 'passageiro';
+  }
+
+  alterarFiltroTipo(tipo: FiltroTipo): void {
+    this.filtroTipo = tipo;
+  }
+
+  viagensFiltradas(): any[] {
+    if (this.filtroTipo === 'todos') {
+      return this.viagens;
+    }
+
+    return this.viagens.filter(v => this.tipoNormalizado(v) === this.filtroTipo);
   }
 
   private normalizeUsuario(u: any) {
@@ -523,6 +539,10 @@ export class MapaComponent implements AfterViewInit, OnInit {
     }
   }
 
+  ehMinhaCarona(viagem: any): boolean {
+    return Number(viagem?.idUsuario) === Number(this.meuId);
+  }
+
   abrirConversa(viagem: any): void {
     if (!viagem?.idViagem) {
       alert('Não foi possível abrir a conversa desta carona.');
@@ -587,36 +607,36 @@ export class MapaComponent implements AfterViewInit, OnInit {
   }
 
   obterFotoUsuario(
-  email: string,
-  genero: any,
-  idUsuario?: number,
-  usuarioViagem?: any
-): string {
+    email: string,
+    genero: any,
+    idUsuario?: number,
+    usuarioViagem?: any
+  ): string {
+    const urlDireta =
+      usuarioViagem?.fotoUrl ||
+      usuarioViagem?.foto ||
+      usuarioViagem?.foto_perfil;
 
-  const urlDireta =
-    usuarioViagem?.fotoUrl ||
-    usuarioViagem?.foto ||
-    usuarioViagem?.foto_perfil;
+    if (urlDireta) return urlDireta;
 
-  if (urlDireta) return urlDireta;
+    const usuarioEncontrado = this.usuarios.find(u =>
+      Number(u?.idUsuario ?? u?.id) === Number(idUsuario) ||
+      u?.email?.trim().toLowerCase() === (email || '').trim().toLowerCase()
+    );
 
-  const usuarioEncontrado = this.usuarios.find(u =>
-    Number(u?.idUsuario ?? u?.id) === Number(idUsuario) ||
-    u?.email?.trim().toLowerCase() === (email || '').trim().toLowerCase()
-  );
+    const url =
+      usuarioEncontrado?.fotoUrl ||
+      usuarioEncontrado?.foto ||
+      usuarioEncontrado?.foto_perfil;
 
-  const url =
-    usuarioEncontrado?.fotoUrl ||
-    usuarioEncontrado?.foto ||
-    usuarioEncontrado?.foto_perfil;
+    if (url) return url;
 
-  if (url) return url;
+    if (genero === true) return 'assets/profile_man.jpeg';
+    if (genero === false) return 'assets/profile_woman.jpeg';
 
-  if (genero === true) return 'assets/profile_man.jpeg';
-  if (genero === false) return 'assets/profile_woman.jpeg';
+    return 'assets/usuario.png';
+  }
 
-  return 'assets/usuario.png';
-}
   excluirCarona(idViagem: number) {
     if (!confirm('Tem certeza que deseja excluir esta carona?')) return;
 
