@@ -87,6 +87,26 @@
   margin: 40px 0;
 }
 
+.section-toggle {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 18px;
+}
+
+.section-toggle:hover {
+  opacity: 0.9;
+}
+
 .encontre-header {
   text-align: center;
   max-width: 720px;
@@ -94,16 +114,17 @@
 }
 
 .encontre-header h3 {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 1.7rem;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
 .encontre-header p {
   color: #cbd5e1;
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   line-height: 1.5;
   margin: 0;
+  font-weight: 400;
 }
 
 .filtros-encontre {
@@ -118,8 +139,8 @@
 .filtros-encontre h4 {
   margin: 0 0 14px 0;
   color: #0f172a;
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .filtros-botoes {
@@ -136,7 +157,7 @@
   border-radius: 12px;
   background-color: #e2e8f0;
   color: #334155;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -179,23 +200,27 @@
 
 .carona-info {
   flex: 1;
+  font-family: 'Poppins', sans-serif;
 }
 
 .carona-info strong {
   color: #0f172a;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .carona-info p {
   margin: 4px 0;
   color: #334155;
   line-height: 1.35;
+  font-size: 0.95rem;
+  font-weight: 400;
 }
 
 .tipo-usuario-card {
   color: #64748b !important;
   margin-top: 2px !important;
   margin-bottom: 8px !important;
+  font-weight: 400 !important;
 }
 
 .dias-aula {
@@ -213,9 +238,10 @@
   border: 1px solid transparent;
   border-radius: 12px;
   padding: 10px 16px;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: 'Poppins', sans-serif;
 }
 
 .btn-rota {
@@ -256,51 +282,7 @@
   border-radius: 14px;
   padding: 18px;
   text-align: center;
-  font-weight: 600;
-}
-
-.ver-rota {
-  background: none;
-  color: #0f172a;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin: 5px 0;
-}
-
-.whatsapp-icon {
-  width: 20px;
-  height: 20px;
-  vertical-align: middle;
-  margin-right: 6px;
-}
-
-.carona-info a {
-  display: inline-block;
-  font-size: 0.95rem;
-  color: #2563eb;
-  text-decoration: none;
-  margin-top: 2px;
-  cursor: pointer;
-}
-
-.carona-info a:hover {
-  text-decoration: underline;
-}
-
-.carona-info .link-whatsapp {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.95rem;
-  color: #2563eb;
-  text-decoration: none;
-  margin-top: 2px;
-  cursor: pointer;
-}
-
-.carona-info .link-whatsapp:hover {
-  text-decoration: underline;
+  font-weight: 500;
 }
 
 .minhas-caronas-faixa {
@@ -314,6 +296,89 @@
   text-align: center;
   color: white;
   margin-bottom: 20px;
+}
+
+.subtitulo-secao {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 16px 0 12px 0;
+}
+
+.card-atividade {
+  font-family: 'Poppins', sans-serif;
+}
+
+.card-atividade h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.card-atividade p {
+  margin: 6px 0;
+  color: #334155;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.card-atividade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.status-pendente {
+  color: #64748b;
+  background-color: #f1f5f9;
+}
+
+.status-aceita {
+  color: #16a34a;
+  background-color: #dcfce7;
+}
+
+.status-recusada {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+.status-aguardando {
+  color: #d97706;
+  background-color: #fef3c7;
+}
+
+.status-concluida {
+  color: #2563eb;
+  background-color: #dbeafe;
+}
+
+.status-cancelada {
+  color: #6b7280;
+  background-color: #e5e7eb;
+}
+
+.empty-box-web {
+  background-color: #ffffff;
+  color: #64748b;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
 .caronas-bloco {
@@ -688,6 +753,19 @@ a:hover {
   vertical-align: -3px;
 }
 
+.export-box {
+  margin: 12px 0 28px 0;
+}
+
+.export-msg {
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.export-actions {
+  gap: 10px;
+}
+
 @media (max-width: 768px) {
   .linha-horizontal {
     flex-direction: column;
@@ -752,6 +830,14 @@ a:hover {
   }
 
   .encontre-header h3 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+  }
+
+  .section-toggle {
+    font-size: 1.25rem;
+  }
+
+  .card-atividade-header {
+    align-items: flex-start;
   }
 }

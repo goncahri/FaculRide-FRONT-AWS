@@ -171,105 +171,111 @@
   </div>
 
   <div class="caronas-disponiveis-faixa">
-    <div class="encontre-header">
-      <h3 class="titulo-centralizado">🔍 Encontre</h3>
-      <p>
-        Encontre sua carona ideal, visualize a rota e converse diretamente com outros alunos pelo FaculRide.
-      </p>
-    </div>
+    <button type="button" class="section-toggle" (click)="toggleSecao('encontre')">
+      <span>{{ mostrarSecaoEncontre ? '▼' : '▶' }}</span>
+      <span>🔍 Encontre</span>
+    </button>
 
-    <div class="filtros-encontre">
-      <h4>Filtros</h4>
-
-      <div class="filtros-botoes">
-        <button
-          type="button"
-          [class.active]="filtroTipo === 'todos'"
-          (click)="alterarFiltroTipo('todos')"
-        >
-          Todos
-        </button>
-
-        <button
-          type="button"
-          [class.active]="filtroTipo === 'motorista'"
-          (click)="alterarFiltroTipo('motorista')"
-        >
-          Motorista
-        </button>
-
-        <button
-          type="button"
-          [class.active]="filtroTipo === 'passageiro'"
-          (click)="alterarFiltroTipo('passageiro')"
-        >
-          Passageiro
-        </button>
+    <div *ngIf="mostrarSecaoEncontre">
+      <div class="encontre-header">
+        <p>
+          Encontre sua carona ideal, visualize a rota e converse diretamente com outros alunos pelo FaculRide.
+        </p>
       </div>
-    </div>
 
-    <div class="caronas-disponiveis-lista">
-      <div *ngFor="let viagem of viagensFiltradas()" class="carona-card">
-        <img
-          [src]="obterFotoUsuario(
-            viagem.usuario?.email,
-            viagem.usuario?.genero,
-            viagem.idUsuario,
-            viagem.usuario
-          )"
-          alt="Foto"
-          class="carona-foto"
-        />
+      <div class="filtros-encontre">
+        <h4>Filtros</h4>
 
-        <div class="carona-info">
-          <strong>{{ viagem.usuario?.nome || 'Usuário' }}</strong>
-          <p class="tipo-usuario-card">
-            {{ tipoNormalizado(viagem) === 'motorista' ? 'Motorista' : 'Passageiro' }}
-          </p>
+        <div class="filtros-botoes">
+          <button
+            type="button"
+            [class.active]="filtroTipo === 'todos'"
+            (click)="alterarFiltroTipo('todos')"
+          >
+            Todos
+          </button>
 
-          <p><strong>Partida:</strong> {{ viagem.partida }}</p>
-          <p><strong>Destino:</strong> {{ viagem.destino }}</p>
-          <p><strong>Entrada:</strong> {{ viagem.horarioEntrada }}</p>
-          <p><strong>Saída:</strong> {{ viagem.horarioSaida }}</p>
-          <p><strong>Ajuda mensal:</strong> R$ {{ viagem.ajudaDeCusto }}</p>
+          <button
+            type="button"
+            [class.active]="filtroTipo === 'motorista'"
+            (click)="alterarFiltroTipo('motorista')"
+          >
+            Motorista
+          </button>
 
-          <p *ngIf="(viagem.diasAgendados?.length || viagem.datasRota?.length)" class="dias-aula">
-            <strong>Dias:</strong>
-            {{ resumirDiasRota(viagem) }}
-          </p>
-
-          <div class="carona-acoes">
-            <button
-              type="button"
-              class="btn-card btn-rota"
-              (click)="mostrarRota(viagem.partida, viagem.destino)"
-            >
-              Ver rota
-            </button>
-
-            <button
-              *ngIf="ehMinhaCarona(viagem)"
-              type="button"
-              class="btn-card btn-excluir"
-              (click)="excluirCarona(viagem.idViagem)"
-            >
-              🗑️ Excluir
-            </button>
-
-            <button
-              *ngIf="!ehMinhaCarona(viagem)"
-              type="button"
-              class="btn-card btn-contato"
-              (click)="abrirConversa(viagem)"
-            >
-              💬 Entrar em contato
-            </button>
-          </div>
+          <button
+            type="button"
+            [class.active]="filtroTipo === 'passageiro'"
+            (click)="alterarFiltroTipo('passageiro')"
+          >
+            Passageiro
+          </button>
         </div>
       </div>
 
-      <div *ngIf="viagensFiltradas().length === 0" class="sem-caronas-filtro">
-        Nenhuma carona encontrada para este filtro.
+      <div class="caronas-disponiveis-lista">
+        <div *ngFor="let viagem of viagensFiltradas()" class="carona-card">
+          <img
+            [src]="obterFotoUsuario(
+              viagem.usuario?.email,
+              viagem.usuario?.genero,
+              viagem.idUsuario,
+              viagem.usuario
+            )"
+            alt="Foto"
+            class="carona-foto"
+          />
+
+          <div class="carona-info">
+            <strong>{{ viagem.usuario?.nome || 'Usuário' }}</strong>
+            <p class="tipo-usuario-card">
+              {{ tipoNormalizado(viagem) === 'motorista' ? 'Motorista' : 'Passageiro' }}
+            </p>
+
+            <p><strong>Partida:</strong> {{ viagem.partida }}</p>
+            <p><strong>Destino:</strong> {{ viagem.destino }}</p>
+            <p><strong>Entrada:</strong> {{ viagem.horarioEntrada }}</p>
+            <p><strong>Saída:</strong> {{ viagem.horarioSaida }}</p>
+            <p><strong>Ajuda mensal:</strong> R$ {{ viagem.ajudaDeCusto }}</p>
+
+            <p *ngIf="(viagem.diasAgendados?.length || viagem.datasRota?.length)" class="dias-aula">
+              <strong>Dias:</strong>
+              {{ resumirDiasRota(viagem) }}
+            </p>
+
+            <div class="carona-acoes">
+              <button
+                type="button"
+                class="btn-card btn-rota"
+                (click)="mostrarRota(viagem.partida, viagem.destino)"
+              >
+                Ver rota
+              </button>
+
+              <button
+                *ngIf="ehMinhaCarona(viagem)"
+                type="button"
+                class="btn-card btn-excluir"
+                (click)="excluirCarona(viagem.idViagem)"
+              >
+                🗑️ Excluir
+              </button>
+
+              <button
+                *ngIf="!ehMinhaCarona(viagem)"
+                type="button"
+                class="btn-card btn-contato"
+                (click)="abrirConversa(viagem)"
+              >
+                💬 Entrar em contato
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="viagensFiltradas().length === 0" class="sem-caronas-filtro">
+          Nenhuma carona encontrada para este filtro.
+        </div>
       </div>
     </div>
   </div>
@@ -297,42 +303,82 @@
   </div>
 
   <div class="minhas-caronas-faixa">
-    <h3 class="titulo-centralizado">Minhas Caronas</h3>
+    <button type="button" class="section-toggle" (click)="toggleSecao('minhasCaronas')">
+      <span>{{ mostrarSecaoMinhasCaronas ? '▼' : '▶' }}</span>
+      <span>Minhas Caronas</span>
+    </button>
 
-    <div *ngIf="caronasOferecidas.length > 0">
-      <h4 style="color: white;">Caronas Oferecidas</h4>
-      <div *ngFor="let c of caronasOferecidas" class="avaliacoes-bloco">
-        <p><strong>Partida:</strong> {{ c.partida }}</p>
-        <p><strong>Destino:</strong> {{ c.destino }}</p>
-        <p><strong>Entrada:</strong> {{ c.entrada }}</p>
-        <p><strong>Saída:</strong> {{ c.saida }}</p>
-        <p><strong>Ajuda Mensal:</strong> R$ {{ c.ajuda }}</p>
+    <div *ngIf="mostrarSecaoMinhasCaronas">
+      <div *ngIf="caronasOferecidas.length > 0">
+        <h4 class="subtitulo-secao">Caronas Oferecidas</h4>
 
-        <p *ngIf="(c.diasAgendados?.length || c.datasRota?.length)" class="dias-aula">
-          <strong>Dias desta rota:</strong>
-          {{ resumirDiasRota(c) }}
-        </p>
+        <div *ngFor="let c of caronasOferecidas" class="avaliacoes-bloco card-atividade">
+          <div class="card-atividade-header">
+            <h4>Carona Oferecida</h4>
+            <span class="status-badge" [ngClass]="statusClasse(c)">
+              {{ obterStatusViagem(c) }}
+            </span>
+          </div>
+
+          <p><strong>Partida:</strong> {{ c.partida }}</p>
+          <p><strong>Destino:</strong> {{ c.destino }}</p>
+          <p><strong>Entrada:</strong> {{ c.entrada || c.horarioEntrada }}</p>
+          <p><strong>Saída:</strong> {{ c.saida || c.horarioSaida }}</p>
+          <p><strong>Ajuda Mensal:</strong> R$ {{ c.ajuda || c.ajudaDeCusto }}</p>
+
+          <p *ngIf="(c.diasAgendados?.length || c.datasRota?.length)" class="dias-aula">
+            <strong>Dias desta rota:</strong>
+            {{ resumirDiasRota(c) }}
+          </p>
+
+          <button
+            type="button"
+            class="btn-card btn-rota"
+            (click)="mostrarRota(c.partida, c.destino)"
+          >
+            Ver rota
+          </button>
+        </div>
       </div>
-    </div>
 
-    <div *ngIf="caronasProcuradas.length > 0">
-      <h4 style="color: white;">Caronas Procuradas</h4>
-      <div *ngFor="let c of caronasProcuradas" class="avaliacoes-bloco">
-        <p><strong>Partida:</strong> {{ c.partida }}</p>
-        <p><strong>Destino:</strong> {{ c.destino }}</p>
-        <p><strong>Entrada:</strong> {{ c.entrada }}</p>
-        <p><strong>Saída:</strong> {{ c.saida }}</p>
-        <p><strong>Ajuda Mensal:</strong> R$ {{ c.ajuda }}</p>
+      <div *ngIf="caronasProcuradas.length > 0">
+        <h4 class="subtitulo-secao">Caronas Procuradas</h4>
 
-        <p *ngIf="(c.diasAgendados?.length || c.datasRota?.length)" class="dias-aula">
-          <strong>Dias desta rota:</strong>
-          {{ resumirDiasRota(c) }}
-        </p>
+        <div *ngFor="let c of caronasProcuradas" class="avaliacoes-bloco card-atividade">
+          <div class="card-atividade-header">
+            <h4>Carona Procurada</h4>
+            <span class="status-badge" [ngClass]="statusClasse(c)">
+              {{ obterStatusViagem(c) }}
+            </span>
+          </div>
+
+          <p><strong>Partida:</strong> {{ c.partida }}</p>
+          <p><strong>Destino:</strong> {{ c.destino }}</p>
+          <p><strong>Entrada:</strong> {{ c.entrada || c.horarioEntrada }}</p>
+          <p><strong>Saída:</strong> {{ c.saida || c.horarioSaida }}</p>
+          <p><strong>Ajuda Mensal:</strong> R$ {{ c.ajuda || c.ajudaDeCusto }}</p>
+
+          <p *ngIf="(c.diasAgendados?.length || c.datasRota?.length)" class="dias-aula">
+            <strong>Dias desta rota:</strong>
+            {{ resumirDiasRota(c) }}
+          </p>
+
+          <button
+            type="button"
+            class="btn-card btn-rota"
+            (click)="mostrarRota(c.partida, c.destino)"
+          >
+            Ver rota
+          </button>
+        </div>
       </div>
-    </div>
 
-    <div *ngIf="caronasOferecidas.length === 0 && caronasProcuradas.length === 0" style="color: white;">
-      Você não tem caronas registradas.
+      <div
+        *ngIf="caronasOferecidas.length === 0 && caronasProcuradas.length === 0"
+        class="empty-box-web"
+      >
+        Você ainda não possui caronas registradas.
+      </div>
     </div>
   </div>
 
@@ -360,31 +406,47 @@
   </ng-template>
 
   <div class="minhas-caronas-faixa">
-    <h3 class="titulo-centralizado">Minhas Avaliações</h3>
+    <button type="button" class="section-toggle" (click)="toggleSecao('avaliacoes')">
+      <span>{{ mostrarSecaoAvaliacoes ? '▼' : '▶' }}</span>
+      <span>Minhas Avaliações</span>
+    </button>
 
-    <div *ngIf="avaliacoesRecebidas.length > 0">
-      <h4 style="color: white;">Avaliações Recebidas</h4>
-      <div *ngFor="let a of avaliacoesRecebidas" class="avaliacoes-bloco">
-        <p><strong>De:</strong> {{ a.nomeAvaliador }}</p>
-        <p><strong>Nota:</strong> ⭐ {{ a.Estrelas }}</p>
-        <p><strong>Comentário:</strong> {{ a.Comentario }}</p>
+    <div *ngIf="mostrarSecaoAvaliacoes">
+      <div>
+        <h4 class="subtitulo-secao">Avaliações Recebidas</h4>
+
+        <div *ngIf="avaliacoesRecebidas.length > 0; else semAvaliacoesRecebidas">
+          <div *ngFor="let a of avaliacoesRecebidas" class="avaliacoes-bloco card-atividade">
+            <h4>De: {{ a.nomeAvaliador }}</h4>
+            <p><strong>Nota:</strong> ⭐ {{ a.Estrelas }}</p>
+            <p><strong>Comentário:</strong> {{ a.Comentario }}</p>
+          </div>
+        </div>
+
+        <ng-template #semAvaliacoesRecebidas>
+          <div class="empty-box-web">
+            Você ainda não possui avaliações recebidas.
+          </div>
+        </ng-template>
       </div>
-    </div>
 
-    <div *ngIf="avaliacoesEnviadas.length > 0">
-      <h4 style="color: white;">Avaliações Enviadas</h4>
-      <div *ngFor="let a of avaliacoesEnviadas" class="avaliacoes-bloco">
-        <p><strong>Para:</strong> {{ a.nomeAvaliado }}</p>
-        <p><strong>Nota:</strong> ⭐ {{ a.Estrelas }}</p>
-        <p><strong>Comentário:</strong> {{ a.Comentario }}</p>
+      <div>
+        <h4 class="subtitulo-secao">Avaliações Enviadas</h4>
+
+        <div *ngIf="avaliacoesEnviadas.length > 0; else semAvaliacoesEnviadas">
+          <div *ngFor="let a of avaliacoesEnviadas" class="avaliacoes-bloco card-atividade">
+            <h4>Para: {{ a.nomeAvaliado }}</h4>
+            <p><strong>Nota:</strong> ⭐ {{ a.Estrelas }}</p>
+            <p><strong>Comentário:</strong> {{ a.Comentario }}</p>
+          </div>
+        </div>
+
+        <ng-template #semAvaliacoesEnviadas>
+          <div class="empty-box-web">
+            Você ainda não possui avaliações enviadas.
+          </div>
+        </ng-template>
       </div>
-    </div>
-
-    <div
-      *ngIf="avaliacoesRecebidas.length === 0 && avaliacoesEnviadas.length === 0"
-      style="color: white;"
-    >
-      Você não tem avaliações registradas.
     </div>
   </div>
 </section>
