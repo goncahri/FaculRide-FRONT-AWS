@@ -19,6 +19,7 @@ type CalendarioMes = {
 
 type ModoVigencia = 'mensal' | 'semestre';
 type FiltroTipo = 'todos' | 'motorista' | 'passageiro';
+type SecaoMapa = 'encontre' | 'minhasCaronas' | 'avaliacoes';
 
 @Component({
   selector: 'app-mapa',
@@ -48,6 +49,10 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   tipoCarona: string = 'oferecer';
   filtroTipo: FiltroTipo = 'todos';
+
+  mostrarSecaoEncontre = true;
+  mostrarSecaoMinhasCaronas = true;
+  mostrarSecaoAvaliacoes = true;
 
   origem: string = '';
   cidadePartida: string = '';
@@ -107,6 +112,20 @@ export class MapaComponent implements AfterViewInit, OnInit {
     this.inicializarMapa();
   }
 
+  toggleSecao(secao: SecaoMapa): void {
+    if (secao === 'encontre') {
+      this.mostrarSecaoEncontre = !this.mostrarSecaoEncontre;
+    }
+
+    if (secao === 'minhasCaronas') {
+      this.mostrarSecaoMinhasCaronas = !this.mostrarSecaoMinhasCaronas;
+    }
+
+    if (secao === 'avaliacoes') {
+      this.mostrarSecaoAvaliacoes = !this.mostrarSecaoAvaliacoes;
+    }
+  }
+
   inicializarMapa(): void {
     if (!isBrowser() || !this.mapContainer?.nativeElement) return;
 
@@ -157,6 +176,45 @@ export class MapaComponent implements AfterViewInit, OnInit {
     return this.viagens.filter(v => this.tipoNormalizado(v) === this.filtroTipo);
   }
 
+  obterStatusViagem(viagem: any): string {
+    const statusBack = String(viagem?.statusViagem || viagem?.status || '')
+      .trim()
+      .toLowerCase();
+
+    if (statusBack === 'aceita') return 'Aceita';
+    if (statusBack === 'recusada') return 'Recusada';
+    if (statusBack === 'concluida' || statusBack === 'concluída') return 'Concluída';
+    if (statusBack === 'cancelada') return 'Cancelada';
+    if (statusBack === 'pendente') return 'Pendente';
+    if (statusBack === 'aguardando_confirmacao') return 'Aguardando confirmação';
+
+    const datas = this.normalizarDatasViagem(viagem);
+
+    const horarioSaida = viagem?.horarioSaida || viagem?.saida;
+    if (datas.length > 0 && horarioSaida) {
+      const ultimaData = datas[datas.length - 1];
+      const dataHora = new Date(`${ultimaData}T${horarioSaida}`);
+
+      if (!isNaN(dataHora.getTime()) && dataHora.getTime() < Date.now()) {
+        return 'Concluída';
+      }
+    }
+
+    return 'Pendente';
+  }
+
+  statusClasse(viagem: any): string {
+    const status = this.obterStatusViagem(viagem);
+
+    if (status === 'Aceita') return 'status-aceita';
+    if (status === 'Recusada') return 'status-recusada';
+    if (status === 'Aguardando confirmação') return 'status-aguardando';
+    if (status === 'Concluída') return 'status-concluida';
+    if (status === 'Cancelada') return 'status-cancelada';
+
+    return 'status-pendente';
+  }
+
   private normalizeUsuario(u: any) {
     const bruto = (u?.tipoUsuario ?? u?.tipo_usuario ?? u?.tipo ?? '')
       .toString()
@@ -200,7 +258,10 @@ export class MapaComponent implements AfterViewInit, OnInit {
       });
     }
 
-    return [...new Set(datas)];
+    return [...new Set(datas)]
+      .filter((d: string) => typeof d === 'string' && d.length >= 10)
+      .map((d: string) => d.slice(0, 10))
+      .sort((a, b) => a.localeCompare(b));
   }
 
   carregarViagens(): void {
@@ -214,6 +275,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
         this.caronasOferecidas = this.viagens
           .filter(v => Number(v.idUsuario) === this.meuId && this.tipoNormalizado(v) === 'motorista')
           .map(v => ({
+            ...v,
             partida: v.partida,
             destino: v.destino,
             entrada: v.horarioEntrada,
@@ -225,6 +287,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
         this.caronasProcuradas = this.viagens
           .filter(v => Number(v.idUsuario) === this.meuId && this.tipoNormalizado(v) === 'passageiro')
           .map(v => ({
+            ...v,
             partida: v.partida,
             destino: v.destino,
             entrada: v.horarioEntrada,
