@@ -38,11 +38,11 @@ export class MapaComponent implements AfterViewInit, OnInit {
   infoWindow!: google.maps.InfoWindow;
 
   carregando: boolean = true;
-  private _loads = { usuarios: false, viagens: false, avaliacoes: false };
+  private _loads = { usuarios: false, viagens: false, avaliacoes: false, conversas: false };
 
-  private markLoaded(key: 'usuarios' | 'viagens' | 'avaliacoes') {
+  private markLoaded(key: 'usuarios' | 'viagens' | 'avaliacoes' | 'conversas') {
     this._loads[key] = true;
-    if (this._loads.usuarios && this._loads.viagens && this._loads.avaliacoes) {
+    if (this._loads.usuarios && this._loads.viagens && this._loads.avaliacoes && this._loads.conversas) {
       this.carregando = false;
     }
   }
@@ -76,6 +76,8 @@ export class MapaComponent implements AfterViewInit, OnInit {
   viagens: any[] = [];
   caronasOferecidas: any[] = [];
   caronasProcuradas: any[] = [];
+  conversas: any[] = [];
+  caronasAceitas: any[] = [];
 
   mostrarAvaliacao: boolean = false;
   nomeUsuarioSelecionado: string = '';
@@ -103,10 +105,11 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   ngOnInit(): void {
     this.carregando = true;
-    this._loads = { usuarios: false, viagens: false, avaliacoes: false };
+    this._loads = { usuarios: false, viagens: false, avaliacoes: false, conversas: false };
 
     this.carregarUsuarios();
     this.carregarViagens();
+    this.carregarConversas();
     this.carregarAvaliacoes();
   }
 
@@ -171,11 +174,13 @@ export class MapaComponent implements AfterViewInit, OnInit {
   }
 
   viagensFiltradas(): any[] {
+    const viagensDisponiveis = this.viagens.filter(v => !this.viagemTemConversaAceita(v));
+
     if (this.filtroTipo === 'todos') {
-      return this.viagens;
+      return viagensDisponiveis;
     }
 
-    return this.viagens.filter(v => this.tipoNormalizado(v) === this.filtroTipo);
+    return viagensDisponiveis.filter(v => this.tipoNormalizado(v) === this.filtroTipo);
   }
 
   obterStatusViagem(viagem: any): string {
@@ -216,6 +221,54 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
     return 'status-pendente';
   }
+
+  private viagemTemConversaAceita(viagem: any): boolean {
+  const idViagem = Number(viagem?.idViagem ?? viagem?.id);
+
+  if (!idViagem) return false;
+
+  return this.conversas.some(c =>
+    Number(c?.idViagem) === idViagem &&
+    String(c?.status || '').toLowerCase() === 'aceita'
+  );
+}
+
+private montarCaronasAceitas(): void {
+  const idsAdicionados = new Set<number>();
+
+  this.caronasAceitas = this.conversas
+    .filter(c => String(c?.status || '').toLowerCase() === 'aceita')
+    .filter(c =>
+      Number(c?.idMotorista) === Number(this.meuId) ||
+      Number(c?.idPassageiro) === Number(this.meuId)
+    )
+    .map(c => {
+      const viagem = this.viagens.find(v =>
+        Number(v?.idViagem ?? v?.id) === Number(c?.idViagem)
+      );
+
+      if (!viagem) return null;
+
+      return {
+        ...viagem,
+        conversa: c,
+        partida: viagem.partida,
+        destino: viagem.destino,
+        entrada: viagem.horarioEntrada,
+        saida: viagem.horarioSaida,
+        ajuda: viagem.ajudaDeCusto,
+        diasAgendados: this.normalizarDatasViagem(viagem)
+      };
+    })
+    .filter(Boolean)
+    .filter((v: any) => {
+      const id = Number(v?.idViagem ?? v?.id);
+      if (!id || idsAdicionados.has(id)) return false;
+
+      idsAdicionados.add(id);
+      return true;
+    });
+}
 
   private normalizeUsuario(u: any) {
     const bruto = (u?.tipoUsuario ?? u?.tipo_usuario ?? u?.tipo ?? '')
@@ -298,6 +351,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
             diasAgendados: v.diasAgendados
           }));
 
+        this.montarCaronasAceitas();
         this.atualizarMarcadoresViagens();
         this.markLoaded('viagens');
       },
@@ -307,6 +361,33 @@ export class MapaComponent implements AfterViewInit, OnInit {
       }
     });
   }
+
+  carregarConversas(): void {
+  const token =
+    localStorage.getItem('token') ||
+    localStorage.getItem('accessToken') ||
+    localStorage.getItem('jwt') ||
+    this.usuarioLogado?.token ||
+    '';
+
+  const headers: any = token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
+
+  this.http.get<any[]>(`${this.baseURL}/conversas`, { headers }).subscribe({
+    next: (res) => {
+      this.conversas = Array.isArray(res) ? res : [];
+      this.montarCaronasAceitas();
+      this.markLoaded('conversas');
+    },
+    error: (err) => {
+      console.error('Erro ao carregar conversas:', err);
+      this.conversas = [];
+      this.caronasAceitas = [];
+      this.markLoaded('conversas');
+    }
+  });
+}
 
   carregarUsuarios(): void {
     this.http.get<any[]>(`${this.baseURL}/usuario`).subscribe({
