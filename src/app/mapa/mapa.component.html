@@ -259,7 +259,7 @@
               </button>
 
               <button
-                *ngIf="ehMinhaCarona(viagem)"
+                *ngIf="ehMinhaCarona(viagem) && podeEditarCarona(viagem)"
                 type="button"
                 class="btn-card btn-editar"
                 (click)="editarCarona(viagem)"
@@ -356,6 +356,7 @@
             </button>
 
             <button
+              *ngIf="podeEditarCarona(c)"
               type="button"
               class="btn-card btn-editar"
               (click)="editarCarona(c)"
@@ -433,6 +434,7 @@
             </button>
 
             <button
+              *ngIf="podeEditarCarona(c)"
               type="button"
               class="btn-card btn-editar"
               (click)="editarCarona(c)"
