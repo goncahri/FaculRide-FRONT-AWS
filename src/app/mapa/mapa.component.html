@@ -366,6 +366,41 @@
         </div>
       </div>
 
+      <div *ngIf="caronasAceitas.length > 0">
+        <h4 class="subtitulo-secao">Caronas Aceitas</h4>
+
+        <div *ngFor="let c of caronasAceitas" class="avaliacoes-bloco card-atividade">
+          <div class="card-atividade-header">
+            <h4>Carona Aceita</h4>
+
+            <span class="status-badge status-aceita">
+              Aceita
+            </span>
+          </div>
+
+          <p><strong>Partida:</strong> {{ c.partida }}</p>
+          <p><strong>Destino:</strong> {{ c.destino }}</p>
+          <p><strong>Entrada:</strong> {{ c.entrada || c.horarioEntrada }}</p>
+          <p><strong>Saída:</strong> {{ c.saida || c.horarioSaida }}</p>
+          <p><strong>Ajuda Mensal:</strong> R$ {{ c.ajuda || c.ajudaDeCusto }}</p>
+
+          <p *ngIf="(c.diasAgendados?.length || c.datasRota?.length)" class="dias-aula">
+            <strong>Dias desta rota:</strong>
+            {{ resumirDiasRota(c) }}
+          </p>
+
+          <div class="carona-acoes">
+            <button
+              type="button"
+              class="btn-card btn-rota"
+              (click)="mostrarRota(c.partida, c.destino)"
+            >
+              Ver rota
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div *ngIf="caronasProcuradas.length > 0">
         <h4 class="subtitulo-secao">Caronas Procuradas</h4>
 
@@ -409,7 +444,11 @@
       </div>
 
       <div
-        *ngIf="caronasOferecidas.length === 0 && caronasProcuradas.length === 0"
+        *ngIf="
+          caronasOferecidas.length === 0 &&
+          caronasProcuradas.length === 0 &&
+          caronasAceitas.length === 0
+        "
         class="empty-box-web"
       >
         Você ainda não possui caronas registradas.
@@ -419,7 +458,12 @@
 
   <div
     class="export-box"
-    *ngIf="(caronasOferecidas?.length || 0) + (caronasProcuradas?.length || 0) > 0; else noRides"
+    *ngIf="
+      (caronasOferecidas?.length || 0) +
+      (caronasProcuradas?.length || 0) +
+      (caronasAceitas?.length || 0) > 0;
+      else noRides
+    "
   >
     <p class="export-msg">
       💾 Quer guardar ou compartilhar?
