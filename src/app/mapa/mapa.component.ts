@@ -184,6 +184,15 @@ export class MapaComponent implements AfterViewInit, OnInit {
   }
 
   obterStatusViagem(viagem: any): string {
+    const conversa = this.obterConversaDaViagem(viagem);
+    const statusConversa = String(conversa?.status || '')
+      .trim()
+      .toLowerCase();
+
+    if (statusConversa === 'aceita') return 'Aceita';
+    if (statusConversa === 'recusada') return 'Recusada';
+    if (statusConversa === 'aguardando_confirmacao') return 'Aguardando confirmação';
+
     const statusBack = String(viagem?.statusViagem || viagem?.status || '')
       .trim()
       .toLowerCase();
@@ -196,8 +205,8 @@ export class MapaComponent implements AfterViewInit, OnInit {
     if (statusBack === 'aguardando_confirmacao') return 'Aguardando confirmação';
 
     const datas = this.normalizarDatasViagem(viagem);
-
     const horarioSaida = viagem?.horarioSaida || viagem?.saida;
+
     if (datas.length > 0 && horarioSaida) {
       const ultimaData = datas[datas.length - 1];
       const dataHora = new Date(`${ultimaData}T${horarioSaida}`);
@@ -220,6 +229,31 @@ export class MapaComponent implements AfterViewInit, OnInit {
     if (status === 'Cancelada') return 'status-cancelada';
 
     return 'status-pendente';
+  }
+
+  podeEditarCarona(viagem: any): boolean {
+    const status = this.obterStatusViagem(viagem);
+
+    return status !== 'Aceita' && status !== 'Recusada' && status !== 'Concluída' && status !== 'Cancelada';
+  }
+
+  private obterConversaDaViagem(viagem: any): any | null {
+    const idViagem = Number(viagem?.idViagem ?? viagem?.id);
+
+    if (!idViagem) return null;
+
+    const conversasDaViagem = this.conversas.filter(c =>
+      Number(c?.idViagem) === idViagem
+    );
+
+    return (
+      conversasDaViagem.find(c => String(c?.status || '').toLowerCase() === 'aceita') ||
+      conversasDaViagem.find(c =>
+        Number(c?.idMotorista) === Number(this.meuId) ||
+        Number(c?.idPassageiro) === Number(this.meuId)
+      ) ||
+      null
+    );
   }
 
   private viagemTemConversaAceita(viagem: any): boolean {
@@ -328,7 +362,11 @@ private montarCaronasAceitas(): void {
         });
 
         this.caronasOferecidas = this.viagens
-          .filter(v => Number(v.idUsuario) === this.meuId && this.tipoNormalizado(v) === 'motorista')
+          .filter(v =>
+            Number(v.idUsuario) === this.meuId &&
+            this.tipoNormalizado(v) === 'motorista' &&
+            !this.viagemTemConversaAceita(v)
+          )
           .map(v => ({
             ...v,
             partida: v.partida,
@@ -340,7 +378,11 @@ private montarCaronasAceitas(): void {
           }));
 
         this.caronasProcuradas = this.viagens
-          .filter(v => Number(v.idUsuario) === this.meuId && this.tipoNormalizado(v) === 'passageiro')
+          .filter(v =>
+            Number(v.idUsuario) === this.meuId &&
+            this.tipoNormalizado(v) === 'passageiro' &&
+            !this.viagemTemConversaAceita(v)
+          )
           .map(v => ({
             ...v,
             partida: v.partida,
@@ -378,6 +420,7 @@ private montarCaronasAceitas(): void {
     next: (res) => {
       this.conversas = Array.isArray(res) ? res : [];
       this.montarCaronasAceitas();
+      this.carregarViagens();
       this.markLoaded('conversas');
     },
     error: (err) => {
@@ -1012,7 +1055,16 @@ cancelarEdicao(limparFormulario: boolean = true): void {
       Saida: c.saida, Ajuda: String(c.ajuda ?? ''), Tipo: 'Passageiro'
     }));
 
-    return [...oferecidas, ...procuradas];
+    const aceitas = (this.caronasAceitas || []).map(c => ({
+      Partida: c.partida,
+      Destino: c.destino,
+      Entrada: c.entrada,
+      Saida: c.saida,
+      Ajuda: String(c.ajuda ?? ''),
+      Tipo: 'Aceita'
+    }));
+
+    return [...oferecidas, ...procuradas, ...aceitas];
   }
 
   async exportarPDF(): Promise<void> {
