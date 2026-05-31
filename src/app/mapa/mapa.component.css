@@ -865,4 +865,16 @@ a:hover {
   .card-atividade-header {
     align-items: flex-start;
   }
+
+  .info-proximidade {
+  max-width: 560px;
+  margin: 0 auto 20px auto;
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  font-weight: 600;
+}
+
 }

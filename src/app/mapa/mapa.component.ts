@@ -18,7 +18,11 @@ type CalendarioMes = {
 };
 
 type ModoVigencia = 'mensal' | 'semestre';
-type FiltroTipo = 'todos' | 'motorista' | 'passageiro';
+type FiltroTipo =
+  | 'todos'
+  | 'motorista'
+  | 'passageiro'
+  | 'proximas';
 type SecaoMapa = 'encontre' | 'minhasCaronas' | 'avaliacoes';
 
 @Component({
@@ -49,6 +53,9 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   tipoCarona: string = 'oferecer';
   filtroTipo: FiltroTipo = 'todos';
+  infoProximidade = '';
+  private cacheCoordenadas: Record<string, google.maps.LatLngLiteral> = {};
+  private viagensComDistancia: any[] = [];
 
   modoEdicaoAtivo: boolean = false;
   idViagemEdicao: number | null = null;
@@ -171,11 +178,21 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   alterarFiltroTipo(tipo: FiltroTipo): void {
     this.filtroTipo = tipo;
+
+    if (tipo === 'proximas') {
+      this.calcularCaronasProximas();
+    } else {
+      this.infoProximidade = '';
+    }
   }
 
   viagensFiltradas(): any[] {
     const viagensDisponiveis = this.viagens.filter(v => !this.viagemTemConversaAceita(v));
 
+    if (this.filtroTipo === 'proximas') {
+      return this.viagensComDistancia;
+    }
+    
     if (this.filtroTipo === 'todos') {
       return viagensDisponiveis;
     }
@@ -758,6 +775,132 @@ private montarCaronasAceitas(): void {
       );
     }
   }
+
+  private montarEnderecoUsuarioLogado(): string {
+  const partes = [
+    this.usuarioLogado?.endereco,
+    this.usuarioLogado?.numero,
+    this.usuarioLogado?.cidade,
+    this.usuarioLogado?.estado,
+    this.usuarioLogado?.cep
+  ]
+    .filter(Boolean)
+    .map((p: any) => String(p).trim())
+    .filter((p: string) => p.length > 0);
+
+  return partes.join(', ');
+}
+
+private geocodificarEndereco(endereco: string): Promise<google.maps.LatLngLiteral | null> {
+  return new Promise((resolve) => {
+    if (!isBrowser() || !endereco || !(window as any).google?.maps?.Geocoder) {
+      resolve(null);
+      return;
+    }
+
+    const chave = endereco.trim().toLowerCase();
+
+    if (this.cacheCoordenadas[chave]) {
+      resolve(this.cacheCoordenadas[chave]);
+      return;
+    }
+
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ address: endereco }, (results, status) => {
+      if (status === 'OK' && results && results[0]) {
+        const location = results[0].geometry.location;
+
+        const coordenadas = {
+          lat: location.lat(),
+          lng: location.lng()
+        };
+
+        this.cacheCoordenadas[chave] = coordenadas;
+        resolve(coordenadas);
+        return;
+      }
+
+      resolve(null);
+    });
+  });
+}
+
+private calcularDistanciaKm(origem: google.maps.LatLngLiteral, destino: google.maps.LatLngLiteral): number {
+  const raioTerraKm = 6371;
+
+  const toRad = (valor: number) => (valor * Math.PI) / 180;
+
+  const dLat = toRad(destino.lat - origem.lat);
+  const dLng = toRad(destino.lng - origem.lng);
+
+  const lat1 = toRad(origem.lat);
+  const lat2 = toRad(destino.lat);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return raioTerraKm * c;
+}
+
+async calcularCaronasProximas(): Promise<void> {
+  this.infoProximidade = '📍 Calculando caronas próximas de você...';
+
+  const enderecoUsuario = this.montarEnderecoUsuarioLogado();
+
+  if (!enderecoUsuario) {
+    this.viagensComDistancia = [];
+    this.infoProximidade = 'Não foi possível calcular a proximidade. Atualize seu endereço no perfil.';
+    return;
+  }
+
+  const coordenadasUsuario = await this.geocodificarEndereco(enderecoUsuario);
+
+  if (!coordenadasUsuario) {
+    this.viagensComDistancia = [];
+    this.infoProximidade = 'Não foi possível localizar seu endereço para calcular as caronas próximas.';
+    return;
+  }
+
+  const viagensDisponiveis = this.viagens.filter(v => !this.viagemTemConversaAceita(v));
+  const viagensCalculadas: any[] = [];
+
+  for (const viagem of viagensDisponiveis) {
+    const partida = String(viagem?.partida || '').trim();
+
+    if (!partida) continue;
+
+    const coordenadasPartida = await this.geocodificarEndereco(partida);
+
+    if (!coordenadasPartida) continue;
+
+    const distanciaKm = this.calcularDistanciaKm(coordenadasUsuario, coordenadasPartida);
+
+    viagensCalculadas.push({
+      ...viagem,
+      distanciaKm
+    });
+  }
+
+  this.viagensComDistancia = viagensCalculadas.sort(
+    (a, b) => Number(a.distanciaKm) - Number(b.distanciaKm)
+  );
+
+  if (!this.viagensComDistancia.length) {
+    this.infoProximidade = 'Nenhuma carona próxima pôde ser calculada no momento.';
+    return;
+  }
+
+  const menorDistancia = Number(this.viagensComDistancia[0].distanciaKm).toFixed(1).replace('.', ',');
+
+  this.infoProximidade =
+    `📍 A carona mais próxima está a aproximadamente ${menorDistancia} km de você. ` +
+    `Encontramos ${this.viagensComDistancia.length} carona(s) com distância calculada.`;
+}
 
   ehMinhaCarona(viagem: any): boolean {
     return Number(viagem?.idUsuario) === Number(this.meuId);
