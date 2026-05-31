@@ -216,7 +216,21 @@
           >
             Passageiro
           </button>
+          <button
+            type="button"
+            [class.active]="filtroTipo === 'proximas'"
+            (click)="alterarFiltroTipo('proximas')"
+          >
+            📍 Próximas a mim
+          </button>
         </div>
+      </div>
+
+      <div
+        *ngIf="filtroTipo === 'proximas' && infoProximidade"
+        class="info-proximidade"
+      >
+        {{ infoProximidade }}
       </div>
 
       <div class="caronas-disponiveis-lista">
@@ -243,6 +257,10 @@
             <p><strong>Entrada:</strong> {{ viagem.horarioEntrada }}</p>
             <p><strong>Saída:</strong> {{ viagem.horarioSaida }}</p>
             <p><strong>Ajuda mensal:</strong> R$ {{ viagem.ajudaDeCusto }}</p>
+            <p *ngIf="filtroTipo === 'proximas' && viagem.distanciaKm !== undefined">
+              <strong>Distância:</strong>
+              {{ viagem.distanciaKm | number:'1.1-1' }} km de você
+            </p>
 
             <p *ngIf="(viagem.diasAgendados?.length || viagem.datasRota?.length)" class="dias-aula">
               <strong>Dias:</strong>
