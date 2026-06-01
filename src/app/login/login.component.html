@@ -17,6 +17,7 @@
         required
         email
       />
+
       <input
         type="password"
         name="password"
@@ -30,13 +31,11 @@
         class="btn-primary"
         [disabled]="carregando || formLogin.invalid"
       >
-        <!-- Quando NÃO está carregando -->
         <ng-container *ngIf="!carregando; else loadingTpl">
           <img src="assets/logo1.png" alt="FaculRide" class="btn-icon" />
           Entrar
         </ng-container>
 
-        <!-- Quando ESTÁ carregando -->
         <ng-template #loadingTpl>
           <div class="loading-wrapper">
             <span class="spinner"></span>
@@ -46,34 +45,50 @@
       </button>
     </form>
 
-    <!-- Link para recuperar senha -->
+    <!-- Alterar Senha -->
     <button class="recover-password" (click)="toggleRecoverPassword()">
-      Esqueceu sua senha?
+      Alterar senha
     </button>
 
-    <!-- Seção de Recuperação de Senha -->
+    <!-- Seção Alterar Senha -->
     <div *ngIf="showRecoverPasswordSection" class="recover-container">
-      <form (ngSubmit)="sendRecoverEmail()" #formRecover="ngForm">
-        <input
-          id="recover-email"
-          name="recoverEmail"
-          type="email"
-          [(ngModel)]="recoverEmail"
-          placeholder="Informe seu e-mail"
-          required
-        />
-        <button type="submit" class="btn-primary">Enviar</button>
-      </form>
+
+      <input
+        type="password"
+        [(ngModel)]="senhaAtual"
+        placeholder="Senha atual"
+      />
+
+      <input
+        type="password"
+        [(ngModel)]="novaSenha"
+        placeholder="Nova senha"
+      />
+
+      <input
+        type="password"
+        [(ngModel)]="confirmarSenha"
+        placeholder="Confirmar nova senha"
+      />
+
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="alterarSenha()"
+      >
+        Alterar senha
+      </button>
 
       <div *ngIf="recoverMsg" class="success-message">
         {{ recoverMsg }}
       </div>
     </div>
 
-    <!-- Separador -->
+    <!-- Futuro Login Social -->
+
+    <!--
     <p class="ou">ou</p>
 
-    <!-- Login Social -->
     <button type="button" class="btn-google">
       <img src="assets/google.png" alt="Google" class="btn-icon" />
       Continuar com Google
@@ -83,10 +98,13 @@
       <img src="assets/facebook.png" alt="Facebook" class="btn-icon" />
       Continuar com Facebook
     </button>
+    -->
 
     <!-- Link Cadastro -->
     <p class="cadastro">
-      Ainda não tem cadastro? <a routerLink="/cadastro">Cadastrar</a>
+      Ainda não tem cadastro?
+      <a routerLink="/cadastro">Cadastrar</a>
     </p>
+
   </div>
 </section>
