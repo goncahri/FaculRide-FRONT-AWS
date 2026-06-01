@@ -6,7 +6,7 @@
 
 **Sistema de caronas universitárias da FATEC Votorantim**
 
-Versão `0.26.0-preview.1` · Node.js · Angular 18 · React Native · AWS
+Node.js · Angular 18 · React Native · AWS
 
 [![CI/CD Backend](https://github.com/devDavyRibeiro/FaculRide-BackEnd/actions/workflows/ci-main.yml/badge.svg)](https://github.com/devDavyRibeiro/FaculRide-BackEnd/actions)
 [![CI/CD Frontend](https://github.com/goncahri/FaculRide-FRONT-AWS/actions/workflows/main.yml/badge.svg)](https://github.com/goncahri/FaculRide-FRONT-AWS/actions)
@@ -50,18 +50,18 @@ O sistema permite oferecer ou procurar caronas com agendamento por calendário, 
          │
          ▼  DuckDNS (DNS dinâmico)
 ┌─────────────────────────────────────────────────────────┐
-│                  AWS Cloud — us-east-1                   │
-│                                                          │
+│                  AWS Cloud — us-east-1                  │
+│                                                         │
 │  ┌─────────────────────────────────────────────────┐    │
-│  │           EC2 Instâncias (IaaS)                  │    │
-│  │  [EC2 Frontend]  [EC2 Backend]  [EC2 MongoDB]    │    │
+│  │           EC2 Instâncias (IaaS)                 │    │
+│  │  [EC2 Frontend]  [EC2 Backend]  [EC2 MongoDB]   │    │
 │  └─────────────────────────────────────────────────┘    │
-│            │             │               │               │
-│            ▼             ▼               ▼               │
+│            │             │               │              │
+│            ▼             ▼               ▼              │
 │  ┌─────────────────────────────────────────────────┐    │
-│  │         Serviços Gerenciados (PaaS)              │    │
+│  │         Serviços Gerenciados (PaaS)             │    │
 │  │  [RDS PostgreSQL]  [S3 + Réplica]  [CloudWatch] │    │
-│  │  [AWS Lambda]      [IAM Role]      [Secrets Mgr] │   │
+│  │  [AWS Lambda]      [IAM Role]      [Secrets Mgr]│    │
 │  └─────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────┘
          │
@@ -805,7 +805,7 @@ server {
 
 | Componente | GitHub | Docker Hub |
 |---|---|---|
-| **Backend** | [FaculRide-BackEnd](https://github.com/devDavyRibeiro/FaculRide-BackEnd) | [goncahri/faculride-backend](https://hub.docker.com/r/goncahri/faculride-backend) |
+| **Backend** | [FaculRide-BackEnd](https://github.com/devDavyRibeiro/FaculRide-BackEnd) | [ryancnp/faculride-back](https://hub.docker.com/r/ryancnp/faculride-back) |
 | **Frontend Web** | [FaculRide-FRONT-AWS](https://github.com/goncahri/FaculRide-FRONT-AWS) | [goncahri/faculride-frontend](https://hub.docker.com/r/goncahri/faculride-frontend) |
 | **Mobile** | [faculride-mobile](https://github.com/devDavyRibeiro/faculride-mobile) | — |
 
