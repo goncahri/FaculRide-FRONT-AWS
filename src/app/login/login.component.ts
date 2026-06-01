@@ -15,16 +15,21 @@ import { AuthService } from '../services/auth.service';
 export class LoginComponent {
   email: string = '';
   password: string = '';
-  recoverEmail: string = '';
+
   errorMsg: string = '';
   recoverMsg: string = '';
   loginAttempts: number = 0;
+
   showRecoverPasswordSection: boolean = false;
 
-  carregando: boolean = false; // 🔵 NOVO
+  senhaAtual: string = '';
+  novaSenha: string = '';
+  confirmarSenha: string = '';
+
+  carregando: boolean = false;
 
   constructor(
-    private authService: AuthService, 
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -34,7 +39,7 @@ export class LoginComponent {
       return;
     }
 
-    this.carregando = true; // 🔵 ATIVA SPINNER
+    this.carregando = true;
 
     const loginData = {
       email: this.email,
@@ -43,12 +48,12 @@ export class LoginComponent {
 
     this.authService.login(loginData.email, loginData.senha).subscribe({
       next: (res: any) => {
-        this.carregando = false; // 🔵 DESATIVA SPINNER
+        this.carregando = false;
         alert('✅ Login efetuado com sucesso!');
         this.router.navigate(['/usuario']);
       },
       error: (err) => {
-        this.carregando = false; // 🔵 DESATIVA SPINNER
+        this.carregando = false;
         console.error('Erro no login:', err);
 
         this.loginAttempts++;
@@ -66,14 +71,34 @@ export class LoginComponent {
     this.showRecoverPasswordSection = !this.showRecoverPasswordSection;
   }
 
-  sendRecoverEmail() {
-    if (this.recoverEmail.trim() === this.email.trim()) {
-      this.recoverMsg = 'E-mail de recuperação de senha enviado com sucesso!';
-    } else {
-      this.recoverMsg = 'E-mail não encontrado.';
+  alterarSenha() {
+    if (
+      !this.senhaAtual ||
+      !this.novaSenha ||
+      !this.confirmarSenha
+    ) {
+      alert('Preencha todos os campos.');
+      return;
     }
 
-    this.errorMsg = '';
-    this.showRecoverPasswordSection = false;
+    this.authService.alterarSenha({
+      senhaAtual: this.senhaAtual,
+      novaSenha: this.novaSenha,
+      confirmarSenha: this.confirmarSenha
+    }).subscribe({
+      next: () => {
+        alert('✅ Senha alterada com sucesso!');
+
+        this.senhaAtual = '';
+        this.novaSenha = '';
+        this.confirmarSenha = '';
+
+        this.showRecoverPasswordSection = false;
+      },
+      error: (err) => {
+        console.error(err);
+        alert(err?.error?.erro || 'Erro ao alterar senha.');
+      }
+    });
   }
 }

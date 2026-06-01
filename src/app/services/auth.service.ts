@@ -62,4 +62,22 @@ export class AuthService {
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');
   }
+
+  alterarSenha(dados: {
+  senhaAtual: string;
+  novaSenha: string;
+  confirmarSenha: string;
+}) {
+  const token = localStorage.getItem('token');
+
+  return this.http.put(
+    `${this.API_URL}/alterar-senha`,
+    dados,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+}
 }
