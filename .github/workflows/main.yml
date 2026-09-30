@@ -1,4 +1,4 @@
-name: CI / CD - Frontend - Production
+name: CI / CD - Frontend - Production 
 
 on:
   push:
