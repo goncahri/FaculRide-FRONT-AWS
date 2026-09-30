@@ -3,7 +3,7 @@ name: CI / CD - Frontend - Develop
 on:
   push:
     branches:
-      - develop
+      - hotfix/github-actions
 
 permissions:
   contents: write
@@ -23,86 +23,63 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.x'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Instalar Dependências
         run: npm ci
 
-      - name: Semantic Release Preview
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          extra_plugins: |
-            @semantic-release/commit-analyzer
-            @semantic-release/release-notes-generator
-            @semantic-release/github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Calcular versão de preview
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --tags --force --prune
+
+          # Busca a última tag de produção para usar como base
+          LAST_PROD_TAG=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | grep -v 'preview' | head -n1 || true)
+          [ -z "$LAST_PROD_TAG" ] && LAST_PROD_TAG="v0.0.0"
+
+          BASE_VERSION="${LAST_PROD_TAG#v}"
+
+          # Determina o tipo de bump com base nos commits
+          BUMP_TYPE=$(node -e "
+            const { execSync } = require('child_process');
+            try {
+              const range = '${LAST_PROD_TAG}' === 'v0.0.0' ? 'HEAD' : '${LAST_PROD_TAG}..HEAD';
+              const log = execSync('git log ' + range + ' --oneline', { encoding: 'utf8' });
+              if (/feat!|fix!|BREAKING CHANGE/i.test(log)) console.log('major');
+              else if (/feat/i.test(log)) console.log('minor');
+              else if (/fix/i.test(log)) console.log('patch');
+              else console.log('patch');
+            } catch {
+              console.log('patch');
+            }
+          ")
+
+          NEXT_BASE=$(npx semver -i $BUMP_TYPE "$BASE_VERSION")
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          PREVIEW_VERSION="${NEXT_BASE}-preview.${SHORT_SHA}"
+
+          echo "Versão de Preview gerada: $PREVIEW_VERSION"
+          echo "new_version=$PREVIEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Login Docker Hub
-        if: steps.semantic.outputs.new_release_published == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and Push Docker
-        if: steps.semantic.outputs.new_release_published == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            goncahri/faculride-frontend:development-v${{ steps.semantic.outputs.new_release_version }}
+            goncahri/faculride-frontend:development-v${{ steps.version.outputs.new_version }}
             goncahri/faculride-frontend:development-latest
-
-      - name: Deploy to EC2
-        if: steps.semantic.outputs.new_release_published == 'true'
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            mkdir -p ${{ secrets.EC2_PATH }}
-            cd ${{ secrets.EC2_PATH }}
-
-            docker pull goncahri/faculride-frontend:development-latest
-
-            docker stop faculride-frontend || true
-            docker rm faculride-frontend || true
-
-            docker run -d \
-              --name faculride-frontend \
-              --restart always \
-              -p 8080:80 \
-              goncahri/faculride-frontend:development-latest
-
-  notify_failure:
-    name: Notify Failure
-    needs: pipeline
-    runs-on: ubuntu-latest
-    if: failure()
-
-    steps:
-      - name: Send error email
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.MAIL_HOST }}
-          server_port: ${{ secrets.MAIL_PORT }}
-          username: ${{ secrets.MAIL_USER }}
-          password: ${{ secrets.MAIL_PASS }}
-          subject: "🚨 FALHA NO CI/CD: ${{ github.repository }}"
-          to: "${{ secrets.TEAM_EMAILS }}"
-          from: "GitHub Actions <no-reply@faculride.com>"
-          body: |
-            O pipeline de desenvolvimento do Frontend ${{ github.repository }} falhou.
-
-            Detalhes:
-            - Branch: ${{ github.ref_name }}
-            - Autor do commit: ${{ github.actor }}
-            - Workflow: ${{ github.workflow }}
-            - Log do erro: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            Verifique o link acima para entender a causa da falha.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
