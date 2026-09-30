@@ -1,9 +1,9 @@
-name: CI / CD - Frontend - Production 
+name: CI / CD - Frontend - Production
 
 on:
   push:
     branches:
-      - hotfix/github-actions
+      - main
 
 permissions:
   contents: write
