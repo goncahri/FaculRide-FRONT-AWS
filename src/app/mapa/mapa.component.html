@@ -189,6 +189,85 @@
         </p>
       </div>
 
+      <div class="busca-voz" role="search" aria-labelledby="titulo-busca-voz">
+        <div class="busca-voz-cabecalho">
+          <div>
+            <span class="busca-voz-etiqueta">Busca semântica</span>
+            <h4 id="titulo-busca-voz">Encontre uma carona usando sua voz</h4>
+            <p>Exemplo: “Quero uma carona de Sorocaba para a Fatec às sete da noite”.</p>
+          </div>
+        </div>
+
+        <div class="busca-voz-controles">
+          <input
+            type="text"
+            [(ngModel)]="consultaVoz"
+            name="consultaVoz"
+            placeholder="Fale ou digite como deseja encontrar sua carona"
+            aria-label="Consulta para busca de caronas"
+            (keyup.enter)="executarBuscaSemantica()"
+          />
+
+          <button
+            type="button"
+            class="btn-microfone"
+            [class.ouvindo]="ouvindoConsulta"
+            [disabled]="!vozSuportada"
+            [attr.aria-pressed]="ouvindoConsulta"
+            [attr.aria-label]="ouvindoConsulta ? 'Parar reconhecimento de voz' : 'Buscar carona por voz'"
+            (click)="iniciarBuscaPorVoz()"
+          >
+            <span aria-hidden="true">{{ ouvindoConsulta ? '■' : '🎤' }}</span>
+            {{ ouvindoConsulta ? 'Parar' : 'Falar' }}
+          </button>
+
+          <button type="button" class="btn-busca-semantica" (click)="executarBuscaSemantica()">
+            Buscar
+          </button>
+
+          <button
+            *ngIf="buscaSemanticaAtiva || consultaVoz"
+            type="button"
+            class="btn-limpar-busca"
+            (click)="limparBuscaSemantica()"
+          >
+            Limpar
+          </button>
+        </div>
+
+        <p *ngIf="!vozSuportada" class="busca-voz-aviso">
+          O reconhecimento de voz não está disponível neste navegador. Você ainda pode digitar a consulta.
+        </p>
+        <p *ngIf="mensagemBuscaVoz" class="busca-voz-status" aria-live="polite">
+          {{ mensagemBuscaVoz }}
+        </p>
+        <p *ngIf="erroBuscaVoz" class="busca-voz-erro" role="alert">
+          {{ erroBuscaVoz }}
+        </p>
+
+        <div *ngIf="analiseBuscaVoz" class="interpretacao-voz">
+          <div>
+            <span class="interpretacao-rotulo">Intenção identificada</span>
+            <strong>{{ rotuloIntencaoBusca() }}</strong>
+          </div>
+
+          <div *ngIf="resumoEntidadesBusca().length">
+            <span class="interpretacao-rotulo">Entidades extraídas</span>
+            <div class="entidades-voz">
+              <span *ngFor="let entidade of resumoEntidadesBusca()">{{ entidade }}</span>
+            </div>
+          </div>
+
+          <details>
+            <summary>Ver etapas do processamento de linguagem</summary>
+            <p><strong>Normalização:</strong> {{ analiseBuscaVoz.normalizedText }}</p>
+            <p><strong>Tokenização:</strong> {{ analiseBuscaVoz.tokens.join(' | ') }}</p>
+            <p><strong>Sem stopwords:</strong> {{ analiseBuscaVoz.relevantTokens.join(' | ') }}</p>
+            <p><strong>Stemming:</strong> {{ analiseBuscaVoz.stemmedTokens.join(' | ') }}</p>
+          </details>
+        </div>
+      </div>
+
       <div class="filtros-encontre">
         <h4>Filtros</h4>
 
@@ -250,6 +329,13 @@
             <strong>{{ viagem.usuario?.nome || 'Usuário' }}</strong>
             <p class="tipo-usuario-card">
               {{ tipoNormalizado(viagem) === 'motorista' ? 'Motorista' : 'Passageiro' }}
+            </p>
+
+            <p
+              *ngIf="buscaSemanticaAtiva && detalhesCompatibilidade(viagem)"
+              class="compatibilidade-voz"
+            >
+              Compatível: {{ detalhesCompatibilidade(viagem) }}
             </p>
 
             <p><strong>Partida:</strong> {{ viagem.partida }}</p>
