@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { isBrowser } from '../utils/is-browser';
+import { SpeechRecognitionService } from '../services/speech-recognition.service';
+import {
+  VoiceSearchAnalysis,
+  VoiceSearchService
+} from '../services/voice-search.service';
 
 type DiaCalendario = {
   dia: number;
@@ -57,6 +62,16 @@ export class MapaComponent implements AfterViewInit, OnInit {
   private cacheCoordenadas: Record<string, google.maps.LatLngLiteral> = {};
   private viagensComDistancia: any[] = [];
 
+  consultaVoz = '';
+  ouvindoConsulta = false;
+  vozSuportada = false;
+  buscaSemanticaAtiva = false;
+  mensagemBuscaVoz = '';
+  erroBuscaVoz = '';
+  analiseBuscaVoz: VoiceSearchAnalysis | null = null;
+  private resultadosBuscaVoz: any[] = [];
+  private detalhesBuscaVoz = new Map<number, { score: number; reasons: string[] }>();
+
   modoEdicaoAtivo: boolean = false;
   idViagemEdicao: number | null = null;
   mostrarSecaoEncontre = true;
@@ -105,12 +120,15 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private speechRecognition: SpeechRecognitionService,
+    private voiceSearch: VoiceSearchService
   ) {
     this.gerarCalendariosMensais();
   }
 
   ngOnInit(): void {
+    this.vozSuportada = this.speechRecognition.isSupported();
     this.carregando = true;
     this._loads = { usuarios: false, viagens: false, avaliacoes: false, conversas: false };
 
@@ -187,7 +205,9 @@ export class MapaComponent implements AfterViewInit, OnInit {
   }
 
   viagensFiltradas(): any[] {
-    const viagensDisponiveis = this.viagens.filter(v => !this.viagemTemConversaAceita(v));
+    const viagensDisponiveis = this.buscaSemanticaAtiva
+      ? this.resultadosBuscaVoz
+      : this.viagens.filter(v => !this.viagemTemConversaAceita(v));
 
     if (this.filtroTipo === 'proximas') {
       return this.viagensComDistancia;
@@ -198,6 +218,102 @@ export class MapaComponent implements AfterViewInit, OnInit {
     }
 
     return viagensDisponiveis.filter(v => this.tipoNormalizado(v) === this.filtroTipo);
+  }
+
+  async iniciarBuscaPorVoz(): Promise<void> {
+    if (this.ouvindoConsulta) {
+      this.speechRecognition.stop();
+      return;
+    }
+
+    this.erroBuscaVoz = '';
+    this.mensagemBuscaVoz = 'Ouvindo... Fale sua origem, destino e horário.';
+    this.ouvindoConsulta = true;
+
+    try {
+      this.consultaVoz = await this.speechRecognition.listen();
+      this.mensagemBuscaVoz = `Entendi: “${this.consultaVoz}”`;
+      this.executarBuscaSemantica();
+    } catch (error) {
+      this.erroBuscaVoz = error instanceof Error
+        ? error.message
+        : 'Não foi possível reconhecer sua voz.';
+      this.mensagemBuscaVoz = '';
+    } finally {
+      this.ouvindoConsulta = false;
+    }
+  }
+
+  executarBuscaSemantica(): void {
+    const consulta = this.consultaVoz.trim();
+
+    if (!consulta) {
+      this.erroBuscaVoz = 'Digite ou fale uma consulta antes de buscar.';
+      return;
+    }
+
+    this.erroBuscaVoz = '';
+    this.analiseBuscaVoz = this.voiceSearch.analyze(consulta);
+
+    const viagensDisponiveis = this.viagens.filter(
+      viagem => !this.viagemTemConversaAceita(viagem)
+    );
+    const resultados = this.voiceSearch.search(
+      viagensDisponiveis,
+      this.analiseBuscaVoz,
+      viagem => this.tipoNormalizado(viagem)
+    );
+
+    this.resultadosBuscaVoz = resultados.map(resultado => resultado.ride);
+    this.detalhesBuscaVoz.clear();
+    resultados.forEach(resultado => {
+      const id = Number(resultado.ride?.idViagem);
+      if (Number.isFinite(id)) {
+        this.detalhesBuscaVoz.set(id, {
+          score: resultado.score,
+          reasons: resultado.reasons
+        });
+      }
+    });
+
+    this.buscaSemanticaAtiva = true;
+    this.filtroTipo = 'todos';
+    this.infoProximidade = '';
+    this.mensagemBuscaVoz = resultados.length
+      ? `${resultados.length} carona(s) encontrada(s), ordenadas por relevância.`
+      : 'Nenhuma carona compatível foi encontrada. Tente usar origem, destino e horário.';
+  }
+
+  limparBuscaSemantica(): void {
+    this.consultaVoz = '';
+    this.buscaSemanticaAtiva = false;
+    this.analiseBuscaVoz = null;
+    this.resultadosBuscaVoz = [];
+    this.detalhesBuscaVoz.clear();
+    this.mensagemBuscaVoz = '';
+    this.erroBuscaVoz = '';
+  }
+
+  rotuloIntencaoBusca(): string {
+    return this.analiseBuscaVoz
+      ? this.voiceSearch.intentLabel(this.analiseBuscaVoz.intent)
+      : '';
+  }
+
+  resumoEntidadesBusca(): string[] {
+    const entities = this.analiseBuscaVoz?.entities;
+    if (!entities) return [];
+
+    const summary: string[] = [];
+    if (entities.origem) summary.push(`Origem: ${entities.origem}`);
+    if (entities.destino) summary.push(`Destino: ${entities.destino}`);
+    if (entities.horario) summary.push(`Horário: ${entities.horario}`);
+    return summary;
+  }
+
+  detalhesCompatibilidade(viagem: any): string {
+    const details = this.detalhesBuscaVoz.get(Number(viagem?.idViagem));
+    return details?.reasons.join(' • ') || '';
   }
 
   obterStatusViagem(viagem: any): string {

@@ -142,6 +142,139 @@
   font-weight: 400;
 }
 
+.busca-voz {
+  max-width: 860px;
+  margin: 0 auto 24px;
+  padding: 18px;
+  color: #0f172a;
+  background: linear-gradient(135deg, #ffffff 0%, #eef6ff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+}
+
+.busca-voz-cabecalho h4 {
+  margin: 4px 0 6px;
+}
+
+.busca-voz-etiqueta {
+  color: #075985;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.busca-voz-controles {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.busca-voz-controles input {
+  flex: 1 1 360px;
+  min-width: 220px;
+  padding: 12px 14px;
+  border: 1px solid #94a3b8;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.btn-microfone,
+.btn-busca-semantica,
+.btn-limpar-busca {
+  padding: 11px 17px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-microfone {
+  color: #ffffff;
+  background-color: #0369a1;
+}
+
+.btn-microfone.ouvindo {
+  background-color: #dc2626;
+}
+
+.btn-microfone:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.btn-busca-semantica {
+  color: #ffffff;
+  background-color: #0f172a;
+}
+
+.btn-limpar-busca {
+  color: #334155;
+  background-color: #e2e8f0;
+}
+
+.busca-voz-status,
+.busca-voz-aviso,
+.busca-voz-erro {
+  margin: 12px 0 0;
+  padding: 9px;
+  border-radius: 8px;
+}
+
+.busca-voz-status {
+  color: #075985;
+  background-color: #e0f2fe;
+}
+
+.busca-voz-aviso {
+  color: #854d0e;
+  background-color: #fef9c3;
+}
+
+.busca-voz-erro {
+  color: #991b1b;
+  background-color: #fee2e2;
+}
+
+.interpretacao-voz {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 12px;
+}
+
+.interpretacao-rotulo {
+  display: block;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.entidades-voz {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.entidades-voz span,
+.compatibilidade-voz {
+  padding: 5px 9px;
+  color: #075985;
+  background-color: #e0f2fe;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.interpretacao-voz details p {
+  margin: 8px 0 0;
+}
+
+.compatibilidade-voz {
+  display: inline-block;
+  margin: 6px 0;
+}
+
 .filtros-encontre {
   background-color: #ffffff;
   border-radius: 16px;
