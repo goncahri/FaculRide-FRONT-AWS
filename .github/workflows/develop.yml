@@ -3,7 +3,7 @@ name: CI / CD - Frontend - Develop
 on:
   push:
     branches:
-      - hotfix/github-actions
+      - develop
 
 permissions:
   contents: write
