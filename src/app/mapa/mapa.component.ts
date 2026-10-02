@@ -113,7 +113,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   baseURL = isBrowser() && window.location.hostname.includes('localhost')
     ? 'http://localhost:3000/api'
-    : 'http://faculride-api.duckdns.org/api';
+    : 'https://faculride-api.duckdns.org/api';
 
   usuarioLogado = isBrowser() ? JSON.parse(localStorage.getItem('usuarioLogado') || '{}') : {};
   meuId = Number(this.usuarioLogado.idUsuario || this.usuarioLogado.id);
