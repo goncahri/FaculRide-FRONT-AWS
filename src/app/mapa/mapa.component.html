@@ -308,7 +308,7 @@
               Ver rota
             </button>
 
-            <button *ngIf="viagemJaOcorreu(c)" type="button" class="btn-card btn-avaliar" (click)="abrirAvaliacao(c)">
+            <button *ngIf="viagemJaOcorreu(c)" type="button" class="btn-card btn-editar" (click)="abrirAvaliacao(c)">
               Avaliar usuário
             </button>
           </div>
@@ -417,6 +417,15 @@
             <h4>Para: {{ a.nomeAvaliado }}</h4>
             <p><strong>Nota:</strong> ⭐ {{ a.Estrelas }}</p>
             <p><strong>Comentário:</strong> {{ a.Comentario }}</p>
+            <div class="avaliacoes-control">
+              <button type="button" class="btn-card btn-editar" (click)="editarAvaliacao(a)">
+                ✏️ Editar
+              </button>
+
+              <button type="button" class="btn-card btn-excluir" (click)="excluirAvaliacao(a.ID_Avaliacao)">
+                🗑️ Excluir
+              </button>
+            </div>
           </div>
         </div>
 

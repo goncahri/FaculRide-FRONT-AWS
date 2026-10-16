@@ -35,6 +35,7 @@ type SecaoMapa = 'encontre' | 'minhasCaronas' | 'avaliacoes';
   styleUrls: ['./mapa.component.css'],
 })
 export class MapaComponent implements AfterViewInit, OnInit {
+
   @ViewChild('mapContainer', { static: true })
   mapContainer!: ElementRef<HTMLDivElement>;
 
@@ -100,6 +101,8 @@ export class MapaComponent implements AfterViewInit, OnInit {
   caronasAceitas: any[] = [];
 
   mostrarAvaliacao: boolean = false;
+  estadoAvaliacao: 'nova' | 'editar' = 'nova';
+  idViagem:number = 0
   idAvaliacao:number = 0
   nomeUsuarioSelecionado: string = '';
   idUsuarioSelecionado: number | null = null;
@@ -1086,36 +1089,57 @@ export class MapaComponent implements AfterViewInit, OnInit {
       return;
     }
 
-    const avaliacao = {
-      ID_Avaliador: this.meuId,
-      ID_Avaliado: this.idUsuarioSelecionado,
-      Comentario: this.comentarioAvaliacao,
-      Estrelas: this.avaliacaoSelecionada,
-      ID_Viagem: this.idAvaliacao,
-    };
 
-    console.log('Enviando avaliação:', avaliacao);
 
-    this.http.post(`${this.baseURL}/avaliacao`, avaliacao).subscribe({
+    if(this.estadoAvaliacao === "nova"){
+      const avaliacao = {
+        ID_Avaliador: this.meuId,
+        ID_Avaliado: this.idUsuarioSelecionado,
+        Comentario: this.comentarioAvaliacao,
+        Estrelas: this.avaliacaoSelecionada,
+        ID_Viagem: this.idViagem,
+      };
+      this.http.post(`${this.baseURL}/avaliacao`, avaliacao).subscribe({
+        next: () => {
+          alert(
+            `Avaliação enviada! Você avaliou ${this.nomeUsuarioSelecionado} ` +
+              `com ${this.avaliacaoSelecionada} estrelas.`,
+          );
+
+          this.carregarAvaliacoes();
+        },
+        error: (err) => {
+          console.error('Erro ao enviar avaliação:', err);
+          alert('Erro ao enviar avaliação.');
+        },
+      });
+    }
+    else if(this.estadoAvaliacao === "editar"){
+      const avaliacao = {
+        ID_Avaliador: this.meuId,
+        ID_Avaliado: this.idUsuarioSelecionado,
+        Comentario: this.comentarioAvaliacao,
+        Estrelas: this.avaliacaoSelecionada,
+        ID_Viagem: this.idViagem,
+        ID_Avaliacao: this.idAvaliacao
+      };
+      this.http.put(`${this.baseURL}/avaliacao/${this.idAvaliacao}`, avaliacao).subscribe({
       next: () => {
-        alert(
-          `Avaliação enviada! Você avaliou ${this.nomeUsuarioSelecionado} ` +
-            `com ${this.avaliacaoSelecionada} estrelas.`,
-        );
-
-        this.mostrarAvaliacao = false;
-        this.avaliacaoSelecionada = 0;
-        this.comentarioAvaliacao = '';
-        this.idUsuarioSelecionado = null;
-        this.nomeUsuarioSelecionado = '';
-
+        alert('Avaliação editada com sucesso!');
         this.carregarAvaliacoes();
       },
       error: (err) => {
-        console.error('Erro ao enviar avaliação:', err);
-        alert('Erro ao enviar avaliação.');
+        console.error('Erro ao editar avaliação:', err);
+        alert('Erro ao editar avaliação. Tente novamente.');
       },
     });
+    }
+
+    this.mostrarAvaliacao = false;
+    this.avaliacaoSelecionada = 0;
+    this.comentarioAvaliacao = '';
+    this.idUsuarioSelecionado = null;
+    this.nomeUsuarioSelecionado = '';
   }
 
   carregarAvaliacoes(): void {
@@ -1517,7 +1541,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
     this.avaliacaoSelecionada = 0;
     this.comentarioAvaliacao = '';
-    this.idAvaliacao = conversa?.idViagem || conversa?.id_viagem || 0;
+    this.idViagem = conversa?.idViagem || conversa?.id_viagem || 0;
 
     // Abre o popup
     this.mostrarAvaliacao = true;
@@ -1533,6 +1557,35 @@ export class MapaComponent implements AfterViewInit, OnInit {
     this.nomeUsuarioSelecionado = '';
     this.avaliacaoSelecionada = 0;
     this.comentarioAvaliacao = '';
-    this.idAvaliacao = 0;
-}
+    this.idViagem = 0;
+  }
+  excluirAvaliacao(idAvaliacao:number): void {
+    if (!confirm('Tem certeza que deseja excluir esta avaliação?')) {
+      return
+    };
+   this.http.delete(`${this.baseURL}/avaliacao/${idAvaliacao}`).subscribe({
+      next: () => {
+        alert('Avaliação excluída com sucesso!');
+        this.carregarAvaliacoes();
+      },
+      error: (err) => {
+        console.error('Erro ao excluir avaliação:', err);
+        alert('Erro ao excluir avaliação. Tente novamente.');
+      },
+    });
+  }
+  editarAvaliacao(avaliacao: any): void {
+    this.http.get<any>(`${this.baseURL}/usuario/${avaliacao.ID_Avaliado}`).subscribe({
+      next: (usuario) => {
+        this.idUsuarioSelecionado = usuario.idUsuario || usuario.id;
+        this.nomeUsuarioSelecionado = usuario.nome || 'Usuário';
+      }
+    });
+    this.idViagem = avaliacao.ID_Viagem;
+    this.estadoAvaliacao = 'editar';
+    this.mostrarAvaliacao = true;
+    this.avaliacaoSelecionada = 0;
+    this.comentarioAvaliacao = '';
+    this.idAvaliacao = avaliacao.ID_Avaliacao;
+  }
 }
