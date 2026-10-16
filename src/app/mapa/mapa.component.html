@@ -13,24 +13,13 @@
     <div class="linha-horizontal">
       <div class="input-group flex2">
         <label>Partida</label>
-        <input
-          type="text"
-          [(ngModel)]="origem"
-          name="origem"
-          placeholder="Digite sua rua, avenida ou bairro"
-          required
-        />
+        <input type="text" [(ngModel)]="origem" name="origem" placeholder="Digite sua rua, avenida ou bairro"
+          required />
       </div>
 
       <div class="input-group flex2">
         <label>Cidade da partida</label>
-        <input
-          type="text"
-          [(ngModel)]="cidadePartida"
-          name="cidadePartida"
-          placeholder="Digite sua cidade"
-          required
-        />
+        <input type="text" [(ngModel)]="cidadePartida" name="cidadePartida" placeholder="Digite sua cidade" required />
       </div>
     </div>
 
@@ -45,32 +34,17 @@
 
       <div class="input-group">
         <label>Horário de Entrada na Fatec</label>
-        <input
-          type="time"
-          [(ngModel)]="entradaFatec"
-          name="entradaFatec"
-          required
-        />
+        <input type="time" [(ngModel)]="entradaFatec" name="entradaFatec" required />
       </div>
 
       <div class="input-group">
         <label>Horário de Saída da Fatec</label>
-        <input
-          type="time"
-          [(ngModel)]="saidaFatec"
-          name="saidaFatec"
-          required
-        />
+        <input type="time" [(ngModel)]="saidaFatec" name="saidaFatec" required />
       </div>
 
       <div class="input-group">
         <label>Ajuda Mensal</label>
-        <input
-          type="number"
-          [(ngModel)]="ajudaCusto"
-          name="ajudaCusto"
-          placeholder="Ajuda disponível (R$)"
-        />
+        <input type="number" [(ngModel)]="ajudaCusto" name="ajudaCusto" placeholder="Ajuda disponível (R$)" />
       </div>
     </div>
 
@@ -112,22 +86,13 @@
             </div>
 
             <div class="calendario-grid">
-              <div
-                class="calendario-weekday"
-                *ngFor="let diaSem of ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']"
-              >
+              <div class="calendario-weekday" *ngFor="let diaSem of ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']">
                 {{ diaSem }}
               </div>
 
-              <button
-                type="button"
-                *ngFor="let c of mes.dias"
-                class="calendario-dia"
-                [class.vazio]="!c.dateStr"
-                [class.selecionado]="isDiaSelecionado(c)"
-                [disabled]="c.desabilitado || !c.dateStr"
-                (click)="onClickDia(c)"
-              >
+              <button type="button" *ngFor="let c of mes.dias" class="calendario-dia" [class.vazio]="!c.dateStr"
+                [class.selecionado]="isDiaSelecionado(c)" [disabled]="c.desabilitado || !c.dateStr"
+                (click)="onClickDia(c)">
                 {{ c.dia || '' }}
               </button>
             </div>
@@ -193,58 +158,35 @@
         <h4>Filtros</h4>
 
         <div class="filtros-botoes">
-          <button
-            type="button"
-            [class.active]="filtroTipo === 'todos'"
-            (click)="alterarFiltroTipo('todos')"
-          >
+          <button type="button" [class.active]="filtroTipo === 'todos'" (click)="alterarFiltroTipo('todos')">
             Todos
           </button>
 
-          <button
-            type="button"
-            [class.active]="filtroTipo === 'motorista'"
-            (click)="alterarFiltroTipo('motorista')"
-          >
+          <button type="button" [class.active]="filtroTipo === 'motorista'" (click)="alterarFiltroTipo('motorista')">
             Motorista
           </button>
 
-          <button
-            type="button"
-            [class.active]="filtroTipo === 'passageiro'"
-            (click)="alterarFiltroTipo('passageiro')"
-          >
+          <button type="button" [class.active]="filtroTipo === 'passageiro'" (click)="alterarFiltroTipo('passageiro')">
             Passageiro
           </button>
-          <button
-            type="button"
-            [class.active]="filtroTipo === 'proximas'"
-            (click)="alterarFiltroTipo('proximas')"
-          >
+          <button type="button" [class.active]="filtroTipo === 'proximas'" (click)="alterarFiltroTipo('proximas')">
             📍 Próximas a mim
           </button>
         </div>
       </div>
 
-      <div
-        *ngIf="filtroTipo === 'proximas' && infoProximidade"
-        class="info-proximidade"
-      >
+      <div *ngIf="filtroTipo === 'proximas' && infoProximidade" class="info-proximidade">
         {{ infoProximidade }}
       </div>
 
       <div class="caronas-disponiveis-lista">
         <div *ngFor="let viagem of viagensFiltradas()" class="carona-card">
-          <img
-            [src]="obterFotoUsuario(
+          <img [src]="obterFotoUsuario(
               viagem.usuario?.email,
               viagem.usuario?.genero,
               viagem.idUsuario,
               viagem.usuario
-            )"
-            alt="Foto"
-            class="carona-foto"
-          />
+            )" alt="Foto" class="carona-foto" />
 
           <div class="carona-info">
             <strong>{{ viagem.usuario?.nome || 'Usuário' }}</strong>
@@ -268,38 +210,22 @@
             </p>
 
             <div class="carona-acoes">
-              <button
-                type="button"
-                class="btn-card btn-rota"
-                (click)="mostrarRota(viagem.partida, viagem.destino)"
-              >
+              <button type="button" class="btn-card btn-rota" (click)="mostrarRota(viagem.partida, viagem.destino)">
                 Ver rota
               </button>
 
-              <button
-                *ngIf="ehMinhaCarona(viagem) && podeEditarCarona(viagem)"
-                type="button"
-                class="btn-card btn-editar"
-                (click)="editarCarona(viagem)"
-              >
+              <button *ngIf="ehMinhaCarona(viagem) && podeEditarCarona(viagem)" type="button"
+                class="btn-card btn-editar" (click)="editarCarona(viagem)">
                 ✏️ Editar
               </button>
 
-              <button
-                *ngIf="ehMinhaCarona(viagem)"
-                type="button"
-                class="btn-card btn-excluir"
-                (click)="excluirCarona(viagem.idViagem)"
-              >
+              <button *ngIf="ehMinhaCarona(viagem)" type="button" class="btn-card btn-excluir"
+                (click)="excluirCarona(viagem.idViagem)">
                 🗑️ Excluir
               </button>
 
-              <button
-                *ngIf="!ehMinhaCarona(viagem)"
-                type="button"
-                class="btn-card btn-contato"
-                (click)="abrirConversa(viagem)"
-              >
+              <button *ngIf="!ehMinhaCarona(viagem)" type="button" class="btn-card btn-contato"
+                (click)="abrirConversa(viagem)">
                 💬 Entrar em contato
               </button>
             </div>
@@ -311,28 +237,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div *ngIf="mostrarAvaliacao" class="avaliacao-box">
-    <h3>⭐ Avaliar carona com {{ nomeUsuarioSelecionado }}</h3>
-    <p class="subtexto-avaliacao">Avalie de 1 a 5 ⭐</p>
-
-    <div class="estrelas">
-      <label *ngFor="let nota of [5, 4, 3, 2, 1]">
-        <input type="radio" name="avaliacao" [value]="nota" [(ngModel)]="avaliacaoSelecionada" />
-        <span class="estrela">&#9733;</span>
-        <div class="numero-estrela">{{ nota }}</div>
-      </label>
-    </div>
-
-    <textarea
-      [(ngModel)]="comentarioAvaliacao"
-      name="comentario"
-      rows="3"
-      placeholder="Deixe seu comentário sobre a carona"
-    ></textarea>
-
-    <button (click)="enviarAvaliacao()" class="btn-enviar">Enviar Avaliação</button>
   </div>
 
   <div class="minhas-caronas-faixa">
@@ -365,20 +269,11 @@
           </p>
 
           <div class="carona-acoes">
-            <button
-              type="button"
-              class="btn-card btn-rota"
-              (click)="mostrarRota(c.partida, c.destino)"
-            >
+            <button type="button" class="btn-card btn-rota" (click)="mostrarRota(c.partida, c.destino)">
               Ver rota
             </button>
 
-            <button
-              *ngIf="podeEditarCarona(c)"
-              type="button"
-              class="btn-card btn-editar"
-              (click)="editarCarona(c)"
-            >
+            <button *ngIf="podeEditarCarona(c)" type="button" class="btn-card btn-editar" (click)="editarCarona(c)">
               ✏️ Editar
             </button>
           </div>
@@ -409,12 +304,12 @@
           </p>
 
           <div class="carona-acoes">
-            <button
-              type="button"
-              class="btn-card btn-rota"
-              (click)="mostrarRota(c.partida, c.destino)"
-            >
+            <button type="button" class="btn-card btn-rota" (click)="mostrarRota(c.partida, c.destino)">
               Ver rota
+            </button>
+
+            <button type="button" class="btn-card btn-avaliar" (click)="abrirAvaliacao(c)">
+              Avaliar usuário
             </button>
           </div>
         </div>
@@ -443,48 +338,33 @@
           </p>
 
           <div class="carona-acoes">
-            <button
-              type="button"
-              class="btn-card btn-rota"
-              (click)="mostrarRota(c.partida, c.destino)"
-            >
+            <button type="button" class="btn-card btn-rota" (click)="mostrarRota(c.partida, c.destino)">
               Ver rota
             </button>
 
-            <button
-              *ngIf="podeEditarCarona(c)"
-              type="button"
-              class="btn-card btn-editar"
-              (click)="editarCarona(c)"
-            >
+            <button *ngIf="podeEditarCarona(c)" type="button" class="btn-card btn-editar" (click)="editarCarona(c)">
               ✏️ Editar
             </button>
           </div>
         </div>
       </div>
 
-      <div
-        *ngIf="
+      <div *ngIf="
           caronasOferecidas.length === 0 &&
           caronasProcuradas.length === 0 &&
           caronasAceitas.length === 0
-        "
-        class="empty-box-web"
-      >
+        " class="empty-box-web">
         Você ainda não possui caronas registradas.
       </div>
     </div>
   </div>
 
-  <div
-    class="export-box"
-    *ngIf="
+  <div class="export-box" *ngIf="
       (caronasOferecidas?.length || 0) +
       (caronasProcuradas?.length || 0) +
       (caronasAceitas?.length || 0) > 0;
       else noRides
-    "
-  >
+    ">
     <p class="export-msg">
       💾 Quer guardar ou compartilhar?
       <strong>Exporte aqui</strong> a lista das suas caronas.
@@ -545,6 +425,50 @@
             Você ainda não possui avaliações enviadas.
           </div>
         </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup de avaliação -->
+  <div *ngIf="mostrarAvaliacao" class="avaliacao-modal-overlay" (click)="fecharAvaliacao()">
+    <div class="avaliacao-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-avaliacao"
+      (click)="$event.stopPropagation()">
+      <button type="button" class="fechar-modal" aria-label="Fechar avaliação" (click)="fecharAvaliacao()">
+        &times;
+      </button>
+
+      <h2 id="titulo-avaliacao">
+        Avaliar usuário
+      </h2>
+
+      <p>
+        Como foi sua experiência com
+        <strong>{{ nomeUsuarioSelecionado }}</strong>?
+      </p>
+
+      <div class="avaliacao-estrelas" aria-label="Escolha uma nota">
+        <button *ngFor="let estrela of [1, 2, 3, 4, 5]" type="button" class="estrela"
+          [class.selecionada]="estrela <= avaliacaoSelecionada" [attr.aria-label]="estrela + ' estrelas'"
+          [attr.aria-pressed]="estrela === avaliacaoSelecionada" (click)="avaliacaoSelecionada = estrela">
+          {{ estrela <= avaliacaoSelecionada ? '★' : '☆' }} </button>
+      </div>
+
+      <label for="comentario-avaliacao">
+        Comentário (opcional)
+      </label>
+
+      <textarea id="comentario-avaliacao" [(ngModel)]="comentarioAvaliacao" rows="4"
+        placeholder="Conte como foi sua experiência..."></textarea>
+
+      <div class="avaliacao-modal-acoes">
+        <button type="button" class="btn-cancelar-avaliacao" (click)="fecharAvaliacao()">
+          Cancelar
+        </button>
+
+        <button type="button" class="btn-enviar-avaliacao" [disabled]="avaliacaoSelecionada === 0"
+          (click)="enviarAvaliacao()">
+          Enviar avaliação
+        </button>
       </div>
     </div>
   </div>

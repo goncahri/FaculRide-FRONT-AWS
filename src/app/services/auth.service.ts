@@ -9,7 +9,7 @@ import { NotificationService } from './notification.service';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://faculride-api.duckdns.org/api/usuario';
+  private readonly API_URL = 'http://localhost:3000/api/usuario';
 
   constructor(
     private http: HttpClient,
@@ -46,7 +46,7 @@ export class AuthService {
   logout() {
     try {
       localStorage.removeItem('token');
-      localStorage.removeItem('usuarioLogado'); 
+      localStorage.removeItem('usuarioLogado');
     } catch {}
 
     // encerra socket e limpa notificações em memória

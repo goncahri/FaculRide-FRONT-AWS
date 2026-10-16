@@ -807,6 +807,194 @@ a:hover {
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
 }
 
+/* Fundo escuro atrás do popup */
+.avaliacao-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(3px);
+}
+
+/* Janela de avaliação */
+.avaliacao-modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  padding: 30px;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #1e293b;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  animation: abrir-modal-avaliacao 0.2s ease-out;
+}
+
+.avaliacao-modal h2 {
+  margin: 0 35px 12px 0;
+  color: #1A0773;
+  font-size: 1.5rem;
+}
+
+.avaliacao-modal p {
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.fechar-modal {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fechar-modal:hover {
+  color: #1e293b;
+}
+
+/* Seleção das estrelas */
+.avaliacao-estrelas {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.estrela {
+  padding: 4px;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 36px;
+  cursor: pointer;
+}
+
+.estrela.selecionada {
+  color: #f59e0b;
+}
+
+.estrela:focus-visible,
+.fechar-modal:focus-visible {
+  outline: 2px solid #1A0773;
+  outline-offset: 3px;
+}
+
+.avaliacao-modal label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.avaliacao-modal textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e293b;
+  font: inherit;
+  resize: vertical;
+}
+
+.avaliacao-modal textarea:focus {
+  outline: 2px solid #1A0773;
+  outline-offset: 1px;
+  border-color: #1A0773;
+}
+
+.avaliacao-modal-acoes {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.btn-cancelar-avaliacao,
+.btn-enviar-avaliacao {
+  padding: 11px 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancelar-avaliacao {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+}
+
+.btn-enviar-avaliacao {
+  border: none;
+  background: #1A0773;
+  color: #ffffff;
+}
+
+.btn-enviar-avaliacao:hover:not(:disabled) {
+  background: #2d16a0;
+}
+
+.btn-enviar-avaliacao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-avaliar {
+  background: #ffd900;
+}
+
+.btn-avaliar:hover {
+  filter: brightness(0.92);
+}
+
+@keyframes abrir-modal-avaliacao {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .avaliacao-modal {
+    padding: 24px 18px;
+  }
+
+  .avaliacao-modal-acoes {
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancelar-avaliacao,
+  .btn-enviar-avaliacao {
+    width: 100%;
+  }
+}
+
+
 @media (max-width: 768px) {
   .linha-horizontal {
     flex-direction: column;
