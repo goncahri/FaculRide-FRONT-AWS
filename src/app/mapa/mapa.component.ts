@@ -564,7 +564,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
       const data = new Date(ano, mes, d);
       data.setHours(0, 0, 0, 0);
 
-      const isPassado = data <= hoje;
+      const isPassado = data < hoje;
       const isDomingo = data.getDay() === 0;
 
       calendario.push({
@@ -630,7 +630,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
     while (dataAtual <= fimSemestre) {
       const diaSemana = dataAtual.getDay();
       const naoEhDomingo = diaSemana !== 0;
-      const naoEhPassado = dataAtual >= hoje;
+      const naoEhPassado = dataAtual > hoje;
 
       if (naoEhDomingo && naoEhPassado) {
         datas.push(this.toISODate(dataAtual));

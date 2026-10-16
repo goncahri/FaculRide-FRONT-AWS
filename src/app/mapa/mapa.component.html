@@ -308,7 +308,7 @@
               Ver rota
             </button>
 
-            <button type="button" class="btn-card btn-avaliar" (click)="abrirAvaliacao(c)">
+            <button *ngIf="viagemJaOcorreu(c)" type="button" class="btn-card btn-avaliar" (click)="abrirAvaliacao(c)">
               Avaliar usuário
             </button>
           </div>
