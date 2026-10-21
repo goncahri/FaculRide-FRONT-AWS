@@ -9,7 +9,7 @@ import { NotificationService } from './notification.service';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:3000/api/usuario';
+  private readonly API_URL = 'http://faculride-api.duckdns.org/api/usuario';
 
   constructor(
     private http: HttpClient,
