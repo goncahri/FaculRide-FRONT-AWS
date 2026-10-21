@@ -1,4 +1,10 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -18,11 +24,7 @@ type CalendarioMes = {
 };
 
 type ModoVigencia = 'mensal' | 'semestre';
-type FiltroTipo =
-  | 'todos'
-  | 'motorista'
-  | 'passageiro'
-  | 'proximas';
+type FiltroTipo = 'todos' | 'motorista' | 'passageiro' | 'proximas';
 type SecaoMapa = 'encontre' | 'minhasCaronas' | 'avaliacoes';
 
 @Component({
@@ -30,10 +32,12 @@ type SecaoMapa = 'encontre' | 'minhasCaronas' | 'avaliacoes';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './mapa.component.html',
-  styleUrls: ['./mapa.component.css']
+  styleUrls: ['./mapa.component.css'],
 })
 export class MapaComponent implements AfterViewInit, OnInit {
-  @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
+
+  @ViewChild('mapContainer', { static: true })
+  mapContainer!: ElementRef<HTMLDivElement>;
 
   map!: google.maps.Map;
   directionsRenderer!: google.maps.DirectionsRenderer;
@@ -42,11 +46,21 @@ export class MapaComponent implements AfterViewInit, OnInit {
   infoWindow!: google.maps.InfoWindow;
 
   carregando: boolean = true;
-  private _loads = { usuarios: false, viagens: false, avaliacoes: false, conversas: false };
+  private _loads = {
+    usuarios: false,
+    viagens: false,
+    avaliacoes: false,
+    conversas: false,
+  };
 
   private markLoaded(key: 'usuarios' | 'viagens' | 'avaliacoes' | 'conversas') {
     this._loads[key] = true;
-    if (this._loads.usuarios && this._loads.viagens && this._loads.avaliacoes && this._loads.conversas) {
+    if (
+      this._loads.usuarios &&
+      this._loads.viagens &&
+      this._loads.avaliacoes &&
+      this._loads.conversas
+    ) {
       this.carregando = false;
     }
   }
@@ -87,6 +101,9 @@ export class MapaComponent implements AfterViewInit, OnInit {
   caronasAceitas: any[] = [];
 
   mostrarAvaliacao: boolean = false;
+  estadoAvaliacao: 'nova' | 'editar' = 'nova';
+  idViagem:number = 0
+  idAvaliacao:number = 0
   nomeUsuarioSelecionado: string = '';
   idUsuarioSelecionado: number | null = null;
   avaliacaoSelecionada: number = 0;
@@ -96,23 +113,31 @@ export class MapaComponent implements AfterViewInit, OnInit {
   avaliacoesEnviadas: any[] = [];
   usuarios: any[] = [];
 
-  baseURL = isBrowser() && window.location.hostname.includes('localhost')
-    ? 'http://localhost:3000/api'
-    : 'http://faculride-api.duckdns.org/api';
+  baseURL =
+    isBrowser() && window.location.hostname.includes('localhost')
+      ? 'http://localhost:3000/api'
+      : 'http://faculride-api.duckdns.org/api';
 
-  usuarioLogado = isBrowser() ? JSON.parse(localStorage.getItem('usuarioLogado') || '{}') : {};
+  usuarioLogado = isBrowser()
+    ? JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
+    : {};
   meuId = Number(this.usuarioLogado.idUsuario || this.usuarioLogado.id);
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
   ) {
     this.gerarCalendariosMensais();
   }
 
   ngOnInit(): void {
     this.carregando = true;
-    this._loads = { usuarios: false, viagens: false, avaliacoes: false, conversas: false };
+    this._loads = {
+      usuarios: false,
+      viagens: false,
+      avaliacoes: false,
+      conversas: false,
+    };
 
     this.carregarUsuarios();
     this.carregarViagens();
@@ -144,7 +169,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
     const mapOptions = {
       center: new google.maps.LatLng(-23.5015, -47.4526),
       zoom: 12,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
     };
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
@@ -166,7 +191,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
     }
 
     const uid = Number(v?.idUsuario);
-    const u = this.usuarios.find(x => Number(x?.idUsuario ?? x?.id) === uid);
+    const u = this.usuarios.find((x) => Number(x?.idUsuario ?? x?.id) === uid);
 
     const fromUsuario = (u?.tipoUsuario ?? u?.tipo_usuario ?? '')
       .toString()
@@ -187,17 +212,21 @@ export class MapaComponent implements AfterViewInit, OnInit {
   }
 
   viagensFiltradas(): any[] {
-    const viagensDisponiveis = this.viagens.filter(v => !this.viagemTemConversaAceita(v));
+    const viagensDisponiveis = this.viagens.filter(
+      (v) => !this.viagemTemConversaAceita(v),
+    );
 
     if (this.filtroTipo === 'proximas') {
       return this.viagensComDistancia;
     }
-    
+
     if (this.filtroTipo === 'todos') {
       return viagensDisponiveis;
     }
 
-    return viagensDisponiveis.filter(v => this.tipoNormalizado(v) === this.filtroTipo);
+    return viagensDisponiveis.filter(
+      (v) => this.tipoNormalizado(v) === this.filtroTipo,
+    );
   }
 
   obterStatusViagem(viagem: any): string {
@@ -208,7 +237,8 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
     if (statusConversa === 'aceita') return 'Aceita';
     if (statusConversa === 'recusada') return 'Recusada';
-    if (statusConversa === 'aguardando_confirmacao') return 'Aguardando confirmação';
+    if (statusConversa === 'aguardando_confirmacao')
+      return 'Aguardando confirmação';
 
     const statusBack = String(viagem?.statusViagem || viagem?.status || '')
       .trim()
@@ -216,10 +246,12 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
     if (statusBack === 'aceita') return 'Aceita';
     if (statusBack === 'recusada') return 'Recusada';
-    if (statusBack === 'concluida' || statusBack === 'concluída') return 'Concluída';
+    if (statusBack === 'concluida' || statusBack === 'concluída')
+      return 'Concluída';
     if (statusBack === 'cancelada') return 'Cancelada';
     if (statusBack === 'pendente') return 'Pendente';
-    if (statusBack === 'aguardando_confirmacao') return 'Aguardando confirmação';
+    if (statusBack === 'aguardando_confirmacao')
+      return 'Aguardando confirmação';
 
     const datas = this.normalizarDatasViagem(viagem);
     const horarioSaida = viagem?.horarioSaida || viagem?.saida;
@@ -251,7 +283,12 @@ export class MapaComponent implements AfterViewInit, OnInit {
   podeEditarCarona(viagem: any): boolean {
     const status = this.obterStatusViagem(viagem);
 
-    return status !== 'Aceita' && status !== 'Recusada' && status !== 'Concluída' && status !== 'Cancelada';
+    return (
+      status !== 'Aceita' &&
+      status !== 'Recusada' &&
+      status !== 'Concluída' &&
+      status !== 'Cancelada'
+    );
   }
 
   private obterConversaDaViagem(viagem: any): any | null {
@@ -259,67 +296,72 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
     if (!idViagem) return null;
 
-    const conversasDaViagem = this.conversas.filter(c =>
-      Number(c?.idViagem) === idViagem
+    const conversasDaViagem = this.conversas.filter(
+      (c) => Number(c?.idViagem) === idViagem,
     );
 
     return (
-      conversasDaViagem.find(c => String(c?.status || '').toLowerCase() === 'aceita') ||
-      conversasDaViagem.find(c =>
-        Number(c?.idMotorista) === Number(this.meuId) ||
-        Number(c?.idPassageiro) === Number(this.meuId)
+      conversasDaViagem.find(
+        (c) => String(c?.status || '').toLowerCase() === 'aceita',
+      ) ||
+      conversasDaViagem.find(
+        (c) =>
+          Number(c?.idMotorista) === Number(this.meuId) ||
+          Number(c?.idPassageiro) === Number(this.meuId),
       ) ||
       null
     );
   }
 
   private viagemTemConversaAceita(viagem: any): boolean {
-  const idViagem = Number(viagem?.idViagem ?? viagem?.id);
+    const idViagem = Number(viagem?.idViagem ?? viagem?.id);
 
-  if (!idViagem) return false;
+    if (!idViagem) return false;
 
-  return this.conversas.some(c =>
-    Number(c?.idViagem) === idViagem &&
-    String(c?.status || '').toLowerCase() === 'aceita'
-  );
-}
+    return this.conversas.some(
+      (c) =>
+        Number(c?.idViagem) === idViagem &&
+        String(c?.status || '').toLowerCase() === 'aceita',
+    );
+  }
 
-private montarCaronasAceitas(): void {
-  const idsAdicionados = new Set<number>();
+  private montarCaronasAceitas(): void {
+    const idsAdicionados = new Set<number>();
 
-  this.caronasAceitas = this.conversas
-    .filter(c => String(c?.status || '').toLowerCase() === 'aceita')
-    .filter(c =>
-      Number(c?.idMotorista) === Number(this.meuId) ||
-      Number(c?.idPassageiro) === Number(this.meuId)
-    )
-    .map(c => {
-      const viagem = this.viagens.find(v =>
-        Number(v?.idViagem ?? v?.id) === Number(c?.idViagem)
-      );
+    this.caronasAceitas = this.conversas
+      .filter((c) => String(c?.status || '').toLowerCase() === 'aceita')
+      .filter(
+        (c) =>
+          Number(c?.idMotorista) === Number(this.meuId) ||
+          Number(c?.idPassageiro) === Number(this.meuId),
+      )
+      .map((c) => {
+        const viagem = this.viagens.find(
+          (v) => Number(v?.idViagem ?? v?.id) === Number(c?.idViagem),
+        );
 
-      if (!viagem) return null;
+        if (!viagem) return null;
 
-      return {
-        ...viagem,
-        conversa: c,
-        partida: viagem.partida,
-        destino: viagem.destino,
-        entrada: viagem.horarioEntrada,
-        saida: viagem.horarioSaida,
-        ajuda: viagem.ajudaDeCusto,
-        diasAgendados: this.normalizarDatasViagem(viagem)
-      };
-    })
-    .filter(Boolean)
-    .filter((v: any) => {
-      const id = Number(v?.idViagem ?? v?.id);
-      if (!id || idsAdicionados.has(id)) return false;
+        return {
+          ...viagem,
+          conversa: c,
+          partida: viagem.partida,
+          destino: viagem.destino,
+          entrada: viagem.horarioEntrada,
+          saida: viagem.horarioSaida,
+          ajuda: viagem.ajudaDeCusto,
+          diasAgendados: this.normalizarDatasViagem(viagem),
+        };
+      })
+      .filter(Boolean)
+      .filter((v: any) => {
+        const id = Number(v?.idViagem ?? v?.id);
+        if (!id || idsAdicionados.has(id)) return false;
 
-      idsAdicionados.add(id);
-      return true;
-    });
-}
+        idsAdicionados.add(id);
+        return true;
+      });
+  }
 
   private normalizeUsuario(u: any) {
     const bruto = (u?.tipoUsuario ?? u?.tipo_usuario ?? u?.tipo ?? '')
@@ -334,7 +376,7 @@ private montarCaronasAceitas(): void {
 
     return {
       ...u,
-      tipoUsuario
+      tipoUsuario,
     };
   }
 
@@ -349,11 +391,13 @@ private montarCaronasAceitas(): void {
     const ag2 = (v as any).viajemAgendada;
     const ag3 = (v as any).agendamentos;
 
-    const agendamentos: any[] | undefined =
-      Array.isArray(ag1) ? ag1 :
-      Array.isArray(ag2) ? ag2 :
-      Array.isArray(ag3) ? ag3 :
-      undefined;
+    const agendamentos: any[] | undefined = Array.isArray(ag1)
+      ? ag1
+      : Array.isArray(ag2)
+        ? ag2
+        : Array.isArray(ag3)
+          ? ag3
+          : undefined;
 
     if (agendamentos) {
       agendamentos.forEach((a: any) => {
@@ -373,41 +417,43 @@ private montarCaronasAceitas(): void {
   carregarViagens(): void {
     this.http.get<any[]>(`${this.baseURL}/viagem`).subscribe({
       next: (res) => {
-        this.viagens = (res || []).map(v => {
+        this.viagens = (res || []).map((v) => {
           const diasAgendados = this.normalizarDatasViagem(v);
           return { ...v, diasAgendados };
         });
 
         this.caronasOferecidas = this.viagens
-          .filter(v =>
-            Number(v.idUsuario) === this.meuId &&
-            this.tipoNormalizado(v) === 'motorista' &&
-            !this.viagemTemConversaAceita(v)
+          .filter(
+            (v) =>
+              Number(v.idUsuario) === this.meuId &&
+              this.tipoNormalizado(v) === 'motorista' &&
+              !this.viagemTemConversaAceita(v),
           )
-          .map(v => ({
+          .map((v) => ({
             ...v,
             partida: v.partida,
             destino: v.destino,
             entrada: v.horarioEntrada,
             saida: v.horarioSaida,
             ajuda: v.ajudaDeCusto,
-            diasAgendados: v.diasAgendados
+            diasAgendados: v.diasAgendados,
           }));
 
         this.caronasProcuradas = this.viagens
-          .filter(v =>
-            Number(v.idUsuario) === this.meuId &&
-            this.tipoNormalizado(v) === 'passageiro' &&
-            !this.viagemTemConversaAceita(v)
+          .filter(
+            (v) =>
+              Number(v.idUsuario) === this.meuId &&
+              this.tipoNormalizado(v) === 'passageiro' &&
+              !this.viagemTemConversaAceita(v),
           )
-          .map(v => ({
+          .map((v) => ({
             ...v,
             partida: v.partida,
             destino: v.destino,
             entrada: v.horarioEntrada,
             saida: v.horarioSaida,
             ajuda: v.ajudaDeCusto,
-            diasAgendados: v.diasAgendados
+            diasAgendados: v.diasAgendados,
           }));
 
         this.montarCaronasAceitas();
@@ -417,42 +463,42 @@ private montarCaronasAceitas(): void {
       error: (err) => {
         console.error('Erro ao carregar viagens:', err);
         this.markLoaded('viagens');
-      }
+      },
     });
   }
 
   carregarConversas(): void {
-  const token =
-    localStorage.getItem('token') ||
-    localStorage.getItem('accessToken') ||
-    localStorage.getItem('jwt') ||
-    this.usuarioLogado?.token ||
-    '';
+    const token =
+      localStorage.getItem('token') ||
+      localStorage.getItem('accessToken') ||
+      localStorage.getItem('jwt') ||
+      this.usuarioLogado?.token ||
+      '';
 
-  const headers: any = token
-    ? { Authorization: `Bearer ${token}` }
-    : {};
+    const headers: any = token ? { Authorization: `Bearer ${token}` } : {};
 
-  this.http.get<any[]>(`${this.baseURL}/conversas`, { headers }).subscribe({
-    next: (res) => {
-      this.conversas = Array.isArray(res) ? res : [];
-      this.montarCaronasAceitas();
-      this.carregarViagens();
-      this.markLoaded('conversas');
-    },
-    error: (err) => {
-      console.error('Erro ao carregar conversas:', err);
-      this.conversas = [];
-      this.caronasAceitas = [];
-      this.markLoaded('conversas');
-    }
-  });
-}
+    this.http.get<any[]>(`${this.baseURL}/conversas`, { headers }).subscribe({
+      next: (res) => {
+        this.conversas = Array.isArray(res) ? res : [];
+        this.montarCaronasAceitas();
+        this.carregarViagens();
+        this.markLoaded('conversas');
+      },
+      error: (err) => {
+        console.error('Erro ao carregar conversas:', err);
+        this.conversas = [];
+        this.caronasAceitas = [];
+        this.markLoaded('conversas');
+      },
+    });
+  }
 
   carregarUsuarios(): void {
     this.http.get<any[]>(`${this.baseURL}/usuario`).subscribe({
       next: (res) => {
-        this.usuarios = Array.isArray(res) ? res.map(u => this.normalizeUsuario(u)) : [];
+        this.usuarios = Array.isArray(res)
+          ? res.map((u) => this.normalizeUsuario(u))
+          : [];
 
         if (this.avaliacoesRecebidas?.length) {
           this.avaliacoesRecebidas = this.avaliacoesRecebidas.map((a: any) => ({
@@ -485,8 +531,18 @@ private montarCaronasAceitas(): void {
   }
 
   private nomesMes = [
-    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+    'janeiro',
+    'fevereiro',
+    'março',
+    'abril',
+    'maio',
+    'junho',
+    'julho',
+    'agosto',
+    'setembro',
+    'outubro',
+    'novembro',
+    'dezembro',
   ];
 
   private gerarCalendarioDeUmMes(ano: number, mes: number): DiaCalendario[] {
@@ -503,7 +559,7 @@ private montarCaronasAceitas(): void {
       calendario.push({
         dia: 0,
         dateStr: null,
-        desabilitado: true
+        desabilitado: true,
       });
     }
 
@@ -511,13 +567,13 @@ private montarCaronasAceitas(): void {
       const data = new Date(ano, mes, d);
       data.setHours(0, 0, 0, 0);
 
-      const isPassado = data <= hoje;
+      const isPassado = data < hoje;
       const isDomingo = data.getDay() === 0;
 
       calendario.push({
         dia: d,
         dateStr: this.toISODate(data),
-        desabilitado: isPassado || isDomingo
+        desabilitado: isPassado || isDomingo,
       });
     }
 
@@ -577,7 +633,7 @@ private montarCaronasAceitas(): void {
     while (dataAtual <= fimSemestre) {
       const diaSemana = dataAtual.getDay();
       const naoEhDomingo = diaSemana !== 0;
-      const naoEhPassado = dataAtual >= hoje;
+      const naoEhPassado = dataAtual > hoje;
 
       if (naoEhDomingo && naoEhPassado) {
         datas.push(this.toISODate(dataAtual));
@@ -622,14 +678,16 @@ private montarCaronasAceitas(): void {
 
     const idx = this.datasRota.indexOf(cel.dateStr);
     if (idx >= 0) {
-      this.datasRota = this.datasRota.filter(d => d !== cel.dateStr);
+      this.datasRota = this.datasRota.filter((d) => d !== cel.dateStr);
     } else {
-      this.datasRota = [...this.datasRota, cel.dateStr].sort((a, b) => a.localeCompare(b));
+      this.datasRota = [...this.datasRota, cel.dateStr].sort((a, b) =>
+        a.localeCompare(b),
+      );
     }
   }
 
   removerDataRota(data: string): void {
-    this.datasRota = this.datasRota.filter(d => d !== data);
+    this.datasRota = this.datasRota.filter((d) => d !== data);
   }
 
   formatarDataTag(d: string): string {
@@ -649,30 +707,42 @@ private montarCaronasAceitas(): void {
     return origemLimpa || cidadeLimpa;
   }
 
-  private extrairOrigemECidade(partidaCompleta?: string): { origem: string; cidade: string } {
-  const texto = String(partidaCompleta || '').trim();
+  private extrairOrigemECidade(partidaCompleta?: string): {
+    origem: string;
+    cidade: string;
+  } {
+    const texto = String(partidaCompleta || '').trim();
 
-  if (!texto) {
-    return { origem: '', cidade: '' };
-  }
+    if (!texto) {
+      return { origem: '', cidade: '' };
+    }
 
-  const partes = texto.split(',').map(p => p.trim()).filter(Boolean);
+    const partes = texto
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
 
-  if (partes.length >= 2) {
+    if (partes.length >= 2) {
+      return {
+        origem: partes.slice(0, partes.length - 1).join(', '),
+        cidade: partes[partes.length - 1],
+      };
+    }
+
     return {
-      origem: partes.slice(0, partes.length - 1).join(', '),
-      cidade: partes[partes.length - 1]
+      origem: texto,
+      cidade: '',
     };
   }
 
-  return {
-    origem: texto,
-    cidade: ''
-  };
-}
-
   tracarRota(): void {
-    if (!this.origem || !this.cidadePartida || !this.destino || !this.entradaFatec || !this.saidaFatec) {
+    if (
+      !this.origem ||
+      !this.cidadePartida ||
+      !this.destino ||
+      !this.entradaFatec ||
+      !this.saidaFatec
+    ) {
       alert('Preencha todos os campos.');
       return;
     }
@@ -686,7 +756,7 @@ private montarCaronasAceitas(): void {
       alert(
         this.modoVigencia === 'semestre'
           ? 'Não foi possível gerar datas para o semestre atual.'
-          : 'Selecione pelo menos um dia para que esta rota seja válida.'
+          : 'Selecione pelo menos um dia para que esta rota seja válida.',
       );
       return;
     }
@@ -701,16 +771,24 @@ private montarCaronasAceitas(): void {
       horarioSaida: this.saidaFatec,
       ajudaDeCusto: this.ajudaCusto ? this.ajudaCusto.toString() : '0',
       idUsuario: this.meuId,
-      datasAgendadas: datasSelecionadas
+      datasAgendadas: datasSelecionadas,
     };
 
-    const request$ = this.modoEdicaoAtivo && this.idViagemEdicao
-      ? this.http.put(`${this.baseURL}/viagem/${this.idViagemEdicao}`, dadosViagem)
-      : this.http.post(`${this.baseURL}/viagem`, dadosViagem);
+    const request$ =
+      this.modoEdicaoAtivo && this.idViagemEdicao
+        ? this.http.put(
+            `${this.baseURL}/viagem/${this.idViagemEdicao}`,
+            dadosViagem,
+          )
+        : this.http.post(`${this.baseURL}/viagem`, dadosViagem);
 
     request$.subscribe({
       next: () => {
-        alert(this.modoEdicaoAtivo ? 'Rota atualizada com sucesso!' : 'Rota cadastrada com sucesso!');
+        alert(
+          this.modoEdicaoAtivo
+            ? 'Rota atualizada com sucesso!'
+            : 'Rota cadastrada com sucesso!',
+        );
 
         this.carregarViagens();
 
@@ -728,22 +806,26 @@ private montarCaronasAceitas(): void {
           setTimeout(() => {
             this.mapContainer.nativeElement.scrollIntoView({
               behavior: 'smooth',
-              block: 'center'
+              block: 'center',
             });
           }, 300);
         }
       },
       error: (err) => {
         console.error('Erro ao cadastrar viagem:', err);
-        alert(this.modoEdicaoAtivo ? 'Erro ao atualizar rota.' : 'Erro ao cadastrar rota.');
-      }
+        alert(
+          this.modoEdicaoAtivo
+            ? 'Erro ao atualizar rota.'
+            : 'Erro ao cadastrar rota.',
+        );
+      },
     });
 
     if (isBrowser()) {
       const request: google.maps.DirectionsRequest = {
         origin: partidaCompleta,
         destination: this.destino,
-        travelMode: google.maps.TravelMode.DRIVING
+        travelMode: google.maps.TravelMode.DRIVING,
       };
 
       const directionsService = new google.maps.DirectionsService();
@@ -762,202 +844,226 @@ private montarCaronasAceitas(): void {
       const request: google.maps.DirectionsRequest = {
         origin: partida,
         destination: destino,
-        travelMode: google.maps.TravelMode.DRIVING
+        travelMode: google.maps.TravelMode.DRIVING,
       };
 
       directionsService.route(request, (result, status) => {
-        if (status === 'OK' && result) this.directionsRenderer.setDirections(result);
+        if (status === 'OK' && result)
+          this.directionsRenderer.setDirections(result);
       });
 
       setTimeout(
-        () => this.mapContainer.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' }),
-        100
+        () =>
+          this.mapContainer.nativeElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          }),
+        100,
       );
     }
   }
 
   private montarEnderecoUsuarioLogado(): string {
-  const partes = [
-    this.usuarioLogado?.endereco,
-    this.usuarioLogado?.numero,
-    this.usuarioLogado?.cidade,
-    this.usuarioLogado?.estado,
-    this.usuarioLogado?.cep
-  ]
-    .filter(Boolean)
-    .map((p: any) => String(p).trim())
-    .filter((p: string) => p.length > 0);
+    const partes = [
+      this.usuarioLogado?.endereco,
+      this.usuarioLogado?.numero,
+      this.usuarioLogado?.cidade,
+      this.usuarioLogado?.estado,
+      this.usuarioLogado?.cep,
+    ]
+      .filter(Boolean)
+      .map((p: any) => String(p).trim())
+      .filter((p: string) => p.length > 0);
 
-  return partes.join(', ');
-}
+    return partes.join(', ');
+  }
 
-private geocodificarEndereco(endereco: string): Promise<google.maps.LatLngLiteral | null> {
-  return new Promise((resolve) => {
-    if (!isBrowser() || !endereco || !(window as any).google?.maps?.Geocoder) {
-      resolve(null);
-      return;
-    }
-
-    const chave = endereco.trim().toLowerCase();
-
-    if (this.cacheCoordenadas[chave]) {
-      resolve(this.cacheCoordenadas[chave]);
-      return;
-    }
-
-    const geocoder = new google.maps.Geocoder();
-
-    geocoder.geocode({ address: endereco }, (results, status) => {
-      if (status === 'OK' && results && results[0]) {
-        const location = results[0].geometry.location;
-
-        const coordenadas = {
-          lat: location.lat(),
-          lng: location.lng()
-        };
-
-        this.cacheCoordenadas[chave] = coordenadas;
-        resolve(coordenadas);
+  private geocodificarEndereco(
+    endereco: string,
+  ): Promise<google.maps.LatLngLiteral | null> {
+    return new Promise((resolve) => {
+      if (
+        !isBrowser() ||
+        !endereco ||
+        !(window as any).google?.maps?.Geocoder
+      ) {
+        resolve(null);
         return;
       }
 
-      resolve(null);
-    });
-  });
-}
+      const chave = endereco.trim().toLowerCase();
 
-private calcularDistanciaKm(origem: google.maps.LatLngLiteral, destino: google.maps.LatLngLiteral): number {
-  const raioTerraKm = 6371;
+      if (this.cacheCoordenadas[chave]) {
+        resolve(this.cacheCoordenadas[chave]);
+        return;
+      }
 
-  const toRad = (valor: number) => (valor * Math.PI) / 180;
+      const geocoder = new google.maps.Geocoder();
 
-  const dLat = toRad(destino.lat - origem.lat);
-  const dLng = toRad(destino.lng - origem.lng);
+      geocoder.geocode({ address: endereco }, (results, status) => {
+        if (status === 'OK' && results && results[0]) {
+          const location = results[0].geometry.location;
 
-  const lat1 = toRad(origem.lat);
-  const lat2 = toRad(destino.lat);
+          const coordenadas = {
+            lat: location.lat(),
+            lng: location.lng(),
+          };
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1) * Math.cos(lat2) *
-    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+          this.cacheCoordenadas[chave] = coordenadas;
+          resolve(coordenadas);
+          return;
+        }
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return raioTerraKm * c;
-}
-
-async calcularCaronasProximas(): Promise<void> {
-  this.infoProximidade = '📍 Calculando caronas próximas de você...';
-
-  const enderecoUsuario = this.montarEnderecoUsuarioLogado();
-
-  if (!enderecoUsuario) {
-    this.viagensComDistancia = [];
-    this.infoProximidade = 'Não foi possível calcular a proximidade. Atualize seu endereço no perfil.';
-    return;
-  }
-
-  const coordenadasUsuario = await this.geocodificarEndereco(enderecoUsuario);
-
-  if (!coordenadasUsuario) {
-    this.viagensComDistancia = [];
-    this.infoProximidade = 'Não foi possível localizar seu endereço para calcular as caronas próximas.';
-    return;
-  }
-
-  const viagensDisponiveis = this.viagens.filter(v => !this.viagemTemConversaAceita(v));
-  const viagensCalculadas: any[] = [];
-
-  for (const viagem of viagensDisponiveis) {
-    const partida = String(viagem?.partida || '').trim();
-
-    if (!partida) continue;
-
-    const coordenadasPartida = await this.geocodificarEndereco(partida);
-
-    if (!coordenadasPartida) continue;
-
-    const distanciaKm = this.calcularDistanciaKm(coordenadasUsuario, coordenadasPartida);
-
-    viagensCalculadas.push({
-      ...viagem,
-      distanciaKm
+        resolve(null);
+      });
     });
   }
 
-  this.viagensComDistancia = viagensCalculadas.sort(
-    (a, b) => Number(a.distanciaKm) - Number(b.distanciaKm)
-  );
+  private calcularDistanciaKm(
+    origem: google.maps.LatLngLiteral,
+    destino: google.maps.LatLngLiteral,
+  ): number {
+    const raioTerraKm = 6371;
 
-  if (!this.viagensComDistancia.length) {
-    this.infoProximidade = 'Nenhuma carona próxima pôde ser calculada no momento.';
-    return;
+    const toRad = (valor: number) => (valor * Math.PI) / 180;
+
+    const dLat = toRad(destino.lat - origem.lat);
+    const dLng = toRad(destino.lng - origem.lng);
+
+    const lat1 = toRad(origem.lat);
+    const lat2 = toRad(destino.lat);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return raioTerraKm * c;
   }
 
-  const menorDistancia = Number(this.viagensComDistancia[0].distanciaKm).toFixed(1).replace('.', ',');
+  async calcularCaronasProximas(): Promise<void> {
+    this.infoProximidade = '📍 Calculando caronas próximas de você...';
 
-  this.infoProximidade =
-    `📍 A carona mais próxima está a aproximadamente ${menorDistancia} km de você. ` +
-    `Encontramos ${this.viagensComDistancia.length} carona(s) com distância calculada.`;
-}
+    const enderecoUsuario = this.montarEnderecoUsuarioLogado();
+
+    if (!enderecoUsuario) {
+      this.viagensComDistancia = [];
+      this.infoProximidade =
+        'Não foi possível calcular a proximidade. Atualize seu endereço no perfil.';
+      return;
+    }
+
+    const coordenadasUsuario = await this.geocodificarEndereco(enderecoUsuario);
+
+    if (!coordenadasUsuario) {
+      this.viagensComDistancia = [];
+      this.infoProximidade =
+        'Não foi possível localizar seu endereço para calcular as caronas próximas.';
+      return;
+    }
+
+    const viagensDisponiveis = this.viagens.filter(
+      (v) => !this.viagemTemConversaAceita(v),
+    );
+    const viagensCalculadas: any[] = [];
+
+    for (const viagem of viagensDisponiveis) {
+      const partida = String(viagem?.partida || '').trim();
+
+      if (!partida) continue;
+
+      const coordenadasPartida = await this.geocodificarEndereco(partida);
+
+      if (!coordenadasPartida) continue;
+
+      const distanciaKm = this.calcularDistanciaKm(
+        coordenadasUsuario,
+        coordenadasPartida,
+      );
+
+      viagensCalculadas.push({
+        ...viagem,
+        distanciaKm,
+      });
+    }
+
+    this.viagensComDistancia = viagensCalculadas.sort(
+      (a, b) => Number(a.distanciaKm) - Number(b.distanciaKm),
+    );
+
+    if (!this.viagensComDistancia.length) {
+      this.infoProximidade =
+        'Nenhuma carona próxima pôde ser calculada no momento.';
+      return;
+    }
+
+    const menorDistancia = Number(this.viagensComDistancia[0].distanciaKm)
+      .toFixed(1)
+      .replace('.', ',');
+
+    this.infoProximidade =
+      `📍 A carona mais próxima está a aproximadamente ${menorDistancia} km de você. ` +
+      `Encontramos ${this.viagensComDistancia.length} carona(s) com distância calculada.`;
+  }
 
   ehMinhaCarona(viagem: any): boolean {
     return Number(viagem?.idUsuario) === Number(this.meuId);
   }
 
   editarCarona(viagem: any): void {
-  if (!viagem?.idViagem && !viagem?.id) {
-    alert('Não foi possível identificar esta carona para edição.');
-    return;
+    if (!viagem?.idViagem && !viagem?.id) {
+      alert('Não foi possível identificar esta carona para edição.');
+      return;
+    }
+
+    const { origem, cidade } = this.extrairOrigemECidade(viagem.partida);
+
+    this.modoEdicaoAtivo = true;
+    this.idViagemEdicao = Number(viagem.idViagem || viagem.id);
+
+    this.tipoCarona =
+      this.tipoNormalizado(viagem) === 'motorista' ? 'oferecer' : 'procurar';
+    this.origem = origem;
+    this.cidadePartida = cidade;
+    this.destino = viagem.destino || '';
+    this.entradaFatec = viagem.horarioEntrada || viagem.entrada || '';
+    this.saidaFatec = viagem.horarioSaida || viagem.saida || '';
+    this.ajudaCusto = viagem.ajudaDeCusto || viagem.ajuda || null;
+
+    const datas = this.normalizarDatasViagem(viagem);
+    this.datasRota = datas;
+    this.modoVigencia = datas.length >= 20 ? 'semestre' : 'mensal';
+
+    this.mostrarCalendario = false;
+
+    if (isBrowser()) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
   }
 
-  const { origem, cidade } = this.extrairOrigemECidade(viagem.partida);
+  cancelarEdicao(limparFormulario: boolean = true): void {
+    this.modoEdicaoAtivo = false;
+    this.idViagemEdicao = null;
 
-  this.modoEdicaoAtivo = true;
-  this.idViagemEdicao = Number(viagem.idViagem || viagem.id);
+    if (!limparFormulario) return;
 
-  this.tipoCarona = this.tipoNormalizado(viagem) === 'motorista' ? 'oferecer' : 'procurar';
-  this.origem = origem;
-  this.cidadePartida = cidade;
-  this.destino = viagem.destino || '';
-  this.entradaFatec = viagem.horarioEntrada || viagem.entrada || '';
-  this.saidaFatec = viagem.horarioSaida || viagem.saida || '';
-  this.ajudaCusto = viagem.ajudaDeCusto || viagem.ajuda || null;
-
-  const datas = this.normalizarDatasViagem(viagem);
-  this.datasRota = datas;
-  this.modoVigencia = datas.length >= 20 ? 'semestre' : 'mensal';
-
-  this.mostrarCalendario = false;
-
-  if (isBrowser()) {
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }, 100);
+    this.tipoCarona = 'oferecer';
+    this.origem = '';
+    this.cidadePartida = '';
+    this.destino = '';
+    this.entradaFatec = '';
+    this.saidaFatec = '';
+    this.ajudaCusto = null;
+    this.datasRota = [];
+    this.modoVigencia = 'mensal';
+    this.mostrarCalendario = false;
   }
-}
-
-cancelarEdicao(limparFormulario: boolean = true): void {
-  this.modoEdicaoAtivo = false;
-  this.idViagemEdicao = null;
-
-  if (!limparFormulario) return;
-
-  this.tipoCarona = 'oferecer';
-  this.origem = '';
-  this.cidadePartida = '';
-  this.destino = '';
-  this.entradaFatec = '';
-  this.saidaFatec = '';
-  this.ajudaCusto = null;
-  this.datasRota = [];
-  this.modoVigencia = 'mensal';
-  this.mostrarCalendario = false;
-}
 
   abrirConversa(viagem: any): void {
     if (!viagem?.idViagem) {
@@ -967,58 +1073,105 @@ cancelarEdicao(limparFormulario: boolean = true): void {
 
     this.router.navigate(['/conversas'], {
       queryParams: {
-        idViagem: viagem.idViagem
-      }
+        idViagem: viagem.idViagem,
+      },
     });
   }
 
-  enviarAvaliacao() {
-    if (!this.avaliacaoSelecionada) return alert('Por favor, selecione uma nota.');
+  enviarAvaliacao(): void {
+    if (!this.idUsuarioSelecionado) {
+      alert('Não foi possível identificar o usuário que será avaliado.');
+      return;
+    }
 
-    const avaliacao = {
-      ID_Avaliador: this.meuId,
-      ID_Avaliado: this.idUsuarioSelecionado,
-      Comentario: this.comentarioAvaliacao,
-      Estrelas: this.avaliacaoSelecionada
-    };
+    if (!this.avaliacaoSelecionada) {
+      alert('Por favor, selecione uma nota.');
+      return;
+    }
 
-    this.http.post(`${this.baseURL}/avaliacao`, avaliacao).subscribe({
+
+
+    if(this.estadoAvaliacao === "nova"){
+      const avaliacao = {
+        ID_Avaliador: this.meuId,
+        ID_Avaliado: this.idUsuarioSelecionado,
+        Comentario: this.comentarioAvaliacao,
+        Estrelas: this.avaliacaoSelecionada,
+        ID_Viagem: this.idViagem,
+      };
+      this.http.post(`${this.baseURL}/avaliacao`, avaliacao).subscribe({
+        next: () => {
+          alert(
+            `Avaliação enviada! Você avaliou ${this.nomeUsuarioSelecionado} ` +
+              `com ${this.avaliacaoSelecionada} estrelas.`,
+          );
+
+          this.carregarAvaliacoes();
+        },
+        error: (err) => {
+          console.error('Erro ao enviar avaliação:', err);
+          alert('Erro ao enviar avaliação.');
+        },
+      });
+    }
+    else if(this.estadoAvaliacao === "editar"){
+      const avaliacao = {
+        ID_Avaliador: this.meuId,
+        ID_Avaliado: this.idUsuarioSelecionado,
+        Comentario: this.comentarioAvaliacao,
+        Estrelas: this.avaliacaoSelecionada,
+        ID_Viagem: this.idViagem,
+        ID_Avaliacao: this.idAvaliacao
+      };
+      this.http.put(`${this.baseURL}/avaliacao/${this.idAvaliacao}`, avaliacao).subscribe({
       next: () => {
-        alert(`✅ Avaliação enviada! Você avaliou ${this.nomeUsuarioSelecionado} com ${this.avaliacaoSelecionada} ⭐`);
-        this.mostrarAvaliacao = false;
-        this.avaliacaoSelecionada = 0;
-        this.comentarioAvaliacao = '';
+        alert('Avaliação editada com sucesso!');
         this.carregarAvaliacoes();
       },
       error: (err) => {
-        console.error(err);
-        alert('Erro ao enviar avaliação.');
-      }
+        console.error('Erro ao editar avaliação:', err);
+        alert('Erro ao editar avaliação. Tente novamente.');
+      },
     });
+    }
+
+    this.mostrarAvaliacao = false;
+    this.avaliacaoSelecionada = 0;
+    this.comentarioAvaliacao = '';
+    this.idUsuarioSelecionado = null;
+    this.nomeUsuarioSelecionado = '';
   }
 
   carregarAvaliacoes(): void {
     this.http.get<any[]>(`${this.baseURL}/avaliacao`).subscribe({
       next: (res) => {
         this.avaliacoesRecebidas = res
-          .filter(a => a.ID_Avaliado === this.meuId)
-          .map(a => ({ ...a, nomeAvaliador: this.pegarNomeUsuario(a.ID_Avaliador) }));
+          .filter((a) => a.ID_Avaliado === this.meuId)
+          .map((a) => ({
+            ...a,
+            nomeAvaliador: this.pegarNomeUsuario(a.ID_Avaliador),
+          }));
 
         this.avaliacoesEnviadas = res
-          .filter(a => a.ID_Avaliador === this.meuId)
-          .map(a => ({ ...a, nomeAvaliado: this.pegarNomeUsuario(a.ID_Avaliado) }));
+          .filter((a) => a.ID_Avaliador === this.meuId)
+          .map((a) => ({
+            ...a,
+            nomeAvaliado: this.pegarNomeUsuario(a.ID_Avaliado),
+          }));
 
         this.markLoaded('avaliacoes');
       },
       error: (err) => {
         console.error('Erro ao carregar avaliações:', err);
         this.markLoaded('avaliacoes');
-      }
+      },
     });
   }
 
   pegarNomeUsuario(id: number): string {
-    const usuario = this.usuarios.find(u => u.id === id || u.idUsuario === id);
+    const usuario = this.usuarios.find(
+      (u) => u.id === id || u.idUsuario === id,
+    );
     return usuario ? usuario.nome : 'Usuário';
   }
 
@@ -1026,7 +1179,7 @@ cancelarEdicao(limparFormulario: boolean = true): void {
     email: string,
     genero: any,
     idUsuario?: number,
-    usuarioViagem?: any
+    usuarioViagem?: any,
   ): string {
     const urlDireta =
       usuarioViagem?.fotoUrl ||
@@ -1035,9 +1188,10 @@ cancelarEdicao(limparFormulario: boolean = true): void {
 
     if (urlDireta) return urlDireta;
 
-    const usuarioEncontrado = this.usuarios.find(u =>
-      Number(u?.idUsuario ?? u?.id) === Number(idUsuario) ||
-      u?.email?.trim().toLowerCase() === (email || '').trim().toLowerCase()
+    const usuarioEncontrado = this.usuarios.find(
+      (u) =>
+        Number(u?.idUsuario ?? u?.id) === Number(idUsuario) ||
+        u?.email?.trim().toLowerCase() === (email || '').trim().toLowerCase(),
     );
 
     const url =
@@ -1064,17 +1218,21 @@ cancelarEdicao(limparFormulario: boolean = true): void {
       error: (err) => {
         console.error('Erro ao excluir carona:', err);
         alert('Erro ao excluir carona. Tente novamente.');
-      }
+      },
     });
   }
 
   formatDiasViagem(v: any): string {
     if (Array.isArray(v?.diasAgendados) && v.diasAgendados.length) {
-      return v.diasAgendados.map((d: string) => this.formatarDataTag(d)).join(', ');
+      return v.diasAgendados
+        .map((d: string) => this.formatarDataTag(d))
+        .join(', ');
     }
 
     if (Array.isArray(v?.datasAgendadas) && v.datasAgendadas.length) {
-      return v.datasAgendadas.map((d: string) => this.formatarDataTag(d)).join(', ');
+      return v.datasAgendadas
+        .map((d: string) => this.formatarDataTag(d))
+        .join(', ');
     }
 
     if (Array.isArray(v?.datasRota) && v.datasRota.length) {
@@ -1089,11 +1247,7 @@ cancelarEdicao(limparFormulario: boolean = true): void {
   }
 
   resumirDiasRota(v: any): string {
-    const datas =
-      v?.diasAgendados ||
-      v?.datasAgendadas ||
-      v?.datasRota ||
-      [];
+    const datas = v?.diasAgendados || v?.datasAgendadas || v?.datasRota || [];
 
     if (!Array.isArray(datas) || !datas.length) {
       return '';
@@ -1105,9 +1259,7 @@ cancelarEdicao(limparFormulario: boolean = true): void {
       return `Semestre fechado: ${this.formatarDataTag(datasOrdenadas[0])} até ${this.formatarDataTag(datasOrdenadas[datasOrdenadas.length - 1])}`;
     }
 
-    return datasOrdenadas
-      .map((d: string) => this.formatarDataTag(d))
-      .join(' ');
+    return datasOrdenadas.map((d: string) => this.formatarDataTag(d)).join(' ');
   }
 
   private atualizarMarcadoresViagens(): void {
@@ -1115,7 +1267,7 @@ cancelarEdicao(limparFormulario: boolean = true): void {
     if (!this.map) return;
     if (!this.viagens || !this.viagens.length) return;
 
-    this.markers.forEach(m => m.setMap(null));
+    this.markers.forEach((m) => m.setMap(null));
     this.markers = [];
 
     const geocoder = new google.maps.Geocoder();
@@ -1143,17 +1295,17 @@ cancelarEdicao(limparFormulario: boolean = true): void {
             const destinoLabel = destino || '';
             const entrada = v.horarioEntrada || v.horario_entrada || '';
             const saida = v.horarioSaida || v.horario_saida || '';
-            const tipoLegivel = tipo === 'motorista'
-              ? 'Motorista (oferece carona)'
-              : 'Passageiro (procura carona)';
+            const tipoLegivel =
+              tipo === 'motorista'
+                ? 'Motorista (oferece carona)'
+                : 'Passageiro (procura carona)';
 
             const diasLabel = this.resumirDiasRota(v);
             const diasHtml = diasLabel
               ? `<div><strong>Dias:</strong> ${diasLabel}</div>`
               : '';
 
-            const conteudo =
-              `<div style="min-width:220px;font-family:Arial, sans-serif;font-size:12px;">
+            const conteudo = `<div style="min-width:220px;font-family:Arial, sans-serif;font-size:12px;">
                 <div style="font-weight:bold;font-size:13px;margin-bottom:2px;">${nome}</div>
                 <div style="color:#555;margin-bottom:4px;">${tipoLegivel}</div>
                 <div style="margin-bottom:4px;">
@@ -1173,12 +1325,17 @@ cancelarEdicao(limparFormulario: boolean = true): void {
             this.infoWindow.setContent(conteudo);
             this.infoWindow.open(this.map, marker);
 
-            google.maps.event.addListenerOnce(this.infoWindow, 'domready', () => {
-              const btn = document.getElementById('btnMostrarRotaMarker');
-              if (btn) {
-                btn.onclick = () => this.mostrarRota(partidaLabel, destinoLabel);
-              }
-            });
+            google.maps.event.addListenerOnce(
+              this.infoWindow,
+              'domready',
+              () => {
+                const btn = document.getElementById('btnMostrarRotaMarker');
+                if (btn) {
+                  btn.onclick = () =>
+                    this.mostrarRota(partidaLabel, destinoLabel);
+                }
+              },
+            );
           });
 
           this.markers.push(marker);
@@ -1188,23 +1345,31 @@ cancelarEdicao(limparFormulario: boolean = true): void {
   }
 
   private getCaronasParaExportar() {
-    const oferecidas = (this.caronasOferecidas || []).map(c => ({
-      Partida: c.partida, Destino: c.destino, Entrada: c.entrada,
-      Saida: c.saida, Ajuda: String(c.ajuda ?? ''), Tipo: 'Motorista'
-    }));
-
-    const procuradas = (this.caronasProcuradas || []).map(c => ({
-      Partida: c.partida, Destino: c.destino, Entrada: c.entrada,
-      Saida: c.saida, Ajuda: String(c.ajuda ?? ''), Tipo: 'Passageiro'
-    }));
-
-    const aceitas = (this.caronasAceitas || []).map(c => ({
+    const oferecidas = (this.caronasOferecidas || []).map((c) => ({
       Partida: c.partida,
       Destino: c.destino,
       Entrada: c.entrada,
       Saida: c.saida,
       Ajuda: String(c.ajuda ?? ''),
-      Tipo: 'Aceita'
+      Tipo: 'Motorista',
+    }));
+
+    const procuradas = (this.caronasProcuradas || []).map((c) => ({
+      Partida: c.partida,
+      Destino: c.destino,
+      Entrada: c.entrada,
+      Saida: c.saida,
+      Ajuda: String(c.ajuda ?? ''),
+      Tipo: 'Passageiro',
+    }));
+
+    const aceitas = (this.caronasAceitas || []).map((c) => ({
+      Partida: c.partida,
+      Destino: c.destino,
+      Entrada: c.entrada,
+      Saida: c.saida,
+      Ajuda: String(c.ajuda ?? ''),
+      Tipo: 'Aceita',
     }));
 
     return [...oferecidas, ...procuradas, ...aceitas];
@@ -1216,7 +1381,7 @@ cancelarEdicao(limparFormulario: boolean = true): void {
 
     const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
       import('jspdf'),
-      import('jspdf-autotable')
+      import('jspdf-autotable'),
     ]);
 
     const doc = new jsPDF('landscape', 'pt', 'a4');
@@ -1228,8 +1393,17 @@ cancelarEdicao(limparFormulario: boolean = true): void {
     doc.setFontSize(10);
     doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 40, 58);
 
-    const head = [['Partida', 'Destino', 'Entrada', 'Saída', 'Ajuda (R$)', 'Tipo']];
-    const body = linhas.map(l => [l.Partida, l.Destino, l.Entrada, l.Saida, l.Ajuda, l.Tipo]);
+    const head = [
+      ['Partida', 'Destino', 'Entrada', 'Saída', 'Ajuda (R$)', 'Tipo'],
+    ];
+    const body = linhas.map((l) => [
+      l.Partida,
+      l.Destino,
+      l.Entrada,
+      l.Saida,
+      l.Ajuda,
+      l.Tipo,
+    ]);
 
     autoTable(doc, {
       head,
@@ -1237,7 +1411,7 @@ cancelarEdicao(limparFormulario: boolean = true): void {
       startY: 70,
       theme: 'grid',
       styles: { fontSize: 10, cellPadding: 6 },
-      headStyles: { fillColor: [43, 140, 255], textColor: 255 }
+      headStyles: { fillColor: [43, 140, 255], textColor: 255 },
     });
 
     doc.save(`caronas_${this.timestamp()}.pdf`);
@@ -1261,7 +1435,12 @@ cancelarEdicao(limparFormulario: boolean = true): void {
       const ws = XLSX.utils.json_to_sheet(linhas);
 
       (ws as any)['!cols'] = [
-        { wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 14 },
+        { wch: 12 },
       ];
 
       const wb = XLSX.utils.book_new();
@@ -1269,7 +1448,7 @@ cancelarEdicao(limparFormulario: boolean = true): void {
 
       const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([wbout], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8',
       });
 
       if (typeof saveAs === 'function') {
@@ -1292,5 +1471,121 @@ cancelarEdicao(limparFormulario: boolean = true): void {
     const d = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+  }
+
+  viagemJaOcorreu(viagem: any): boolean {
+    const datas = this.normalizarDatasViagem(viagem);
+
+    if (datas.length === 0) {
+      return false;
+    }
+
+    const agora = new Date();
+    const hoje =
+      `${agora.getFullYear()}-` +
+      `${String(agora.getMonth() + 1).padStart(2, '0')}-` +
+      `${String(agora.getDate()).padStart(2, '0')}`;
+
+    const horarioSaida = viagem?.horarioSaida || viagem?.saida || '23:59';
+
+    return datas.some((data: string) => {
+      // Uma data anterior à data de hoje já ocorreu.
+      if (data < hoje) {
+        return true;
+      }
+
+      // Datas futuras não são consideradas ocorridas.
+      if (data > hoje) {
+        return false;
+      }
+
+      // Se for hoje, verifica também o horário de saída.
+      const [hora, minuto] = horarioSaida.split(':').map(Number);
+
+      const dataHoraViagem = new Date(
+        agora.getFullYear(),
+        agora.getMonth(),
+        agora.getDate(),
+        hora,
+        minuto || 0,
+      );
+
+      return dataHoraViagem.getTime() <= agora.getTime();
+    });
+  }
+  abrirAvaliacao(c: any): void {
+    const conversa = c?.conversa;
+    const idMotorista = Number(conversa?.idMotorista);
+    const idPassageiro = Number(conversa?.idPassageiro);
+    const meuId = Number(this.meuId);
+
+    let idOutroUsuario: number;
+
+    if (idMotorista === meuId) {
+      idOutroUsuario = idPassageiro;
+    } else if (idPassageiro === meuId) {
+      idOutroUsuario = idMotorista;
+    } else {
+      console.error('Não foi possível identificar os participantes.', c);
+      alert('Não foi possível identificar o usuário desta carona.');
+      return;
+    }
+
+    if (!Number.isFinite(idOutroUsuario) || idOutroUsuario <= 0) {
+      alert('Não foi possível identificar o usuário que será avaliado.');
+      return;
+    }
+
+    this.idUsuarioSelecionado = idOutroUsuario;
+    this.nomeUsuarioSelecionado = this.pegarNomeUsuario(idOutroUsuario);
+
+    this.avaliacaoSelecionada = 0;
+    this.comentarioAvaliacao = '';
+    this.idViagem = conversa?.idViagem || conversa?.id_viagem || 0;
+
+    // Abre o popup
+    this.mostrarAvaliacao = true;
+
+    console.log('Popup de avaliação aberto para:', {
+      idOutroUsuario,
+      nome: this.nomeUsuarioSelecionado,
+    });
+  }
+  fecharAvaliacao(): void {
+    this.mostrarAvaliacao = false;
+    this.idUsuarioSelecionado = null;
+    this.nomeUsuarioSelecionado = '';
+    this.avaliacaoSelecionada = 0;
+    this.comentarioAvaliacao = '';
+    this.idViagem = 0;
+  }
+  excluirAvaliacao(idAvaliacao:number): void {
+    if (!confirm('Tem certeza que deseja excluir esta avaliação?')) {
+      return
+    };
+   this.http.delete(`${this.baseURL}/avaliacao/${idAvaliacao}`).subscribe({
+      next: () => {
+        alert('Avaliação excluída com sucesso!');
+        this.carregarAvaliacoes();
+      },
+      error: (err) => {
+        console.error('Erro ao excluir avaliação:', err);
+        alert('Erro ao excluir avaliação. Tente novamente.');
+      },
+    });
+  }
+  editarAvaliacao(avaliacao: any): void {
+    this.http.get<any>(`${this.baseURL}/usuario/${avaliacao.ID_Avaliado}`).subscribe({
+      next: (usuario) => {
+        this.idUsuarioSelecionado = usuario.idUsuario || usuario.id;
+        this.nomeUsuarioSelecionado = usuario.nome || 'Usuário';
+      }
+    });
+    this.idViagem = avaliacao.ID_Viagem;
+    this.estadoAvaliacao = 'editar';
+    this.mostrarAvaliacao = true;
+    this.avaliacaoSelecionada = 0;
+    this.comentarioAvaliacao = '';
+    this.idAvaliacao = avaliacao.ID_Avaliacao;
   }
 }

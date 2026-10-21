@@ -46,7 +46,7 @@ export class AuthService {
   logout() {
     try {
       localStorage.removeItem('token');
-      localStorage.removeItem('usuarioLogado'); 
+      localStorage.removeItem('usuarioLogado');
     } catch {}
 
     // encerra socket e limpa notificações em memória
