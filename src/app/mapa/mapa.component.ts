@@ -4,12 +4,14 @@ import {
   ViewChild,
   AfterViewInit,
   OnInit,
+  Inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { isBrowser } from '../utils/is-browser';
+import { AvaliacaoService } from '../services/avaliacao.service';
 
 type DiaCalendario = {
   dia: number;
@@ -44,7 +46,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   markers: google.maps.Marker[] = [];
   infoWindow!: google.maps.InfoWindow;
-
+  avaliacaoService = Inject(AvaliacaoService);
   carregando: boolean = true;
   private _loads = {
     usuarios: false,
@@ -1568,5 +1570,14 @@ export class MapaComponent implements AfterViewInit, OnInit {
     this.avaliacaoSelecionada = 0;
     this.comentarioAvaliacao = '';
     this.idAvaliacao = avaliacao.ID_Avaliacao;
+  }
+
+  hasAvaliacao(viagem: any): boolean {
+    const idViagem = Number(viagem?.idViagem || viagem?.id);
+    return this.avaliacaoService.hasAvaliacao(idViagem).subscribe({
+      next: (hasAvaliacao: boolean) => {
+        return hasAvaliacao;
+      }
+    })
   }
 }

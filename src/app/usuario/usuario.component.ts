@@ -62,7 +62,7 @@ export class UsuarioComponent implements OnInit {
       this.http.get(`${this.baseURL}/avaliacao/media/${user.id}`).subscribe({
         next: (response: any) => {
           const media = response.media;
-          this.pontuacao = media !== null ? parseFloat(media.toFixed(2)) : 0;
+          this.pontuacao = media !== null ? parseFloat(media.toFixed(2)) : 5;
           console.log('Média das avaliações:', response);
         }
       });
