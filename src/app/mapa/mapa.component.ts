@@ -235,35 +235,15 @@ export class MapaComponent implements AfterViewInit, OnInit {
       .trim()
       .toLowerCase();
 
-    if (statusConversa === 'aceita') return 'Aceita';
+    if (statusConversa === 'aceita') {
+      if(this.viagemJaOcorreu(viagem)) {
+        return 'Concluída';
+      }
+      return 'Aceita';
+    }
     if (statusConversa === 'recusada') return 'Recusada';
     if (statusConversa === 'aguardando_confirmacao')
       return 'Aguardando confirmação';
-
-    const statusBack = String(viagem?.statusViagem || viagem?.status || '')
-      .trim()
-      .toLowerCase();
-
-    if (statusBack === 'aceita') return 'Aceita';
-    if (statusBack === 'recusada') return 'Recusada';
-    if (statusBack === 'concluida' || statusBack === 'concluída')
-      return 'Concluída';
-    if (statusBack === 'cancelada') return 'Cancelada';
-    if (statusBack === 'pendente') return 'Pendente';
-    if (statusBack === 'aguardando_confirmacao')
-      return 'Aguardando confirmação';
-
-    const datas = this.normalizarDatasViagem(viagem);
-    const horarioSaida = viagem?.horarioSaida || viagem?.saida;
-
-    if (datas.length > 0 && horarioSaida) {
-      const ultimaData = datas[datas.length - 1];
-      const dataHora = new Date(`${ultimaData}T${horarioSaida}`);
-
-      if (!isNaN(dataHora.getTime()) && dataHora.getTime() < Date.now()) {
-        return 'Concluída';
-      }
-    }
 
     return 'Pendente';
   }
