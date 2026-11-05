@@ -4,12 +4,14 @@ import {
   ViewChild,
   AfterViewInit,
   OnInit,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { isBrowser } from '../utils/is-browser';
+import id from '@angular/common/locales/id';
 
 type DiaCalendario = {
   dia: number;
@@ -35,7 +37,6 @@ type SecaoMapa = 'encontre' | 'minhasCaronas' | 'avaliacoes';
   styleUrls: ['./mapa.component.css'],
 })
 export class MapaComponent implements AfterViewInit, OnInit {
-
   @ViewChild('mapContainer', { static: true })
   mapContainer!: ElementRef<HTMLDivElement>;
 
@@ -102,8 +103,8 @@ export class MapaComponent implements AfterViewInit, OnInit {
 
   mostrarAvaliacao: boolean = false;
   estadoAvaliacao: 'nova' | 'editar' = 'nova';
-  idViagem:number = 0
-  idAvaliacao:number = 0
+  idViagem: number = 0;
+  idAvaliacao: number = 0;
   nomeUsuarioSelecionado: string = '';
   idUsuarioSelecionado: number | null = null;
   avaliacaoSelecionada: number = 0;
@@ -236,7 +237,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
       .toLowerCase();
 
     if (statusConversa === 'aceita') {
-      if(this.viagemJaOcorreu(viagem)) {
+      if (this.viagemJaOcorreu(viagem)) {
         return 'Concluída';
       }
       return 'Aceita';
@@ -1069,9 +1070,7 @@ export class MapaComponent implements AfterViewInit, OnInit {
       return;
     }
 
-
-
-    if(this.estadoAvaliacao === "nova"){
+    if (this.estadoAvaliacao === 'nova') {
       const avaliacao = {
         ID_Avaliador: this.meuId,
         ID_Avaliado: this.idUsuarioSelecionado,
@@ -1093,26 +1092,27 @@ export class MapaComponent implements AfterViewInit, OnInit {
           alert('Erro ao enviar avaliação.');
         },
       });
-    }
-    else if(this.estadoAvaliacao === "editar"){
+    } else if (this.estadoAvaliacao === 'editar') {
       const avaliacao = {
         ID_Avaliador: this.meuId,
         ID_Avaliado: this.idUsuarioSelecionado,
         Comentario: this.comentarioAvaliacao,
         Estrelas: this.avaliacaoSelecionada,
         ID_Viagem: this.idViagem,
-        ID_Avaliacao: this.idAvaliacao
+        ID_Avaliacao: this.idAvaliacao,
       };
-      this.http.put(`${this.baseURL}/avaliacao/${this.idAvaliacao}`, avaliacao).subscribe({
-      next: () => {
-        alert('Avaliação editada com sucesso!');
-        this.carregarAvaliacoes();
-      },
-      error: (err) => {
-        console.error('Erro ao editar avaliação:', err);
-        alert('Erro ao editar avaliação. Tente novamente.');
-      },
-    });
+      this.http
+        .put(`${this.baseURL}/avaliacao/${this.idAvaliacao}`, avaliacao)
+        .subscribe({
+          next: () => {
+            alert('Avaliação editada com sucesso!');
+            this.carregarAvaliacoes();
+          },
+          error: (err) => {
+            console.error('Erro ao editar avaliação:', err);
+            alert('Erro ao editar avaliação. Tente novamente.');
+          },
+        });
     }
 
     this.mostrarAvaliacao = false;
@@ -1539,11 +1539,11 @@ export class MapaComponent implements AfterViewInit, OnInit {
     this.comentarioAvaliacao = '';
     this.idViagem = 0;
   }
-  excluirAvaliacao(idAvaliacao:number): void {
+  excluirAvaliacao(idAvaliacao: number): void {
     if (!confirm('Tem certeza que deseja excluir esta avaliação?')) {
-      return
-    };
-   this.http.delete(`${this.baseURL}/avaliacao/${idAvaliacao}`).subscribe({
+      return;
+    }
+    this.http.delete(`${this.baseURL}/avaliacao/${idAvaliacao}`).subscribe({
       next: () => {
         alert('Avaliação excluída com sucesso!');
         this.carregarAvaliacoes();
@@ -1555,17 +1555,33 @@ export class MapaComponent implements AfterViewInit, OnInit {
     });
   }
   editarAvaliacao(avaliacao: any): void {
-    this.http.get<any>(`${this.baseURL}/usuario/${avaliacao.ID_Avaliado}`).subscribe({
-      next: (usuario) => {
-        this.idUsuarioSelecionado = usuario.idUsuario || usuario.id;
-        this.nomeUsuarioSelecionado = usuario.nome || 'Usuário';
-      }
-    });
+    this.http
+      .get<any>(`${this.baseURL}/usuario/${avaliacao.ID_Avaliado}`)
+      .subscribe({
+        next: (usuario) => {
+          this.idUsuarioSelecionado = usuario.idUsuario || usuario.id;
+          this.nomeUsuarioSelecionado = usuario.nome || 'Usuário';
+        },
+      });
     this.idViagem = avaliacao.ID_Viagem;
     this.estadoAvaliacao = 'editar';
     this.mostrarAvaliacao = true;
     this.avaliacaoSelecionada = 0;
     this.comentarioAvaliacao = '';
     this.idAvaliacao = avaliacao.ID_Avaliacao;
+  }
+
+  EnableAvaliacao(viagem: any): boolean {
+    if(!this.viagemJaOcorreu(viagem)) return false;
+    if(this.hasAvaliacao(viagem)) return false;
+    return true;
+  }
+
+  hasAvaliacao(viagem:any):boolean{
+    const avaliacao = this.avaliacoesEnviadas.find((avaliacao) => avaliacao.ID_Viagem === viagem.idViagem);
+    if(avaliacao){
+      return true;
+    }
+    return false;
   }
 }
