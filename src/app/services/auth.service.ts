@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { NotificationService } from './notification.service';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private storageService: StorageService
   ) {}
 
   /** Faz login e armazena token e dados do usuário */
@@ -24,8 +26,8 @@ export class AuthService {
         const usuario = res?.usuario;
 
         if (token && usuario) {
-          localStorage.setItem('token', token);
-          localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
+          this.storageService.setItem('token', token);
+          this.storageService.setItem('usuarioLogado', JSON.stringify(usuario));
           this.notificationService.init(token);
         } else {
           console.error('Resposta inválida do servidor: faltando token ou usuário.');
@@ -36,7 +38,7 @@ export class AuthService {
 
   /** Reativa sessão ao recarregar a página */
   bootstrapSession() {
-    const token = localStorage.getItem('token');
+    const token = this.storageService.getItem('token');
     if (token) {
       this.notificationService.init(token);
     }
@@ -44,10 +46,8 @@ export class AuthService {
 
   /** Faz logout limpando token, dados locais e desconectando socket */
   logout() {
-    try {
-      localStorage.removeItem('token');
-      localStorage.removeItem('usuarioLogado');
-    } catch {}
+    this.storageService.removeItem('token');
+    this.storageService.removeItem('usuarioLogado');
 
     // encerra socket e limpa notificações em memória
     this.notificationService.clear();
@@ -55,12 +55,12 @@ export class AuthService {
 
   /** Retorna o token atual (para uso eventual) */
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return this.storageService.getItem('token');
   }
 
   /** Verifica se há sessão ativa */
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    return !!this.storageService.getItem('token');
   }
 
   alterarSenha(dados: {
@@ -68,7 +68,7 @@ export class AuthService {
   novaSenha: string;
   confirmarSenha: string;
 }) {
-  const token = localStorage.getItem('token');
+  const token = this.storageService.getItem('token');
 
   return this.http.put(
     `${this.API_URL}/alterar-senha`,

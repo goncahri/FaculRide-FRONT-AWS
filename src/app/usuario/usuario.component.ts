@@ -23,6 +23,8 @@ export class UsuarioComponent implements OnInit {
       : 'http://faculride-api.duckdns.org/api';
 
   ngOnInit(): void {
+    if (!isBrowser()) return;
+
     const usuarioLogado = localStorage.getItem('usuarioLogado');
 
     if (usuarioLogado) {
@@ -45,7 +47,9 @@ export class UsuarioComponent implements OnInit {
   }
 
   obterFotoUsuario(email: string, genero: any): string {
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const usuarioLogado = isBrowser()
+      ? localStorage.getItem('usuarioLogado')
+      : null;
     if (usuarioLogado) {
       const u = JSON.parse(usuarioLogado);
       if (u.foto || u.fotoUrl) {
@@ -62,7 +66,7 @@ export class UsuarioComponent implements OnInit {
       this.http.get(`${this.baseURL}/avaliacao/media/${user.id}`).subscribe({
         next: (response: any) => {
           const media = response.media;
-          this.pontuacao = media !== null ? parseFloat(media.toFixed(2)) : 5;
+          this.pontuacao = media !== null ? parseFloat(media.toFixed(2)) : 0;
           console.log('Média das avaliações:', response);
         }
       });

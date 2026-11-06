@@ -281,14 +281,14 @@
       </div>
 
       <div *ngIf="caronasAceitas.length > 0">
-        <h4 class="subtitulo-secao">Caronas Aceitas</h4>
+        <h4 class="subtitulo-secao">Caronas Aceitas ou Concluídas</h4>
 
         <div *ngFor="let c of caronasAceitas" class="avaliacoes-bloco card-atividade">
           <div class="card-atividade-header">
-            <h4>Carona Aceita</h4>
+            <h4>Carona {{ obterStatusViagem(c) }}</h4>
 
-            <span class="status-badge status-aceita">
-              Aceita
+            <span class="status-badge" [ngClass]="statusClasse(c)">
+              {{ obterStatusViagem(c) }}
             </span>
           </div>
 
@@ -308,7 +308,7 @@
               Ver rota
             </button>
 
-            <button *ngIf="viagemJaOcorreu(c) && !hasAvaliacao(c)" type="button" class="btn-card btn-editar" (click)="abrirAvaliacao(c)">
+            <button *ngIf="EnableAvaliacao(c)" type="button" class="btn-card btn-editar" (click)="abrirAvaliacao(c)">
               Avaliar usuário
             </button>
           </div>
