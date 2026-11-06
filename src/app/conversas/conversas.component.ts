@@ -124,11 +124,14 @@ export class ConversasComponent implements OnInit, OnDestroy {
     const usuarioLogado = isBrowser()
       ? JSON.parse(localStorage.getItem('usuarioLogado') || '{}')
       : {};
+    const token = isBrowser()
+      ? localStorage.getItem('token') ||
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('jwt')
+      : null;
 
     return (
-      localStorage.getItem('token') ||
-      localStorage.getItem('accessToken') ||
-      localStorage.getItem('jwt') ||
+      token ||
       usuarioLogado?.token ||
       ''
     );

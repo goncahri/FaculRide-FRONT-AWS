@@ -34,7 +34,7 @@ export class SocketService implements OnDestroy {
 
     this.socket = io(this.SOCKET_URL, {
       transports: ['websocket', 'polling'],
-      auth: { token }, 
+      auth: { token },
       withCredentials: true
     });
 
