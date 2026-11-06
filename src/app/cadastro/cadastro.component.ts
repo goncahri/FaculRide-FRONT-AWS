@@ -35,7 +35,7 @@ export class CadastroComponent implements OnInit {
 
   baseURL = window.location.hostname.includes('localhost')
     ? 'http://localhost:3000/api/usuario'
-    : 'http://faculride-api.duckdns.org/api/usuario';
+    : 'https://faculride-api.duckdns.org/api/usuario';
 
   constructor(
     private fb: FormBuilder,

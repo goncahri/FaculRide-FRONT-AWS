@@ -23,61 +23,96 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.x'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Semantic Release Production
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v4
+      - name: Calcular nova versão
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --tags --force --prune
+
+          LAST_TAG=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | grep -v 'preview' | head -n1 || true)
+          [ -z "$LAST_TAG" ] && LAST_TAG="v0.0.0"
+          echo "Última tag de produção: $LAST_TAG"
+
+          CURRENT_VERSION="${LAST_TAG#v}"
+          BASE_VERSION=$(echo $CURRENT_VERSION | cut -d'-' -f1)
+
+          BUMP_TYPE=$(node -e "
+            const { execSync } = require('child_process');
+            try {
+              const range = '${LAST_TAG}' === 'v0.0.0' ? 'HEAD' : '${LAST_TAG}..HEAD';
+              const log = execSync('git log ' + range + ' --oneline', { encoding: 'utf8' });
+              if (/feat!|fix!|BREAKING CHANGE/i.test(log)) console.log('major');
+              else if (/feat/i.test(log)) console.log('minor');
+              else if (/fix/i.test(log)) console.log('patch');
+              else console.log('none');
+            } catch {
+              console.log('none');
+            }
+          ")
+
+          if [ "$BUMP_TYPE" = "none" ]; then
+            echo "Nenhuma alteração que exija bump de versão."
+            echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+          else
+            NEW_VERSION=$(npx semver -i $BUMP_TYPE "$BASE_VERSION")
+            echo "Versão final: $CURRENT_VERSION -> $NEW_VERSION"
+            echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Atualizar package.json
+        if: steps.version.outputs.should_deploy == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          npm version ${{ steps.version.outputs.new_version }} --git-tag-version=false
+
+          git add package.json package-lock.json
+          git commit -m "chore(release): bump version to v${{ steps.version.outputs.new_version }} [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}
+
+      - name: Criar Release e Tag (GitHub)
+        if: steps.version.outputs.should_deploy == 'true'
+        uses: softprops/action-gh-release@v2
         with:
-          extra_plugins: |
-            @semantic-release/commit-analyzer
-            @semantic-release/release-notes-generator
-            @semantic-release/github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ steps.version.outputs.new_version }}
+          name: "Release v${{ steps.version.outputs.new_version }}"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login Docker Hub
-        if: steps.semantic.outputs.new_release_published == 'true'
+        if: steps.version.outputs.should_deploy == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Setup Docker Buildx
+        if: steps.version.outputs.should_deploy == 'true'
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and Push Docker
-        if: steps.semantic.outputs.new_release_published == 'true'
+        if: steps.version.outputs.should_deploy == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            goncahri/faculride-frontend:production-v${{ steps.semantic.outputs.new_release_version }}
+            goncahri/faculride-frontend:production-v${{ steps.version.outputs.new_version }}
             goncahri/faculride-frontend:production-latest
-
-      - name: Deploy to EC2
-        if: steps.semantic.outputs.new_release_published == 'true'
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            mkdir -p ${{ secrets.EC2_PATH }}
-            cd ${{ secrets.EC2_PATH }}
-
-            docker pull goncahri/faculride-frontend:production-latest
-
-            docker stop faculride-frontend || true
-            docker rm faculride-frontend || true
-
-            docker run -d \
-              --name faculride-frontend \
-              --restart always \
-              -p 8080:80 \
-              goncahri/faculride-frontend:production-latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   notify_failure:
     name: Notify Failure

@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GerenciarContaComponent } from './gerenciar.component';
+import { GerenciarComponent } from './gerenciar.component';
 
 describe('GerenciarContaComponent', () => {
-  let component: GerenciarContaComponent;
-  let fixture: ComponentFixture<GerenciarContaComponent>;
+  let component: GerenciarComponent;
+  let fixture: ComponentFixture<GerenciarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GerenciarContaComponent]
+      imports: [GerenciarComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(GerenciarContaComponent);
+    fixture = TestBed.createComponent(GerenciarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

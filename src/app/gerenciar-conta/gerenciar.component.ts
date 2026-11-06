@@ -41,7 +41,7 @@ export class GerenciarComponent implements OnInit {
 
   baseURL = isBrowser() && window.location.hostname.includes('localhost')
     ? 'http://localhost:3000/api'
-    : 'http://faculride-api.duckdns.org/api';
+    : 'https://faculride-api.duckdns.org/api';
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.form = this.fb.group({

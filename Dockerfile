@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm ci && npm cache clean --force
 
 COPY . .
 
@@ -16,7 +16,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=build /app/dist/faculride/browser /usr/share/nginx/html
 
-RUN cp /usr/share/nginx/html/index.csr.html /usr/share/nginx/html/index.html
+RUN if [ -f /usr/share/nginx/html/index.csr.html ]; then cp /usr/share/nginx/html/index.csr.html /usr/share/nginx/html/index.html; fi
 
 EXPOSE 80
 

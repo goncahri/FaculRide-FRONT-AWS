@@ -6,8 +6,8 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root',
 })
 export class UsuariosService {
-  private apiAuth = 'http://faculride-api.duckdns.org/api/auth';
-private apiUsuario = 'http://faculride-api.duckdns.org/api/usuario';
+  private apiAuth = 'https://faculride-api.duckdns.org/api/auth';
+private apiUsuario = 'https://faculride-api.duckdns.org/api/usuario';
 
   constructor(private http: HttpClient) {}
 
