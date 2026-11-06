@@ -449,12 +449,13 @@ export class MapaComponent implements AfterViewInit, OnInit {
   }
 
   carregarConversas(): void {
-    const token =
-      localStorage.getItem('token') ||
-      localStorage.getItem('accessToken') ||
-      localStorage.getItem('jwt') ||
-      this.usuarioLogado?.token ||
-      '';
+    const token = isBrowser()
+      ? localStorage.getItem('token') ||
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('jwt') ||
+        this.usuarioLogado?.token ||
+        ''
+      : '';
 
     const headers: any = token ? { Authorization: `Bearer ${token}` } : {};
 
