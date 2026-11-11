@@ -83,4 +83,8 @@ export class AuthService {
     }
   );
 }
+
+  enviarEmailRecuperacao(email: string): Observable<boolean> {
+    return this.http.post<boolean>(`${this.API_URL}/recuperar-senha`, { email });
+  }
 }

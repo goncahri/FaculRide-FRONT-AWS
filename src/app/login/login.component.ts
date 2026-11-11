@@ -22,9 +22,7 @@ export class LoginComponent {
 
   showRecoverPasswordSection: boolean = false;
 
-  senhaAtual: string = '';
-  novaSenha: string = '';
-  confirmarSenha: string = '';
+  emailRecuperacaoSenha: string = '';
 
   carregando: boolean = false;
 
@@ -73,32 +71,24 @@ export class LoginComponent {
 
   alterarSenha() {
     if (
-      !this.senhaAtual ||
-      !this.novaSenha ||
-      !this.confirmarSenha
+      !this.emailRecuperacaoSenha || this.emailRecuperacaoSenha.trim() === ''
     ) {
       alert('Preencha todos os campos.');
       return;
     }
-
-    this.authService.alterarSenha({
-      senhaAtual: this.senhaAtual,
-      novaSenha: this.novaSenha,
-      confirmarSenha: this.confirmarSenha
-    }).subscribe({
-      next: () => {
-        alert('✅ Senha alterada com sucesso!');
-
-        this.senhaAtual = '';
-        this.novaSenha = '';
-        this.confirmarSenha = '';
-
-        this.showRecoverPasswordSection = false;
+    this.authService.enviarEmailRecuperacao(this.emailRecuperacaoSenha).subscribe({
+      next: (res) => {
+        if (res) {
+          this.recoverMsg = 'Enviamos um email de recuperação senha no email ' + this.emailRecuperacaoSenha;
+          alert(this.recoverMsg);
+        }
       },
       error: (err) => {
-        console.error(err);
-        alert(err?.error?.erro || 'Erro ao alterar senha.');
-      }
+        console.error('Erro ao enviar email de recuperação:', err);
+        this.recoverMsg = '❌ Erro ao enviar email de recuperação.';
+        alert(this.recoverMsg);
+      },
     });
+
   }
 }

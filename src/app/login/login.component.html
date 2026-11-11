@@ -47,36 +47,24 @@
 
     <!-- Alterar Senha -->
     <button class="recover-password" (click)="toggleRecoverPassword()">
-      Alterar senha
+      Esqueci minha senha
     </button>
 
     <!-- Seção Alterar Senha -->
     <div *ngIf="showRecoverPasswordSection" class="recover-container">
 
       <input
-        type="password"
-        [(ngModel)]="senhaAtual"
-        placeholder="Senha atual"
-      />
-
-      <input
-        type="password"
-        [(ngModel)]="novaSenha"
-        placeholder="Nova senha"
-      />
-
-      <input
-        type="password"
-        [(ngModel)]="confirmarSenha"
-        placeholder="Confirmar nova senha"
+        type="email"
+        [(ngModel)]="emailRecuperacaoSenha"
+        placeholder="Email"
       />
 
       <button
         type="button"
-        class="btn-primary"
+        class="btn-primary mt-3"
         (click)="alterarSenha()"
       >
-        Alterar senha
+        Enviar Email
       </button>
 
       <div *ngIf="recoverMsg" class="success-message">
