@@ -5,12 +5,15 @@ import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { StorageService } from './storage.service';
+import { isBrowser } from '../utils/is-browser';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'https://faculride-api.duckdns.org/api/usuario';
+  private API_URL = isBrowser() && window.location.hostname.includes('localhost')
+    ? 'http://localhost:3000/api/usuario'
+    : 'https://faculride-api.duckdns.org/api/usuario';
 
   constructor(
     private http: HttpClient,
