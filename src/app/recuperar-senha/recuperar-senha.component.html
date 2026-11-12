@@ -1,0 +1,40 @@
+<section class="register-section">
+  <h2>Redefinir Senha</h2>
+  <p class="subtexto">
+
+  </p>
+  <form [formGroup]="RecuperarSenhaForm" (ngSubmit)="recuperarSenha()">
+    <div class="form-group">
+      <label for="senha">Senha</label>
+      <input
+        type="password"
+        id="senha"
+        formControlName="senha"
+        placeholder="Digite sua nova senha"
+      />
+      <div *ngIf="RecuperarSenhaForm.get('senha')?.invalid && RecuperarSenhaForm.get('senha')?.touched" class="error-message">
+        Por favor, insira uma senha válida.
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="confirmarSenha">Confirmar Senha</label>
+      <input
+        type="password"
+        id="confirmarSenha"
+        formControlName="confirmarSenha"
+        placeholder="Digite novamente sua nova senha"
+      />
+      <div *ngIf="RecuperarSenhaForm.get('confirmarSenha')?.invalid && RecuperarSenhaForm.get('confirmarSenha')?.touched" class="error-message">
+        Por favor, insira uma senha válida.
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary" [disabled]="RecuperarSenhaForm.invalid || carregando">
+      Salvar
+      <ng-template *ngIf="carregando">
+        <span class="spinner"></span>
+        Carregando...
+      </ng-template>
+    </button>
+  </form>
+</section>
