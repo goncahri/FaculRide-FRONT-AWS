@@ -12,8 +12,8 @@
         formControlName="senha"
         placeholder="Digite sua nova senha"
       />
-      <div *ngIf="RecuperarSenhaForm.get('senha')?.invalid && RecuperarSenhaForm.get('senha')?.touched" class="error-message">
-        Por favor, insira uma senha válida.
+      <div *ngIf="RecuperarSenhaForm.get('senha')?.invalid && RecuperarSenhaForm.get('senha')?.touched" class="erro">
+        Por favor, insira uma senha forte com no mínimo de 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.
       </div>
     </div>
     <div class="form-group">
@@ -24,17 +24,14 @@
         formControlName="confirmarSenha"
         placeholder="Digite novamente sua nova senha"
       />
-      <div *ngIf="RecuperarSenhaForm.get('confirmarSenha')?.invalid && RecuperarSenhaForm.get('confirmarSenha')?.touched" class="error-message">
-        Por favor, insira uma senha válida.
+
+      <div *ngIf="RecuperarSenhaForm.get('confirmarSenha')?.value !== RecuperarSenhaForm.get('senha')?.value && RecuperarSenhaForm.get('confirmarSenha')?.dirty" class="erro">
+        As senhas não coincidem.
       </div>
     </div>
 
-    <button type="submit" class="btn-primary" [disabled]="RecuperarSenhaForm.invalid || carregando">
+    <button type="submit" class="btn-primary" [disabled]="RecuperarSenhaForm.invalid || RecuperarSenhaForm.get('confirmarSenha')?.value !== RecuperarSenhaForm.get('senha')?.value ">
       Salvar
-      <ng-template *ngIf="carregando">
-        <span class="spinner"></span>
-        Carregando...
-      </ng-template>
     </button>
   </form>
 </section>

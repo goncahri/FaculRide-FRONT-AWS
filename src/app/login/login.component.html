@@ -52,7 +52,7 @@
 
     <!-- Seção Alterar Senha -->
     <div *ngIf="showRecoverPasswordSection" class="recover-container">
-
+      <label for="emailRecuperacaoSenha">Digite seu email para redefinir sua senha:</label>
       <input
         type="email"
         [(ngModel)]="emailRecuperacaoSenha"
@@ -66,10 +66,6 @@
       >
         Enviar Email
       </button>
-
-      <div *ngIf="recoverMsg" class="success-message">
-        {{ recoverMsg }}
-      </div>
     </div>
 
     <!-- Futuro Login Social -->

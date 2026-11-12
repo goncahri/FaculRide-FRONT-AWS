@@ -77,11 +77,9 @@ export class LoginComponent {
       return;
     }
     this.authService.enviarEmailRecuperacao(this.emailRecuperacaoSenha).subscribe({
-      next: (res) => {
-        if (res) {
-          this.recoverMsg = 'Enviamos um email de recuperação senha no email ' + this.emailRecuperacaoSenha;
-          alert(this.recoverMsg);
-        }
+      next: () => {
+        this.recoverMsg = 'Enviamos um email de recuperação senha no email ' + this.emailRecuperacaoSenha;
+        alert(this.recoverMsg);
       },
       error: (err) => {
         console.error('Erro ao enviar email de recuperação:', err);

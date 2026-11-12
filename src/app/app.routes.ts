@@ -15,7 +15,7 @@ export const routes: Routes = [
   { path: 'usuario', component: UsuarioComponent },
   { path: 'conversas', component: ConversasComponent },
 
-  {path: 'recuperar-senha', loadComponent: () => import('./recuperar-senha/recuperar-senha.component').then(m => m.RecuperarSenhaComponent)},
+  {path: 'redefinir-senha/:token', loadComponent: () => import('./recuperar-senha/recuperar-senha.component').then(m => m.RecuperarSenhaComponent)},
   { path: 'cadastro', loadComponent: () => import('./cadastro/cadastro.component').then(m => m.CadastroComponent) },
   { path: 'gerenciar', loadComponent: () => import('./gerenciar-conta/gerenciar.component').then(m => m.GerenciarComponent) }
 ];
