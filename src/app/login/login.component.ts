@@ -82,8 +82,8 @@ export class LoginComponent {
         alert(this.recoverMsg);
       },
       error: (err) => {
-        console.error('Erro ao enviar email de recuperação:', err);
-        this.recoverMsg = '❌ Erro ao enviar email de recuperação.';
+        console.error('Erro ao enviar email de recuperação:', err.mensage);
+        this.recoverMsg = '❌ Erro ao enviar email de recuperação: '+ err.mensage;
         alert(this.recoverMsg);
       },
     });

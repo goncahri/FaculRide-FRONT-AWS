@@ -12,8 +12,8 @@ import { isBrowser } from '../utils/is-browser';
 })
 export class AuthService {
   private API_URL = isBrowser() && window.location.hostname.includes('localhost')
-    ? 'http://localhost:3000/api/usuario'
-    : 'https://faculride-api.duckdns.org/api/usuario';
+    ? 'http://localhost:3000/api/auth'
+    : 'https://faculride-api.duckdns.org/api/auth';
 
   constructor(
     private http: HttpClient,
@@ -66,26 +66,8 @@ export class AuthService {
     return !!this.storageService.getItem('token');
   }
 
-  alterarSenha(dados: {
-  senhaAtual: string;
-  novaSenha: string;
-  confirmarSenha: string;
-}) {
-  const token = this.storageService.getItem('token');
-
-  return this.http.put(
-    `${this.API_URL}/alterar-senha`,
-    dados,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
-  );
-}
-
   enviarEmailRecuperacao(email: string): Observable<void> {
-    return this.http.post<void>(`${this.API_URL}/recuperar-senha`, { email });
+    return this.http.post<void>(`${this.API_URL}/esqueci-senha`, { email });
   }
   redefinirSenha(token: string, novaSenha: string): Observable<void> {
     return this.http.post<void>(`${this.API_URL}/redefinir-senha`, { novaSenha },{headers: { 'Authorization': `Bearer ${token}` }});
