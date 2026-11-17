@@ -7,7 +7,7 @@ import { Observable, tap } from 'rxjs';
 })
 export class UsuariosService {
   private apiAuth = 'https://faculride-api.duckdns.org/api/auth';
-private apiUsuario = 'https://faculride-api.duckdns.org/api/usuario';
+  private apiUsuario = 'https://faculride-api.duckdns.org/api/usuario';
 
   constructor(private http: HttpClient) {}
 
@@ -23,6 +23,7 @@ private apiUsuario = 'https://faculride-api.duckdns.org/api/usuario';
     );
   }
 
+
   // Listar usuários
   getUsuarios(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUsuario);
@@ -37,6 +38,10 @@ private apiUsuario = 'https://faculride-api.duckdns.org/api/usuario';
   deletarUsuario(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUsuario}/${id}`);
   }
+  redefinirSenha(token: string, novaSenha: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUsuario}/redefinir-senha`, { novaSenha },{headers: { 'Authorization': `Bearer ${token}`}});
+  }
+
 }
 
 

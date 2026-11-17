@@ -3,7 +3,7 @@
   <p class="subtexto">
 
   </p>
-  <form [formGroup]="RecuperarSenhaForm" (ngSubmit)="recuperarSenha()">
+  <form [formGroup]="recuperarSenhaForm" (ngSubmit)="redefinirSenha()">
     <div class="form-group">
       <label for="senha">Senha</label>
       <input
@@ -12,7 +12,7 @@
         formControlName="senha"
         placeholder="Digite sua nova senha"
       />
-      <div *ngIf="RecuperarSenhaForm.get('senha')?.invalid && RecuperarSenhaForm.get('senha')?.touched" class="erro">
+      <div *ngIf="recuperarSenhaForm.get('senha')?.invalid && recuperarSenhaForm.get('senha')?.touched" class="erro">
         Por favor, insira uma senha forte com no mínimo de 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.
       </div>
     </div>
@@ -25,12 +25,12 @@
         placeholder="Digite novamente sua nova senha"
       />
 
-      <div *ngIf="RecuperarSenhaForm.get('confirmarSenha')?.value !== RecuperarSenhaForm.get('senha')?.value && RecuperarSenhaForm.get('confirmarSenha')?.dirty" class="erro">
+      <div *ngIf="recuperarSenhaForm.get('confirmarSenha')?.value !== recuperarSenhaForm.get('senha')?.value && recuperarSenhaForm.get('confirmarSenha')?.dirty" class="erro">
         As senhas não coincidem.
       </div>
     </div>
 
-    <button type="submit" class="btn-primary" [disabled]="RecuperarSenhaForm.invalid || RecuperarSenhaForm.get('confirmarSenha')?.value !== RecuperarSenhaForm.get('senha')?.value ">
+    <button type="submit" class="btn-primary" [disabled]="recuperarSenhaForm.invalid || recuperarSenhaForm.get('confirmarSenha')?.value !== recuperarSenhaForm.get('senha')?.value ">
       Salvar
     </button>
   </form>

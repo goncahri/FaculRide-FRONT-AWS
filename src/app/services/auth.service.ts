@@ -69,7 +69,4 @@ export class AuthService {
   enviarEmailRecuperacao(email: string): Observable<void> {
     return this.http.post<void>(`${this.API_URL}/esqueci-senha`, { email });
   }
-  redefinirSenha(token: string, novaSenha: string): Observable<void> {
-    return this.http.post<void>(`${this.API_URL}/redefinir-senha`, { novaSenha },{headers: { 'Authorization': `Bearer ${token}` }});
-  }
 }
