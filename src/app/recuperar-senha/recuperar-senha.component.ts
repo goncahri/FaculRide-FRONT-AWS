@@ -29,13 +29,18 @@ export class RecuperarSenhaComponent implements OnInit{
     }
   }
   redefinirSenha() {
+    if(this.recuperarSenhaForm.invalid || this.recuperarSenhaForm.get('confirmarSenha')?.value !== this.recuperarSenhaForm.get('senha')?.value){
+      alert('Preencha o formulário corretamente')
+      return;
+    }
     this.usuariosService.redefinirSenha(this.token, this.recuperarSenhaForm.controls.senha.value as string).subscribe({
       next:()=>{
         alert("redefinição de senha foi um sucesso");
         this.router.navigate(['login'])
       },
-      error:(err)=>{
-        alert(`Erro ao redefinir senha: ${err.message}`)
+      error:(mensage)=>{
+        console.log(mensage)
+        alert(`Erro ao redefinir senha: ${mensage.error.erro}`)
       }
     })
   }

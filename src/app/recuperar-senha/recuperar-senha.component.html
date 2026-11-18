@@ -5,7 +5,7 @@
   </p>
   <form [formGroup]="recuperarSenhaForm" (ngSubmit)="redefinirSenha()">
     <div class="form-group">
-      <label for="senha">Senha</label>
+      <label for="senha">Nova Senha</label>
       <input
         type="password"
         id="senha"
@@ -13,7 +13,20 @@
         placeholder="Digite sua nova senha"
       />
       <div *ngIf="recuperarSenhaForm.get('senha')?.invalid && recuperarSenhaForm.get('senha')?.touched" class="erro">
-        Por favor, insira uma senha forte com no mínimo de 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.
+        <span>Insira uma senha forte com no mínimo:</span>
+          <ul>
+            <li>
+             8 caracteres
+            </li>
+            <li>
+              1 letra minúscula
+            </li>
+            <li>
+              1 letra maiúscula
+            </li>
+            <li>1 número</li>
+            <li>1 caractere especial (&commat;$!%*#?&)</li>
+          </ul>
       </div>
     </div>
     <div class="form-group">
@@ -30,7 +43,7 @@
       </div>
     </div>
 
-    <button type="submit" class="btn-primary" [disabled]="recuperarSenhaForm.invalid || recuperarSenhaForm.get('confirmarSenha')?.value !== recuperarSenhaForm.get('senha')?.value ">
+    <button type="submit" class="btn-primary">
       Salvar
     </button>
   </form>
