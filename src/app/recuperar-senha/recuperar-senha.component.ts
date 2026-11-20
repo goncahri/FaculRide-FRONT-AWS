@@ -40,7 +40,7 @@ export class RecuperarSenhaComponent implements OnInit{
       },
       error:(mensage)=>{
         console.log(mensage)
-        alert(`Erro ao redefinir senha: ${mensage.error.erro}`)
+        alert(`Não foi possível redefinir senha: ${mensage.error.erro}`)
       }
     })
   }

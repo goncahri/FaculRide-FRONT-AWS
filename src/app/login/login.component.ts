@@ -52,11 +52,11 @@ export class LoginComponent {
       },
       error: (err) => {
         this.carregando = false;
-        console.error('Erro no login:', err);
+        console.log(err);
+        //console.error('Erro no login:', err);
 
         this.loginAttempts++;
-        this.errorMsg = err?.error?.erro || 'E-mail ou senha inválidos.';
-        alert(this.errorMsg);
+        alert(err.erro);
 
         if (this.loginAttempts >= 1) {
           this.showRecoverPasswordSection = true;
@@ -82,8 +82,8 @@ export class LoginComponent {
         alert(this.recoverMsg);
       },
       error: (err) => {
-        console.error('Erro ao enviar email de recuperação:', err.mensage);
-        this.recoverMsg = '❌ Erro ao enviar email de recuperação: '+ err.mensage;
+        console.error('Erro ao enviar email de recuperação:', err.error.erro);
+        this.recoverMsg = '❌ Erro ao enviar email de recuperação'
         alert(this.recoverMsg);
       },
     });
