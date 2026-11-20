@@ -22,9 +22,7 @@ export class LoginComponent {
 
   showRecoverPasswordSection: boolean = false;
 
-  senhaAtual: string = '';
-  novaSenha: string = '';
-  confirmarSenha: string = '';
+  emailRecuperacaoSenha: string = '';
 
   carregando: boolean = false;
 
@@ -54,11 +52,11 @@ export class LoginComponent {
       },
       error: (err) => {
         this.carregando = false;
-        console.error('Erro no login:', err);
+        console.log(err);
+        //console.error('Erro no login:', err);
 
         this.loginAttempts++;
-        this.errorMsg = err?.error?.erro || 'E-mail ou senha inválidos.';
-        alert(this.errorMsg);
+        alert(err.erro);
 
         if (this.loginAttempts >= 1) {
           this.showRecoverPasswordSection = true;
@@ -73,32 +71,22 @@ export class LoginComponent {
 
   alterarSenha() {
     if (
-      !this.senhaAtual ||
-      !this.novaSenha ||
-      !this.confirmarSenha
+      !this.emailRecuperacaoSenha || this.emailRecuperacaoSenha.trim() === ''
     ) {
       alert('Preencha todos os campos.');
       return;
     }
-
-    this.authService.alterarSenha({
-      senhaAtual: this.senhaAtual,
-      novaSenha: this.novaSenha,
-      confirmarSenha: this.confirmarSenha
-    }).subscribe({
+    this.authService.enviarEmailRecuperacao(this.emailRecuperacaoSenha).subscribe({
       next: () => {
-        alert('✅ Senha alterada com sucesso!');
-
-        this.senhaAtual = '';
-        this.novaSenha = '';
-        this.confirmarSenha = '';
-
-        this.showRecoverPasswordSection = false;
+        this.recoverMsg = 'Enviamos um email de recuperação senha no email ' + this.emailRecuperacaoSenha;
+        alert(this.recoverMsg);
       },
       error: (err) => {
-        console.error(err);
-        alert(err?.error?.erro || 'Erro ao alterar senha.');
-      }
+        console.error('Erro ao enviar email de recuperação:', err.error.erro);
+        this.recoverMsg = '❌ Erro ao enviar email de recuperação'
+        alert(this.recoverMsg);
+      },
     });
+
   }
 }

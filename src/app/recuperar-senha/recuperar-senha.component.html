@@ -1,0 +1,50 @@
+<section class="register-section">
+  <h2>Redefinir Senha</h2>
+  <p class="subtexto">
+
+  </p>
+  <form [formGroup]="recuperarSenhaForm" (ngSubmit)="redefinirSenha()">
+    <div class="form-group">
+      <label for="senha">Nova Senha</label>
+      <input
+        type="password"
+        id="senha"
+        formControlName="senha"
+        placeholder="Digite sua nova senha"
+      />
+      <div *ngIf="recuperarSenhaForm.get('senha')?.invalid && recuperarSenhaForm.get('senha')?.touched" class="erro">
+        <span>Insira uma senha forte com no mínimo:</span>
+          <ul>
+            <li>
+             8 caracteres
+            </li>
+            <li>
+              1 letra minúscula
+            </li>
+            <li>
+              1 letra maiúscula
+            </li>
+            <li>1 número</li>
+            <li>1 caractere especial (&commat;$!%*#?&)</li>
+          </ul>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="confirmarSenha">Confirmar Senha</label>
+      <input
+        type="password"
+        id="confirmarSenha"
+        formControlName="confirmarSenha"
+        placeholder="Digite novamente sua nova senha"
+      />
+
+      <div *ngIf="recuperarSenhaForm.get('confirmarSenha')?.value !== recuperarSenhaForm.get('senha')?.value && recuperarSenhaForm.get('confirmarSenha')?.dirty" class="erro">
+        As senhas não coincidem.
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary">
+      Salvar
+    </button>
+  </form>
+</section>
