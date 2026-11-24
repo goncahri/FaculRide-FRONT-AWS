@@ -10,11 +10,11 @@
     <div class="form-group">
       <label for="tipoUsuario">Tipo de Usuário</label>
       <select id="tipoUsuario" formControlName="tipoUsuario" (change)="alternarCamposMotorista()"
-        [ngClass]="{'campo-invalido': cadastroForm.get('tipoUsuario')?.invalid && cadastroForm.get('tipoUsuario')?.touched}">
+        [ngClass]="{'campo-invalido': cadastroForm.get('tipoUsuario')?.invalid && (cadastroForm.get('tipoUsuario')?.touched || cadastroForm.get('tipoUsuario')?.dirty)}">
         <option value="passageiro">Passageiro</option>
         <option value="motorista">Motorista</option>
       </select>
-      <div class="erro" *ngIf="cadastroForm.get('tipoUsuario')?.invalid && cadastroForm.get('tipoUsuario')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('tipoUsuario')?.invalid && (cadastroForm.get('tipoUsuario')?.touched || cadastroForm.get('tipoUsuario')?.dirty)">
         Tipo de usuário é obrigatório.
       </div>
     </div>
@@ -23,9 +23,9 @@
     <div class="form-group">
       <label for="nome">Nome</label>
       <input id="nome" type="text" formControlName="nome"
-        [ngClass]="{'campo-invalido': cadastroForm.get('nome')?.invalid && cadastroForm.get('nome')?.touched}"
+        [ngClass]="{'campo-invalido': cadastroForm.get('nome')?.invalid && (cadastroForm.get('nome')?.touched || cadastroForm.get('nome')?.dirty)}"
         placeholder="Nome completo" />
-      <div class="erro" *ngIf="cadastroForm.get('nome')?.invalid && cadastroForm.get('nome')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('nome')?.invalid && (cadastroForm.get('nome')?.touched || cadastroForm.get('nome')?.dirty)">
         Nome é obrigatório.
       </div>
     </div>
@@ -34,9 +34,9 @@
     <div class="form-group">
       <label for="cpf">CPF</label>
       <input id="cpf" type="text" formControlName="cpf"
-        [ngClass]="{'campo-invalido': cadastroForm.get('cpf')?.invalid && cadastroForm.get('cpf')?.touched}"
+        [ngClass]="{'campo-invalido': cadastroForm.get('cpf')?.invalid && (cadastroForm.get('cpf')?.touched || cadastroForm.get('cpf')?.dirty)}"
         placeholder="000.000.000-00" mask="000.000.000-00" />
-      <div class="erro" *ngIf="cadastroForm.get('cpf')?.invalid && cadastroForm.get('cpf')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('cpf')?.invalid && (cadastroForm.get('cpf')?.touched || cadastroForm.get('cpf')?.dirty)">
         CPF inválido
       </div>
     </div>
@@ -45,12 +45,12 @@
     <div class="form-group">
       <label for="email">E-mail</label>
       <input id="email" type="email" formControlName="email"
-        [ngClass]="{'campo-invalido': cadastroForm.get('email')?.invalid && cadastroForm.get('email')?.touched}"
+        [ngClass]="{'campo-invalido': cadastroForm.get('email')?.invalid && (cadastroForm.get('email')?.touched || cadastroForm.get('email')?.dirty)}"
         placeholder="exemplo@email.com" />
-      <div class="erro" *ngIf="cadastroForm.get('email')?.errors?.['required'] && cadastroForm.get('email')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('email')?.errors?.['required'] && (cadastroForm.get('email')?.touched || cadastroForm.get('email')?.dirty)">
         E-mail é obrigatório.
       </div>
-      <div class="erro" *ngIf="cadastroForm.get('email')?.errors?.['email'] && cadastroForm.get('email')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('email')?.errors?.['email'] && (cadastroForm.get('email')?.touched || cadastroForm.get('email')?.dirty)">
         E-mail inválido.
       </div>
     </div>
@@ -59,14 +59,14 @@
     <div class="form-group">
       <label for="telefone">Telefone (WhatsApp)</label>
       <input id="telefone" type="tel" formControlName="telefone"
-        [ngClass]="{'campo-invalido': cadastroForm.get('telefone')?.invalid && cadastroForm.get('telefone')?.touched}"
+        [ngClass]="{'campo-invalido': cadastroForm.get('telefone')?.invalid && (cadastroForm.get('telefone')?.touched || cadastroForm.get('telefone')?.dirty)}"
         placeholder="(00) 00000-0000" mask="(00) 00000-0000" />
       <div class="erro"
-        *ngIf="cadastroForm.get('telefone')?.errors?.['required'] && cadastroForm.get('telefone')?.touched">
+        *ngIf="cadastroForm.get('telefone')?.errors?.['required'] && (cadastroForm.get('telefone')?.touched || cadastroForm.get('telefone')?.dirty)">
         Telefone é obrigatório.
       </div>
       <div class="erro"
-        *ngIf="cadastroForm.get('telefone')?.errors?.['pattern'] && cadastroForm.get('telefone')?.touched">
+        *ngIf="cadastroForm.get('telefone')?.errors?.['pattern'] && (cadastroForm.get('telefone')?.touched || cadastroForm.get('telefone')?.dirty)">
         Telefone inválido. Informe DDD + número.
       </div>
     </div>
@@ -75,9 +75,9 @@
     <div class="form-group">
       <label for="cep">CEP</label>
       <input id="cep" type="text" formControlName="cep"
-        [ngClass]="{'campo-invalido': cadastroForm.get('cep')?.invalid && cadastroForm.get('cep')?.touched}"
+        [ngClass]="{'campo-invalido': cadastroForm.get('cep')?.invalid && (cadastroForm.get('cep')?.touched || cadastroForm.get('cep')?.dirty)}"
         placeholder="00000-000" mask="00000-000" (blur)="buscarEnderecoPorCep()" />
-      <div class="erro" *ngIf="cadastroForm.get('cep')?.invalid && cadastroForm.get('cep')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('cep')?.invalid && (cadastroForm.get('cep')?.touched || cadastroForm.get('cep')?.dirty)">
         CEP é obrigatório.
       </div>
     </div>
@@ -110,11 +110,11 @@
     <div class="form-group">
       <label for="fatec">Sua Fatec</label>
       <select id="fatec" formControlName="fatec"
-        [ngClass]="{'campo-invalido': cadastroForm.get('fatec')?.invalid && cadastroForm.get('fatec')?.touched}">
+        [ngClass]="{'campo-invalido': cadastroForm.get('fatec')?.invalid && (cadastroForm.get('fatec')?.touched || cadastroForm.get('fatec')?.dirty)}">
         <option value="" disabled selected>Selecione</option>
         <option value="FATEC Votorantim">FATEC Votorantim</option>
       </select>
-      <div class="erro" *ngIf="cadastroForm.get('fatec')?.invalid && cadastroForm.get('fatec')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('fatec')?.invalid && (cadastroForm.get('fatec')?.touched || cadastroForm.get('fatec')?.dirty)">
         Fatec é obrigatória.
       </div>
     </div>
@@ -123,9 +123,9 @@
     <div class="form-group">
       <label for="ra">RA</label>
       <input id="ra" type="text" formControlName="ra"
-        [ngClass]="{'campo-invalido': cadastroForm.get('ra')?.invalid && cadastroForm.get('ra')?.touched}"
+        [ngClass]="{'campo-invalido': cadastroForm.get('ra')?.invalid && (cadastroForm.get('ra')?.touched || cadastroForm.get('ra')?.dirty)}"
         placeholder="RA (13 dígitos)" maxlength="13" mask="0000000000000" />
-      <div class="erro" *ngIf="cadastroForm.get('ra')?.invalid && cadastroForm.get('ra')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('ra')?.invalid && (cadastroForm.get('ra')?.touched || cadastroForm.get('ra')?.dirty)">
         RA deve conter 13 dígitos.
       </div>
     </div>
@@ -134,12 +134,12 @@
     <div class="form-group">
       <label for="genero">Gênero</label>
       <select id="genero" formControlName="genero"
-        [ngClass]="{'campo-invalido': cadastroForm.get('genero')?.invalid && cadastroForm.get('genero')?.touched}">
+        [ngClass]="{'campo-invalido': cadastroForm.get('genero')?.invalid && (cadastroForm.get('genero')?.touched || cadastroForm.get('genero')?.dirty)}">
         <option value="" disabled selected>Selecione</option>
         <option value="Masculino">Masculino</option>
         <option value="Feminino">Feminino</option>
       </select>
-      <div class="erro" *ngIf="cadastroForm.get('genero')?.invalid && cadastroForm.get('genero')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('genero')?.invalid && (cadastroForm.get('genero')?.touched || cadastroForm.get('genero')?.dirty)">
         Gênero é obrigatório.
       </div>
     </div>
@@ -148,9 +148,9 @@
     <div class="form-group">
       <label for="dataNascimento">Data de Nascimento</label>
       <input id="dataNascimento" type="date" formControlName="dataNascimento" [attr.max]="hoje"
-        [ngClass]="{'campo-invalido': cadastroForm.get('dataNascimento')?.invalid && cadastroForm.get('dataNascimento')?.touched}" />
+        [ngClass]="{'campo-invalido': cadastroForm.get('dataNascimento')?.invalid && (cadastroForm.get('dataNascimento')?.touched || cadastroForm.get('dataNascimento')?.dirty)}" />
       <div class="erro"
-        *ngIf="cadastroForm.get('dataNascimento')?.invalid && cadastroForm.get('dataNascimento')?.touched">
+        *ngIf="cadastroForm.get('dataNascimento')?.invalid && (cadastroForm.get('dataNascimento')?.touched || cadastroForm.get('dataNascimento')?.dirty)">
         Data inválida. Não é permitido uma data futura.
       </div>
     </div>
@@ -162,7 +162,7 @@
         id="senha"
         type="password"
         formControlName="senha"
-        [ngClass]="{'campo-invalido': cadastroForm.get('senha')?.invalid && cadastroForm.get('senha')?.touched}"
+        [ngClass]="{'campo-invalido': cadastroForm.get('senha')?.invalid && (cadastroForm.get('senha')?.touched || cadastroForm.get('senha')?.dirty)}"
         placeholder="Mínimo 6 caracteres"
       />
 
@@ -171,7 +171,7 @@
         letra maiúscula, letra minúscula, número e caractere especial.
       </small>
 
-      <div class="erro" *ngIf="cadastroForm.get('senha')?.invalid && cadastroForm.get('senha')?.touched">
+      <div class="erro" *ngIf="cadastroForm.get('senha')?.invalid && (cadastroForm.get('senha')?.touched || cadastroForm.get('senha')?.dirty)">
         Senha deve ter no mínimo 6 caracteres.
       </div>
     </div>
@@ -180,9 +180,9 @@
     <div class="form-group">
       <label for="repetirSenha">Repita sua senha</label>
       <input id="repetirSenha" type="password" formControlName="repetirSenha"
-        [ngClass]="{'campo-invalido': cadastroForm.hasError('senhasDiferentes') && cadastroForm.get('repetirSenha')?.touched}" />
+        [ngClass]="{'campo-invalido': cadastroForm.hasError('senhasDiferentes') && (cadastroForm.get('repetirSenha')?.touched || cadastroForm.get('repetirSenha')?.dirty)}" />
       <div class="erro"
-        *ngIf="cadastroForm.hasError('senhasDiferentes') && cadastroForm.get('repetirSenha')?.touched">
+        *ngIf="cadastroForm.hasError('senhasDiferentes') && (cadastroForm.get('repetirSenha')?.touched || cadastroForm.get('repetirSenha')?.dirty)">
         As senhas não coincidem.
       </div>
     </div>
@@ -192,10 +192,10 @@
       <div class="form-group">
         <label for="cnh">CNH</label>
         <input id="cnh" type="text" formControlName="cnh"
-          [ngClass]="{'campo-invalido': cadastroForm.get('cnh')?.invalid && cadastroForm.get('cnh')?.touched}"
+          [ngClass]="{'campo-invalido': cadastroForm.get('cnh')?.invalid && (cadastroForm.get('cnh')?.touched || cadastroForm.get('cnh')?.dirty)}"
           placeholder="CNH (somente números)" />
         <div class="erro"
-          *ngIf="cadastroForm.get('cnh')?.invalid && cadastroForm.get('cnh')?.touched">
+          *ngIf="cadastroForm.get('cnh')?.invalid && (cadastroForm.get('cnh')?.touched || cadastroForm.get('cnh')?.dirty)">
           CNH é obrigatória.
         </div>
       </div>
@@ -230,10 +230,9 @@
       <div class="form-group">
         <label for="modeloCarro">Modelo do Carro</label>
         <input id="modeloCarro" type="text" formControlName="modeloCarro"
-          [ngClass]="{'campo-invalido': cadastroForm.get('modeloCarro')?.invalid && cadastroForm.get('modeloCarro')?.touched}"
+          [ngClass]="{'campo-invalido': cadastroForm.get('modeloCarro')?.invalid && (cadastroForm.get('modeloCarro')?.touched || cadastroForm.get('modeloCarro')?.dirty)}"
           placeholder="Ex.: Fox" />
-        <div class="erro"
-          *ngIf="cadastroForm.get('modeloCarro')?.invalid && cadastroForm.get('modeloCarro')?.touched">
+        <div *ngIf="cadastroForm.get('modeloCarro')?.invalid && (cadastroForm.get('modeloCarro')?.touched || cadastroForm.get('modeloCarro')?.dirty)" class="erro">
           Modelo do carro é obrigatório.
         </div>
       </div>
@@ -241,10 +240,9 @@
       <div class="form-group">
         <label for="anoCarro">Ano do Carro</label>
         <input id="anoCarro" type="text" formControlName="anoCarro"
-          [ngClass]="{'campo-invalido': cadastroForm.get('anoCarro')?.invalid && cadastroForm.get('anoCarro')?.touched}"
+          [ngClass]="{'campo-invalido': cadastroForm.get('anoCarro')?.invalid && (cadastroForm.get('anoCarro')?.touched || cadastroForm.get('anoCarro')?.dirty)}"
           placeholder="Ex.: 2020" />
-        <div class="erro"
-          *ngIf="cadastroForm.get('anoCarro')?.invalid && cadastroForm.get('anoCarro')?.touched">
+        <div *ngIf="cadastroForm.get('anoCarro')?.invalid && (cadastroForm.get('anoCarro')?.touched || cadastroForm.get('anoCarro')?.dirty)" class="erro">
           Ano do carro é obrigatório e deve ser válido.
         </div>
       </div>
@@ -252,10 +250,9 @@
       <div class="form-group">
         <label for="corCarro">Cor do Carro</label>
         <input id="corCarro" type="text" formControlName="corCarro"
-          [ngClass]="{'campo-invalido': cadastroForm.get('corCarro')?.invalid && cadastroForm.get('corCarro')?.touched}"
+          [ngClass]="{'campo-invalido': cadastroForm.get('corCarro')?.invalid && (cadastroForm.get('corCarro')?.touched || cadastroForm.get('corCarro')?.dirty)}"
           placeholder="Ex.: Prata" />
-        <div class="erro"
-          *ngIf="cadastroForm.get('corCarro')?.invalid && cadastroForm.get('corCarro')?.touched">
+        <div *ngIf="cadastroForm.get('corCarro')?.invalid && (cadastroForm.get('corCarro')?.touched || cadastroForm.get('corCarro')?.dirty)" class="erro">
           Cor do carro é obrigatória.
         </div>
       </div>
@@ -263,9 +260,9 @@
       <div class="form-group">
         <label for="placa">Placa</label>
         <input id="placa" type="text" formControlName="placa"
-          [ngClass]="{'campo-invalido': cadastroForm.get('placa')?.invalid && cadastroForm.get('placa')?.touched}"
+          [ngClass]="{'campo-invalido': cadastroForm.get('placa')?.invalid && (cadastroForm.get('placa')?.touched || cadastroForm.get('placa')?.dirty)}"
           placeholder="Placa" />
-        <div class="erro" *ngIf="cadastroForm.get('placa')?.invalid && cadastroForm.get('placa')?.touched">
+        <div *ngIf="cadastroForm.get('placa')?.invalid && (cadastroForm.get('placa')?.touched || cadastroForm.get('placa')?.dirty)" class="erro">
           Placa é obrigatória.
         </div>
       </div>

@@ -4,7 +4,7 @@ import {
   FormBuilder,
   Validators,
   ReactiveFormsModule,
-  AbstractControl
+  AbstractControl,
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -17,7 +17,7 @@ import { cpfValidator } from 'cpf-cnpj-validator/angular';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
   templateUrl: './cadastro.component.html',
-  styleUrls: ['./cadastro.component.css']
+  styleUrls: ['./cadastro.component.css'],
 })
 export class CadastroComponent implements OnInit {
   cadastroForm: FormGroup;
@@ -41,7 +41,7 @@ export class CadastroComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
   ) {
     const senhaForteRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/;
@@ -50,9 +50,15 @@ export class CadastroComponent implements OnInit {
       {
         tipoUsuario: ['passageiro', Validators.required],
         nome: ['', Validators.required],
-        cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/),cpfValidator()]],
+        cpf: [
+          '',
+          [Validators.required, Validators.pattern(/^\d{11}$/), cpfValidator()],
+        ],
         email: ['', [Validators.required, Validators.email]],
-        telefone: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
+        telefone: [
+          '',
+          [Validators.required, Validators.pattern(/^\d{10,11}$/)],
+        ],
         cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
         endereco: ['', Validators.required],
         numero: ['', Validators.required],
@@ -64,13 +70,37 @@ export class CadastroComponent implements OnInit {
         dataNascimento: ['', [Validators.required, this.validarDataNascimento]],
         senha: ['', [Validators.required, Validators.pattern(senhaForteRegex)]],
         repetirSenha: ['', Validators.required],
-        cnh: ['',[Validators.pattern(/^[0-9]\d{20}/)]],
-        modeloCarro: ['',[Validators.pattern(/^[A-Za-z0-9]{15}$/),Validators.required]],
-        anoCarro: ['', [Validators.pattern(/^\d{4}$/), Validators.min(1980), Validators.max(this.anoAtual)]],
-        corCarro: ['',[Validators.required,Validators.pattern(/^[A-Za-z]{15}$/)]],
-        placa: ['',[Validators.required,Validators.pattern(/^[A-Za-z0-9]{8}$/)]]
+        cnh: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+
+        modeloCarro: [
+          '',
+          [Validators.required, Validators.pattern(/^[\p{L}\p{N} -]{1,30}$/u)],
+        ],
+
+        anoCarro: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern(/^\d{4}$/),
+            Validators.min(1980),
+            Validators.max(this.anoAtual),
+          ],
+        ],
+
+        corCarro: [
+          '',
+          [Validators.required, Validators.pattern(/^[\p{L} -]{1,30}$/u)],
+        ],
+
+        placa: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern(/^[A-Za-z]{3}[0-9][A-Za-z0-9][0-9]{2}$/),
+          ],
+        ],
       },
-      { validators: this.validarSenhas }
+      { validators: this.validarSenhas },
     );
   }
 
@@ -81,9 +111,11 @@ export class CadastroComponent implements OnInit {
       this.alternarCamposMotorista();
     });
 
-    this.cadastroForm.get('estado')?.valueChanges.subscribe(v => {
+    this.cadastroForm.get('estado')?.valueChanges.subscribe((v) => {
       if (v && typeof v === 'string' && v !== v.toUpperCase()) {
-        this.cadastroForm.get('estado')?.setValue(v.toUpperCase(), { emitEvent: false });
+        this.cadastroForm
+          .get('estado')
+          ?.setValue(v.toUpperCase(), { emitEvent: false });
       }
     });
   }
@@ -108,7 +140,7 @@ export class CadastroComponent implements OnInit {
 
     const campos = ['cnh', 'modeloCarro', 'anoCarro', 'corCarro', 'placa'];
 
-    campos.forEach(campo => {
+    campos.forEach((campo) => {
       const control = this.cadastroForm.get(campo);
       if (!control) return;
 
@@ -138,13 +170,13 @@ export class CadastroComponent implements OnInit {
     if (!cep || cep.length !== 8) return;
 
     fetch(`https://viacep.com.br/ws/${cep}/json/`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (!data.erro) {
           this.cadastroForm.patchValue({
             endereco: data.logradouro || '',
             cidade: data.localidade || '',
-            estado: (data.uf || '').toUpperCase()
+            estado: (data.uf || '').toUpperCase(),
           });
         } else {
           alert('CEP não encontrado.');
@@ -233,7 +265,9 @@ export class CadastroComponent implements OnInit {
   }
 
   private normalizePlaca(v: any): string {
-    return String(v ?? '').toUpperCase().replace(/\s+/g, '');
+    return String(v ?? '')
+      .toUpperCase()
+      .replace(/\s+/g, '');
   }
 
   async onSubmit() {
@@ -241,9 +275,12 @@ export class CadastroComponent implements OnInit {
 
     if (this.cadastroForm.invalid) {
       const camposInvalidos = Object.keys(this.cadastroForm.controls).filter(
-        c => this.cadastroForm.get(c)?.invalid
+        (c) => this.cadastroForm.get(c)?.invalid,
       );
-      alert('Por favor, preencha corretamente os campos: ' + camposInvalidos.join(', '));
+      alert(
+        'Por favor, preencha corretamente os campos: ' +
+          camposInvalidos.join(', '),
+      );
       return;
     }
 
@@ -256,18 +293,22 @@ export class CadastroComponent implements OnInit {
       tipoUsuario: v.tipoUsuario,
       nome: String(v.nome || '').trim(),
       cpf: this.onlyDigits(v.cpf),
-      email: String(v.email || '').trim().toLowerCase(),
+      email: String(v.email || '')
+        .trim()
+        .toLowerCase(),
       telefone: this.onlyDigits(v.telefone),
       cep: this.onlyDigits(v.cep),
       endereco: String(v.endereco || '').trim(),
       numero: String(v.numero || '').trim(),
       cidade: String(v.cidade || '').trim(),
-      estado: String(v.estado || '').trim().toUpperCase(),
+      estado: String(v.estado || '')
+        .trim()
+        .toUpperCase(),
       fatec: String(v.fatec || '').trim(),
       ra: this.onlyDigits(v.ra),
       genero: v.genero === 'Masculino' || v.genero === true,
       dataNascimento: v.dataNascimento,
-      senha: v.senha
+      senha: v.senha,
     };
 
     if (v.tipoUsuario === 'motorista') {
@@ -276,17 +317,19 @@ export class CadastroComponent implements OnInit {
         Modelo: v.modeloCarro,
         Ano: Number(v.anoCarro),
         Cor: v.corCarro,
-        Placa_veiculo: this.normalizePlaca(v.placa)
+        Placa_veiculo: this.normalizePlaca(v.placa),
       };
     }
 
     this.http.post(this.baseURL, usuarioFinal).subscribe({
       next: async (res: any) => {
         try {
-          const loginResp: any = await this.http.post(`${this.baseURL}/login`, {
-            email: usuarioFinal.email,
-            senha: v.senha
-          }).toPromise();
+          const loginResp: any = await this.http
+            .post(`${this.baseURL}/login`, {
+              email: usuarioFinal.email,
+              senha: v.senha,
+            })
+            .toPromise();
 
           const token = loginResp?.token || '';
           const usuarioDoLogin = loginResp?.usuario || {};
@@ -304,7 +347,7 @@ export class CadastroComponent implements OnInit {
             fotoUrl: usuarioDoLogin?.fotoUrl ?? null,
             fotoPath: usuarioDoLogin?.fotoPath ?? null,
             cnhFotoUrl: usuarioDoLogin?.cnhFotoUrl ?? null,
-            cnhFotoPath: usuarioDoLogin?.cnhFotoPath ?? null
+            cnhFotoPath: usuarioDoLogin?.cnhFotoPath ?? null,
           };
 
           const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
@@ -329,37 +372,51 @@ export class CadastroComponent implements OnInit {
           }
 
           if (token && v.tipoUsuario === 'motorista' && this.selectedCnhFile) {
-          const fdCnh = new FormData();
-          fdCnh.append('file', this.selectedCnhFile, this.selectedCnhFile.name);
-
-          try {
-            const upCnh: any = await this.http
-              .post(`${this.baseURL}/cnh/upload`, fdCnh, { headers })
-              .toPromise();
-
-            if (upCnh?.cnhFotoUrl || upCnh?.url) {
-              usuarioSalvo.cnhFotoUrl = upCnh.cnhFotoUrl || upCnh.url;
-              usuarioSalvo.cnhFotoPath = upCnh.cnhFotoPath ?? usuarioSalvo.cnhFotoPath;
-            }
+            const fdCnh = new FormData();
+            fdCnh.append(
+              'file',
+              this.selectedCnhFile,
+              this.selectedCnhFile.name,
+            );
 
             try {
-              const idUsuarioValidacao = usuarioSalvo.idUsuario || usuarioSalvo.id || res?.id;
+              const upCnh: any = await this.http
+                .post(`${this.baseURL}/cnh/upload`, fdCnh, { headers })
+                .toPromise();
 
-              if (idUsuarioValidacao) {
-                await this.http
-                  .patch(`${this.baseURL}/cnh/validar/${idUsuarioValidacao}`, {}, { headers })
-                  .toPromise();
+              if (upCnh?.cnhFotoUrl || upCnh?.url) {
+                usuarioSalvo.cnhFotoUrl = upCnh.cnhFotoUrl || upCnh.url;
+                usuarioSalvo.cnhFotoPath =
+                  upCnh.cnhFotoPath ?? usuarioSalvo.cnhFotoPath;
+              }
 
-                console.log('E-mail de validação da CNH enviado com sucesso.');
+              try {
+                const idUsuarioValidacao =
+                  usuarioSalvo.idUsuario || usuarioSalvo.id || res?.id;
+
+                if (idUsuarioValidacao) {
+                  await this.http
+                    .patch(
+                      `${this.baseURL}/cnh/validar/${idUsuarioValidacao}`,
+                      {},
+                      { headers },
+                    )
+                    .toPromise();
+
+                  console.log(
+                    'E-mail de validação da CNH enviado com sucesso.',
+                  );
+                }
+              } catch (e) {
+                console.warn(
+                  'E-mail de validação da CNH falhou após upload:',
+                  e,
+                );
               }
             } catch (e) {
-              console.warn('E-mail de validação da CNH falhou após upload:', e);
+              console.warn('Upload da CNH falhou após cadastro:', e);
             }
-          } catch (e) {
-            console.warn('Upload da CNH falhou após cadastro:', e);
           }
-
-        }
 
           localStorage.setItem('usuarioLogado', JSON.stringify(usuarioSalvo));
           alert('✅ Conta criada com sucesso!');
@@ -370,11 +427,13 @@ export class CadastroComponent implements OnInit {
           const usuarioSalvo = {
             ...usuarioFinal,
             id: res?.id,
-            foto: null
+            foto: null,
           };
 
           localStorage.setItem('usuarioLogado', JSON.stringify(usuarioSalvo));
-          alert('Conta criada, mas não foi possível concluir o envio da foto/CNH. Você pode enviar depois em Perfil.');
+          alert(
+            'Conta criada, mas não foi possível concluir o envio da foto/CNH. Você pode enviar depois em Perfil.',
+          );
           this.router.navigate(['/login']);
         } finally {
           this.loading = false;
@@ -384,7 +443,7 @@ export class CadastroComponent implements OnInit {
         this.loading = false;
         console.error('Erro ao cadastrar:', err);
         alert(err?.error?.erro || 'Erro ao criar conta. Verifique os dados.');
-      }
+      },
     });
   }
 }
