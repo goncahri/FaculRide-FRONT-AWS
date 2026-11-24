@@ -25,6 +25,7 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "cpf-cnpj-validator": "^2.1.2",
     "express": "^4.18.2",
     "file-saver": "^2.0.5",
     "jspdf": "^3.0.3",

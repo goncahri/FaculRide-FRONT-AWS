@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { NgxMaskDirective } from 'ngx-mask';
+import { cpfValidator } from 'cpf-cnpj-validator/angular';
 
 @Component({
   selector: 'app-gerenciar-conta',
@@ -25,6 +26,7 @@ export class GerenciarComponent implements OnInit {
   usuarioLogado: any;
   temVeiculo: boolean = false;
   idVeiculo: number | null = null;
+  private anoAtual = new Date().getFullYear();
 
   // FOTO PERFIL
   selectedFile: File | null = null;
@@ -46,21 +48,22 @@ export class GerenciarComponent implements OnInit {
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.form = this.fb.group({
       nome: ['', Validators.required],
-      cpf: ['', Validators.required],
+      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/),cpfValidator()]],
       email: ['', [Validators.required, Validators.email]],
       telefone: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
-      cep: ['', Validators.required],
+      cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
       endereco: ['', Validators.required],
       numero: ['', Validators.required],
       cidade: ['', Validators.required],
-      estado: ['', Validators.required],
+      estado: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}$/)]],
       fatec: ['', Validators.required],
-      ra: ['', Validators.required],
+      ra: ['', [Validators.required, Validators.pattern(/^\d{13}$/)]],
       genero: ['', Validators.required],
       dataNascimento: ['', [Validators.required, this.validarDataNascimento]],
 
+      cnh: [''],
       modeloCarro: [''],
-      anoCarro: [''],
+      anoCarro: ['', [Validators.pattern(/^\d{4}$/), Validators.min(1980), Validators.max(this.anoAtual)]],
       corCarro: [''],
       placa: ['']
     });

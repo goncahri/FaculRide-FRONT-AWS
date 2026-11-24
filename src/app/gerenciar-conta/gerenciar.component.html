@@ -6,160 +6,223 @@
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <!-- Dados pessoais -->
+    <!-- Nome -->
     <div class="form-group">
       <label for="nome">Nome</label>
-      <input id="nome" formControlName="nome" placeholder="Nome completo" />
+      <input id="nome" type="text" formControlName="nome"
+        [ngClass]="{'campo-invalido': form.get('nome')?.invalid && form.get('nome')?.dirty}"
+        placeholder="Nome completo" />
+      <div class="erro" *ngIf="form.get('nome')?.invalid && form.get('nome')?.dirty">
+        Nome é obrigatório.
+      </div>
     </div>
 
+    <!-- CPF -->
     <div class="form-group">
       <label for="cpf">CPF</label>
-      <input id="cpf" formControlName="cpf" placeholder="CPF (somente números)" />
+      <input id="cpf" type="text" formControlName="cpf"
+        [ngClass]="{'campo-invalido': form.get('cpf')?.invalid && form.get('cpf')?.dirty}"
+        placeholder="000.000.000-00" mask="000.000.000-00" />
+      <div class="erro" *ngIf="form.get('cpf')?.invalid && form.get('cpf')?.dirty">
+        CPF inválido
+      </div>
     </div>
 
+    <!-- E-mail -->
     <div class="form-group">
       <label for="email">E-mail</label>
-      <input id="email" formControlName="email" placeholder="E-mail" />
+      <input id="email" type="email" formControlName="email"
+        [ngClass]="{'campo-invalido': form.get('email')?.invalid && form.get('email')?.dirty}"
+        placeholder="exemplo@email.com" />
+      <div class="erro" *ngIf="form.get('email')?.errors?.['required'] && form.get('email')?.dirty">
+        E-mail é obrigatório.
+      </div>
+      <div class="erro" *ngIf="form.get('email')?.errors?.['email'] && form.get('email')?.dirty">
+        E-mail inválido.
+      </div>
     </div>
 
+    <!-- Telefone -->
     <div class="form-group">
-      <label for="telefone">Telefone</label>
-      <input id="telefone" formControlName="telefone" placeholder="Telefone (somente números)" />
+      <label for="telefone">Telefone (WhatsApp)</label>
+      <input id="telefone" type="tel" formControlName="telefone"
+        [ngClass]="{'campo-invalido': form.get('telefone')?.invalid && form.get('telefone')?.dirty}"
+        placeholder="(00) 00000-0000" mask="(00) 00000-0000" />
+      <div class="erro"
+        *ngIf="form.get('telefone')?.errors?.['required'] && form.get('telefone')?.dirty">
+        Telefone é obrigatório.
+      </div>
+      <div class="erro"
+        *ngIf="form.get('telefone')?.errors?.['pattern'] && form.get('telefone')?.dirty">
+        Telefone inválido. Informe DDD + número.
+      </div>
     </div>
 
+    <!-- CEP -->
     <div class="form-group">
       <label for="cep">CEP</label>
-      <input id="cep" formControlName="cep" placeholder="CEP (somente números)" (blur)="buscarEnderecoPorCep()" />
+      <input id="cep" type="text" formControlName="cep"
+        [ngClass]="{'campo-invalido': form.get('cep')?.invalid && form.get('cep')?.dirty}"
+        placeholder="00000-000" mask="00000-000" (blur)="buscarEnderecoPorCep()" />
+      <div class="erro" *ngIf="form.get('cep')?.invalid && form.get('cep')?.dirty">
+        CEP é obrigatório.
+      </div>
     </div>
 
+    <!-- Endereço -->
     <div class="form-group">
       <label for="endereco">Endereço</label>
-      <input id="endereco" formControlName="endereco" placeholder="Endereço" />
+      <input id="endereco" type="text" formControlName="endereco" placeholder="Endereço" />
     </div>
 
+    <!-- Número -->
     <div class="form-group">
       <label for="numero">Número</label>
-      <input id="numero" formControlName="numero" placeholder="Número" />
+      <input id="numero" type="text" formControlName="numero" placeholder="Número" />
     </div>
 
+    <!-- Cidade -->
     <div class="form-group">
       <label for="cidade">Cidade</label>
-      <input id="cidade" formControlName="cidade" placeholder="Cidade" />
+      <input id="cidade" type="text" formControlName="cidade" placeholder="Cidade" />
     </div>
 
+    <!-- Estado -->
     <div class="form-group">
       <label for="estado">Estado</label>
-      <input id="estado" formControlName="estado" placeholder="Estado" />
+      <input id="estado" type="text" formControlName="estado" placeholder="Estado" />
     </div>
 
+    <!-- Fatec -->
     <div class="form-group">
-      <label for="fatec">Fatec</label>
-      <input id="fatec" formControlName="fatec" placeholder="Sua Fatec" />
+      <label for="fatec">Sua Fatec</label>
+      <select id="fatec" formControlName="fatec"
+        [ngClass]="{'campo-invalido': form.get('fatec')?.invalid && form.get('fatec')?.dirty}">
+        <option value="" disabled selected>Selecione</option>
+        <option value="FATEC Votorantim">FATEC Votorantim</option>
+      </select>
+      <div class="erro" *ngIf="form.get('fatec')?.invalid && form.get('fatec')?.dirty">
+        Fatec é obrigatória.
+      </div>
     </div>
 
+    <!-- RA -->
     <div class="form-group">
       <label for="ra">RA</label>
-      <input id="ra" formControlName="ra" placeholder="RA (somente números)" />
+      <input id="ra" type="text" formControlName="ra"
+        [ngClass]="{'campo-invalido': form.get('ra')?.invalid && form.get('ra')?.dirty}"
+        placeholder="RA (13 dígitos)" maxlength="13" mask="0000000000000" />
+      <div class="erro" *ngIf="form.get('ra')?.invalid && form.get('ra')?.dirty">
+        RA deve conter 13 dígitos.
+      </div>
     </div>
 
+    <!-- Gênero -->
     <div class="form-group">
       <label for="genero">Gênero</label>
-      <input id="genero" formControlName="genero" placeholder="Masculino ou Feminino" />
+      <select id="genero" formControlName="genero"
+        [ngClass]="{'campo-invalido': form.get('genero')?.invalid && form.get('genero')?.dirty}">
+        <option value="" disabled selected>Selecione</option>
+        <option value="Masculino">Masculino</option>
+        <option value="Feminino">Feminino</option>
+      </select>
+      <div class="erro" *ngIf="form.get('genero')?.invalid && form.get('genero')?.dirty">
+        Gênero é obrigatório.
+      </div>
     </div>
 
+    <!-- Data de Nascimento -->
     <div class="form-group">
       <label for="dataNascimento">Data de Nascimento</label>
-      <input id="dataNascimento" type="date" formControlName="dataNascimento" [attr.max]="hoje" />
-      <div *ngIf="form.get('dataNascimento')?.errors?.['dataFutura'] && form.get('dataNascimento')?.touched">
-        <small>A data não pode ser no futuro.</small>
-      </div>
-      <div *ngIf="form.get('dataNascimento')?.errors?.['required'] && form.get('dataNascimento')?.touched">
-        <small>Preencha a data de nascimento.</small>
+      <input id="dataNascimento" type="date" formControlName="dataNascimento" [attr.max]="hoje"
+        [ngClass]="{'campo-invalido': form.get('dataNascimento')?.invalid && form.get('dataNascimento')?.dirty}" />
+      <div class="erro"
+        *ngIf="form.get('dataNascimento')?.invalid && form.get('dataNascimento')?.dirty">
+        Data inválida. Não é permitido uma data futura.
       </div>
     </div>
 
-    <!-- Dados do veículo -->
-    <div class="card-veiculo">
-      <div *ngIf="temVeiculo; else templateAdicionarVeiculo">
-        <h3>Dados do Veículo</h3>
-
-        <div class="form-group">
-          <label for="modeloCarro">Modelo</label>
-          <input id="modeloCarro" formControlName="modeloCarro" placeholder="Ex: Fox" />
+    <div *ngIf="temVeiculo" class="campos-motorista">
+      <div class="form-group">
+        <label for="cnh">CNH</label>
+        <input id="cnh" type="text" formControlName="cnh"
+          [ngClass]="{'campo-invalido': form.get('cnh')?.invalid && form.get('cnh')?.dirty}"
+          placeholder="CNH (somente números)" />
+        <div class="erro"
+          *ngIf="form.get('cnh')?.invalid && form.get('cnh')?.dirty">
+          CNH é obrigatória.
         </div>
-
-        <div class="form-group">
-          <label for="anoCarro">Ano</label>
-          <input id="anoCarro" formControlName="anoCarro" placeholder="Ex: 2020" />
-        </div>
-
-        <div class="form-group">
-          <label for="corCarro">Cor</label>
-          <input id="corCarro" formControlName="corCarro" placeholder="Ex: Prata" />
-        </div>
-
-        <div class="form-group">
-          <label for="placa">Placa</label>
-          <input id="placa" formControlName="placa" placeholder="Placa do veículo" />
-        </div>
-
-        <!-- CNH do motorista (opcional) -->
-        <div class="form-group">
-          <label for="arquivoCnh">Foto ou PDF da CNH (opcional)</label>
-
-          <div class="foto-preview" *ngIf="previewCnhUrl || cnhFotoUrl || selectedCnhFile">
-            <img
-              *ngIf="!isCnhPdf && (previewCnhUrl || cnhFotoUrl)"
-              [src]="previewCnhUrl || cnhFotoUrl"
-              alt="Pré-visualização da CNH"
-              style="width:96px;height:96px;object-fit:cover;border-radius:8px;border:2px solid #ddd" />
-
-            <div *ngIf="isCnhPdf" style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:32px;">📄</span>
-              <span>{{ selectedCnhFile?.name || 'CNH em PDF enviada' }}</span>
-            </div>
-
-            <button type="button" (click)="removerCnh()">Remover</button>
-          </div>
-
-          <input
-            id="arquivoCnh"
-            type="file"
-            accept="image/png,image/jpeg,image/webp,application/pdf"
-            (change)="onCnhChange($event)" />
-
-          <small>Formatos: JPG/PNG/WEBP/PDF — até 5MB</small>
-        </div>
-
-        <button type="button" (click)="removerVeiculo()" class="btn-remover">
-          Não tenho mais veículo (Remover Veículo)
-        </button>
       </div>
 
-      <!-- Caso não tenha veículo -->
-      <ng-template #templateAdicionarVeiculo>
-        <button type="button" (click)="adicionarVeiculo()" class="btn-adicionar">
-          + Adicionar Veículo
-        </button>
-      </ng-template>
-    </div>
+      <!-- Arquivo da CNH (opcional) -->
+      <div class="form-group">
+        <label for="arquivoCnh">Foto ou PDF da CNH (opcional)</label>
 
-    <!-- Foto do perfil (opcional) -->
-    <div class="form-group">
-      <label for="foto">Foto do perfil (opcional)</label>
+        <div class="foto-preview" *ngIf="previewCnhUrl as cnhSrc">
+          <img
+            *ngIf="cnhFileType !== 'application/pdf'"
+            [src]="cnhSrc"
+            alt="Pré-visualização da CNH"
+            style="width:96px;height:96px;object-fit:cover;border-radius:8px;border:2px solid #ddd" />
 
-      <!-- Preview (mostra se houver imagem selecionada) -->
-      <div class="foto-preview" *ngIf="previewUrl as src">
-        <img [src]="src" alt="Pré-visualização da foto" style="width:96px;height:96px;object-fit:cover;border-radius:50%;border:2px solid #ddd" />
-        <button type="button" (click)="removerFoto()">Remover</button>
+          <span *ngIf="cnhFileType === 'application/pdf'">
+            PDF selecionado: {{ selectedCnhFile?.name }}
+          </span>
+
+          <button type="button" (click)="removerCnh()">Remover</button>
+        </div>
+
+        <input
+          id="arquivoCnh"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,application/pdf"
+          (change)="onCnhChange($event)" />
+
+        <small>Formatos: JPG/PNG/WEBP/PDF — até 5MB</small>
       </div>
 
-      <input
-        id="foto"
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        (change)="onFotoChange($event)" />
+      <div class="form-group">
+        <label for="modeloCarro">Modelo do Carro</label>
+        <input id="modeloCarro" type="text" formControlName="modeloCarro"
+          [ngClass]="{'campo-invalido': form.get('modeloCarro')?.invalid && form.get('modeloCarro')?.dirty}"
+          placeholder="Ex.: Fox" />
+        <div class="erro"
+          *ngIf="form.get('modeloCarro')?.invalid && form.get('modeloCarro')?.dirty">
+          Modelo do carro é obrigatório.
+        </div>
+      </div>
 
-      <small>Formatos: JPG/PNG/WEBP — até 5MB</small>
+      <div class="form-group">
+        <label for="anoCarro">Ano do Carro</label>
+        <input id="anoCarro" type="text" formControlName="anoCarro"
+          [ngClass]="{'campo-invalido': form.get('anoCarro')?.invalid && form.get('anoCarro')?.dirty}"
+          placeholder="Ex.: 2020" />
+        <div class="erro"
+          *ngIf="form.get('anoCarro')?.invalid && form.get('anoCarro')?.dirty">
+          Ano do carro é obrigatório e deve ser válido.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="corCarro">Cor do Carro</label>
+        <input id="corCarro" type="text" formControlName="corCarro"
+          [ngClass]="{'campo-invalido': form.get('corCarro')?.invalid && form.get('corCarro')?.dirty}"
+          placeholder="Ex.: Prata" />
+        <div class="erro"
+          *ngIf="form.get('corCarro')?.invalid && form.get('corCarro')?.dirty">
+          Cor do carro é obrigatória.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="placa">Placa</label>
+        <input id="placa" type="text" formControlName="placa"
+          [ngClass]="{'campo-invalido': form.get('placa')?.invalid && form.get('placa')?.dirty}"
+          placeholder="Placa" />
+        <div class="erro" *ngIf="form.get('placa')?.invalid && form.get('placa')?.dirty">
+          Placa é obrigatória.
+        </div>
+      </div>
     </div>
 
     <button type="submit">Salvar Alterações</button>

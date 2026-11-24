@@ -21,6 +21,15 @@
   font-size: 0.95rem;
 }
 
+select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 h3 {
   margin-top: 20px;
   color: #0f172a;
@@ -140,6 +149,12 @@ small {
 
 .foto-preview button:hover {
   background-color: #b91c1c;
+}
+
+.erro {
+  color: red;
+  font-size: 12px;
+  margin-top: 2px;
 }
 
 /* Responsividade */

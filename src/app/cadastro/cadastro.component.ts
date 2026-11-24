@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgxMaskDirective } from 'ngx-mask';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { cpfValidator } from 'cpf-cnpj-validator/angular';
 
 @Component({
   selector: 'app-cadastro',
@@ -49,7 +50,7 @@ export class CadastroComponent implements OnInit {
       {
         tipoUsuario: ['passageiro', Validators.required],
         nome: ['', Validators.required],
-        cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+        cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/),cpfValidator()]],
         email: ['', [Validators.required, Validators.email]],
         telefone: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
         cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],

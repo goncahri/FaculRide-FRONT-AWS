@@ -37,7 +37,7 @@
         [ngClass]="{'campo-invalido': cadastroForm.get('cpf')?.invalid && cadastroForm.get('cpf')?.touched}"
         placeholder="000.000.000-00" mask="000.000.000-00" />
       <div class="erro" *ngIf="cadastroForm.get('cpf')?.invalid && cadastroForm.get('cpf')?.touched">
-        CPF é obrigatório.
+        CPF inválido
       </div>
     </div>
 
