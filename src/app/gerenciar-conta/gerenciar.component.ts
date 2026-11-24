@@ -61,11 +61,11 @@ export class GerenciarComponent implements OnInit {
       genero: ['', Validators.required],
       dataNascimento: ['', [Validators.required, this.validarDataNascimento]],
 
-      cnh: [''],
-      modeloCarro: [''],
-      anoCarro: ['', [Validators.pattern(/^\d{4}$/), Validators.min(1980), Validators.max(this.anoAtual)]],
-      corCarro: [''],
-      placa: ['']
+        cnh: ['',[Validators.pattern(/^[0-9]\d{20}/)]],
+        modeloCarro: ['',[Validators.pattern(/^[A-Za-z0-9]{15}$/),Validators.required]],
+        anoCarro: ['', [Validators.pattern(/^\d{4}$/), Validators.min(1980), Validators.max(this.anoAtual)]],
+        corCarro: ['',[Validators.required,Validators.pattern(/^[A-Za-z]{15}$/)]],
+        placa: ['',[Validators.required,Validators.pattern(/^[A-Za-z0-9]{8}$/)]]
     });
   }
 

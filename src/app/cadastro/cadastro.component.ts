@@ -64,11 +64,11 @@ export class CadastroComponent implements OnInit {
         dataNascimento: ['', [Validators.required, this.validarDataNascimento]],
         senha: ['', [Validators.required, Validators.pattern(senhaForteRegex)]],
         repetirSenha: ['', Validators.required],
-        cnh: [''],
-        modeloCarro: [''],
+        cnh: ['',[Validators.pattern(/^[0-9]\d{20}/)]],
+        modeloCarro: ['',[Validators.pattern(/^[A-Za-z0-9]{15}$/),Validators.required]],
         anoCarro: ['', [Validators.pattern(/^\d{4}$/), Validators.min(1980), Validators.max(this.anoAtual)]],
-        corCarro: [''],
-        placa: ['']
+        corCarro: ['',[Validators.required,Validators.pattern(/^[A-Za-z]{15}$/)]],
+        placa: ['',[Validators.required,Validators.pattern(/^[A-Za-z0-9]{8}$/)]]
       },
       { validators: this.validarSenhas }
     );
